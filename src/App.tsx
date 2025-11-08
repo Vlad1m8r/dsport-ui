@@ -50,8 +50,10 @@ function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(
     WebApp.colorScheme === 'light' ? 'light' : 'dark',
   )
-  const [isAnimating, setIsAnimating] = useState(true)
   const [isMinimized, setIsMinimized] = useState(false)
+  const [animationStage, setAnimationStage] = useState<'swirl' | 'explosion' | 'final'>(
+    'swirl',
+  )
   const themeRef = useRef(theme)
 
   const systemThemeRef = useRef<Record<string, string>>({
@@ -155,16 +157,18 @@ function App() {
   }, [applyCssVariables, lightTheme, theme])
 
   useEffect(() => {
-    const minimizeTimer = window.setTimeout(() => {
+    const explosionTimer = window.setTimeout(() => {
+      setAnimationStage('explosion')
+    }, 3400)
+
+    const finalTimer = window.setTimeout(() => {
       setIsMinimized(true)
-    }, 3200)
-    const animationTimer = window.setTimeout(() => {
-      setIsAnimating(false)
-    }, 3800)
+      setAnimationStage('final')
+    }, 5000)
 
     return () => {
-      window.clearTimeout(minimizeTimer)
-      window.clearTimeout(animationTimer)
+      window.clearTimeout(explosionTimer)
+      window.clearTimeout(finalTimer)
     }
   }, [])
 
@@ -172,12 +176,16 @@ function App() {
     setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
   }
 
-  const particles = useMemo(() => Array.from({ length: 10 }, (_, index) => index), [])
-  const appClassName = `app${isMinimized ? ' app--minimized' : ''}`
+  const particles = useMemo(() => Array.from({ length: 16 }, (_, index) => index), [])
+  const appClassName = `app${isMinimized ? ' app--minimized' : ''}${
+    animationStage === 'final' ? ' app--finale' : ''
+  }`
   const profileCardClassName = `profile-card${
-    isAnimating ? ' profile-card--animating' : ''
-  }${isMinimized ? ' profile-card--minimized' : ''}`
-
+    animationStage === 'swirl' ? ' profile-card--swirl' : ''
+  }${animationStage === 'explosion' ? ' profile-card--explosion' : ''}${
+    isMinimized ? ' profile-card--minimized' : ''
+  }${animationStage === 'final' ? ' profile-card--final' : ''}`
+  
   return (
     <main className={appClassName}>
       <button
@@ -217,6 +225,22 @@ function App() {
           <p className="profile-card__caption">{statusText}</p>
         </div>
       </section>
+      <div
+        className={`meteor${animationStage === 'explosion' ? ' meteor--active' : ''}`}
+        aria-hidden="true"
+      />
+      <div
+        className={`explosion${animationStage === 'explosion' ? ' explosion--active' : ''}`}
+        aria-hidden="true"
+      />
+      <div
+        className={`finale${animationStage === 'final' ? ' finale--active' : ''}`}
+      >
+        <div className="finale__letter" aria-hidden="true">
+          Z
+        </div>
+        <p className="finale__cta">Вступай в ряды спортсменов</p>
+      </div>
     </main>
   )
 }
