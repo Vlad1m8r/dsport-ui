@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import WebApp, {
   applyThemeParams,
   isTelegramEnvironment,
@@ -47,16 +47,88 @@ const buildStatusText = (user: WebAppUser | null, ready: boolean): string => {
 function App() {
   const [user, setUser] = useState<WebAppUser | null>(null)
   const [isReady, setIsReady] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>(
+    WebApp.colorScheme === 'light' ? 'light' : 'dark',
+  )
+  const themeRef = useRef(theme)
+
+  const systemThemeRef = useRef<Record<string, string>>({
+    '--tg-theme-bg-color': '#0b1120',
+    '--tg-theme-text-color': '#f8fafc',
+    '--tg-theme-hint-color': '#94a3b8',
+    '--tg-theme-button-color': '#2a9df4',
+    '--tg-theme-button-text-color': '#ffffff',
+    '--tg-theme-secondary-bg-color': 'rgba(15, 23, 42, 0.5)',
+    '--tg-theme-link-color': '#38bdf8',
+  })
+
+  const lightTheme = useMemo(
+    () => ({
+      '--tg-theme-bg-color': '#f8fafc',
+      '--tg-theme-text-color': '#0f172a',
+      '--tg-theme-hint-color': '#64748b',
+      '--tg-theme-button-color': '#2563eb',
+      '--tg-theme-button-text-color': '#ffffff',
+      '--tg-theme-secondary-bg-color': '#e2e8f0',
+      '--tg-theme-link-color': '#2563eb',
+    }),
+    [],
+  )
+
+  const applyCssVariables = useCallback((variables: Record<string, string>) => {
+    const root = document.documentElement
+    Object.entries(variables).forEach(([key, value]) => {
+      root.style.setProperty(key, value)
+    })
+  }, [])
+
+  const extractThemeFromWebApp = useCallback(() => {
+    const nextTheme = { ...systemThemeRef.current }
+
+    if (WebApp.themeParams.bg_color) {
+      nextTheme['--tg-theme-bg-color'] = WebApp.themeParams.bg_color
+    }
+    if (WebApp.themeParams.text_color) {
+      nextTheme['--tg-theme-text-color'] = WebApp.themeParams.text_color
+    }
+    if (WebApp.themeParams.hint_color) {
+      nextTheme['--tg-theme-hint-color'] = WebApp.themeParams.hint_color
+    }
+    if (WebApp.themeParams.button_color) {
+      nextTheme['--tg-theme-button-color'] = WebApp.themeParams.button_color
+    }
+    if (WebApp.themeParams.button_text_color) {
+      nextTheme['--tg-theme-button-text-color'] = WebApp.themeParams.button_text_color
+    }
+    if (WebApp.themeParams.secondary_bg_color) {
+      nextTheme['--tg-theme-secondary-bg-color'] = WebApp.themeParams.secondary_bg_color
+    }
+    if (WebApp.themeParams.link_color) {
+      nextTheme['--tg-theme-link-color'] = WebApp.themeParams.link_color
+    }
+
+    return nextTheme
+  }, [])
 
   useEffect(() => {
     WebApp.ready()
     WebApp.expand()
     applyThemeParams(WebApp.themeParams)
+    systemThemeRef.current = extractThemeFromWebApp()
+    if (WebApp.colorScheme === 'light') {
+      applyCssVariables(lightTheme)
+    } else {
+      applyCssVariables(systemThemeRef.current)
+    }
     setUser(WebApp.initDataUnsafe.user ?? null)
     setIsReady(true)
 
     const handleThemeChange = () => {
       applyThemeParams(WebApp.themeParams)
+      systemThemeRef.current = extractThemeFromWebApp()
+      if (themeRef.current === 'dark') {
+        applyCssVariables(systemThemeRef.current)
+      }
     }
 
     WebApp.onEvent('themeChanged', handleThemeChange)
@@ -64,15 +136,37 @@ function App() {
     return () => {
       WebApp.offEvent('themeChanged', handleThemeChange)
     }
-  }, [])
+  }, [applyCssVariables, extractThemeFromWebApp, lightTheme])
 
   const displayName = useMemo(() => buildDisplayName(user), [user])
   const initials = useMemo(() => buildInitials(user), [user])
   const statusText = useMemo(() => buildStatusText(user, isReady), [user, isReady])
   const altText = `Аватар пользователя ${displayName}`
 
+  useEffect(() => {
+    if (theme === 'light') {
+      applyCssVariables(lightTheme)
+    } else {
+      applyCssVariables(systemThemeRef.current)
+    }
+    themeRef.current = theme
+  }, [applyCssVariables, lightTheme, theme])
+
+  const toggleTheme = () => {
+    setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
+  }
+
   return (
     <main className="app">
+      <button
+        type="button"
+        className="theme-toggle"
+        onClick={toggleTheme}
+        aria-pressed={theme === 'light'}
+        aria-label="Переключить тему"
+      >
+        {theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}
+      </button>
       <section className="profile-card" aria-live="polite">
         <div
           className="profile-card__avatar"
