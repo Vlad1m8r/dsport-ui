@@ -6,6 +6,9 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "types": ["vite/client"],
+    "paths": {
+      "@twa-dev/sdk": ["./src/lib/twa-sdk.ts"]
+    },
     "skipLibCheck": true,
 
     /* Bundler mode */
