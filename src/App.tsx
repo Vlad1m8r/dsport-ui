@@ -50,6 +50,8 @@ function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(
     WebApp.colorScheme === 'light' ? 'light' : 'dark',
   )
+  const [isAnimating, setIsAnimating] = useState(true)
+  const [isMinimized, setIsMinimized] = useState(false)
   const themeRef = useRef(theme)
 
   const systemThemeRef = useRef<Record<string, string>>({
@@ -152,12 +154,32 @@ function App() {
     themeRef.current = theme
   }, [applyCssVariables, lightTheme, theme])
 
+  useEffect(() => {
+    const minimizeTimer = window.setTimeout(() => {
+      setIsMinimized(true)
+    }, 3200)
+    const animationTimer = window.setTimeout(() => {
+      setIsAnimating(false)
+    }, 3800)
+
+    return () => {
+      window.clearTimeout(minimizeTimer)
+      window.clearTimeout(animationTimer)
+    }
+  }, [])
+
   const toggleTheme = () => {
     setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
   }
 
+  const particles = useMemo(() => Array.from({ length: 10 }, (_, index) => index), [])
+  const appClassName = `app${isMinimized ? ' app--minimized' : ''}`
+  const profileCardClassName = `profile-card${
+    isAnimating ? ' profile-card--animating' : ''
+  }${isMinimized ? ' profile-card--minimized' : ''}`
+
   return (
-    <main className="app">
+    <main className={appClassName}>
       <button
         type="button"
         className="theme-toggle"
@@ -167,7 +189,12 @@ function App() {
       >
         {theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}
       </button>
-      <section className="profile-card" aria-live="polite">
+      <section className={profileCardClassName} aria-live="polite">
+        <div className="profile-card__particles" aria-hidden="true">
+          {particles.map((particle) => (
+            <span key={particle} />
+          ))}
+        </div>
         <div
           className="profile-card__avatar"
           role={user?.photo_url ? undefined : 'img'}
