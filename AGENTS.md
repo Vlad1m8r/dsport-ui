@@ -50,3 +50,6 @@
   - src/features
   - src/entities
   - src/shared (ui, lib, api, config)
+
+## Контекст продукта
+- Описание MVP и юзер флоу: см. `PRODUCT.md` в корне репозитория.
