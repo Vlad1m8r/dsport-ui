@@ -1,5 +1,5 @@
 # PRODUCT — Telegram WebApp «Workout Journal»
-## MVP v1 (Templates-first)
+## MVP v2 (Templates-first)
 
 ---
 
