@@ -33,3 +33,20 @@
 ## Рабочий процесс
 - Перед коммитом проверяйте проект на сборку и линтер (если применимо к изменению).
 - Обновления описывайте в PR кратко и по делу, подчёркивая влияние на Telegram Mini App.
+
+## Routing
+- Use React Router.
+- Pages live in src/pages and are wired in src/app/router.tsx.
+
+## API / Server state
+- Use a single API client in src/lib/api (fetch wrapper).
+- TanStack Query keys are defined in feature modules.
+- Telegram initData is attached to every request via header (e.g., X-Tg-Init-Data).
+
+## Project structure (choose one)
+- Feature-sliced:
+  - src/app (router, providers)
+  - src/pages
+  - src/features
+  - src/entities
+  - src/shared (ui, lib, api, config)
