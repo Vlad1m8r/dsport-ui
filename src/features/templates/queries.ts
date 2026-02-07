@@ -16,10 +16,19 @@ type TemplateId =
 
 const templatesQueryKey = ["templates"] as const;
 
+const normalizeTemplates = (template: TemplateResponse): TemplateResponse[] => {
+  if (template) {
+    return [template];
+  }
+
+  return [];
+};
+
 export const useTemplates = (): UseQueryResult<TemplateResponse[], Error> => {
   return useQuery({
     queryKey: templatesQueryKey,
     queryFn: listTemplates,
+    select: normalizeTemplates,
   });
 };
 
