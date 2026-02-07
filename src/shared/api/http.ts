@@ -17,7 +17,7 @@ const buildHeaders = (options?: RequestInit): Headers => {
   }
 
   const initData = getInitData();
-  if (initData) {
+  if (initData.trim() !== "") {
     headers.set("X-Tg-Init-Data", initData);
   }
 
