@@ -1,0 +1,652 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /api/templates/{id}:
+    get:
+      tags:
+      - template-controller
+      summary: Получить шаблон
+      operationId: get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Шаблон
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
+        "404":
+          description: Шаблон не найден
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    put:
+      tags:
+      - template-controller
+      summary: Обновить шаблон
+      operationId: update
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemplateCreateRequest"
+        required: true
+      responses:
+        "400":
+          description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Шаблон обновлен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
+        "404":
+          description: Шаблон не найден
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      tags:
+      - template-controller
+      summary: Удалить шаблон
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Шаблон удален
+        "404":
+          description: Шаблон не найден
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/workouts/{workoutId}/exercises:
+    post:
+      tags:
+      - workout-controller
+      summary: Добавить упражнение в тренировку
+      operationId: addExercise
+      parameters:
+      - name: workoutId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddWorkoutExerciseRequest"
+        required: true
+      responses:
+        "404":
+          description: Тренировка или упражнение не найдены
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "400":
+          description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Упражнение добавлено
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkoutExerciseResponse"
+  /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets:
+    post:
+      tags:
+      - workout-controller
+      summary: Добавить подход к упражнению
+      operationId: addSetEntry
+      parameters:
+      - name: workoutId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: workoutExerciseId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddSetEntryRequest"
+        required: true
+      responses:
+        "200":
+          description: Подход добавлен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SetEntryResponse"
+        "404":
+          description: Тренировка или упражнение не найдены
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "400":
+          description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/workouts/start:
+    post:
+      tags:
+      - workout-controller
+      summary: Запустить тренировку
+      operationId: startWorkout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartWorkoutRequest"
+        required: true
+      responses:
+        "200":
+          description: Тренировка создана
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkoutSessionResponse"
+        "400":
+          description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Шаблон не найден
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/templates:
+    get:
+      tags:
+      - template-controller
+      summary: Получить список шаблонов
+      operationId: list
+      responses:
+        "200":
+          description: Список шаблонов
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
+    post:
+      tags:
+      - template-controller
+      summary: Создать шаблон тренировки
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemplateCreateRequest"
+        required: true
+      responses:
+        "400":
+          description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "201":
+          description: Шаблон создан
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
+  /api/exercises/{exerciseId}/last-max:
+    get:
+      tags:
+      - exercise-controller
+      summary: Получить последний максимум по упражнению
+      operationId: getLastMax
+      parameters:
+      - name: exerciseId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Последний максимум
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExerciseLastMaxResponse"
+        "404":
+          description: Упражнение не найдено
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /api/workouts/{workoutId}/exercises/{workoutExerciseId}:
+    delete:
+      tags:
+      - workout-controller
+      summary: Удалить упражнение из тренировки
+      operationId: deleteExercise
+      parameters:
+      - name: workoutId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: workoutExerciseId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Тренировка или упражнение не найдены
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "204":
+          description: Упражнение удалено
+  /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets/{setEntryId}:
+    delete:
+      tags:
+      - workout-controller
+      summary: Удалить подход из тренировки
+      operationId: deleteSetEntry
+      parameters:
+      - name: workoutId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: workoutExerciseId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: setEntryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Подход удален
+        "404":
+          description: Тренировка или подход не найдены
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+components:
+  schemas:
+    TemplateCreateRequest:
+      required:
+      - exercises
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название шаблона
+          example: Грудь
+        exercises:
+          type: array
+          description: Упражнения в шаблоне
+          items:
+            $ref: "#/components/schemas/TemplateExerciseRequest"
+      description: Запрос на создание или обновление шаблона тренировки
+    TemplateExerciseRequest:
+      required:
+      - exerciseId
+      - sets
+      type: object
+      properties:
+        exerciseId:
+          type: integer
+          description: Идентификатор упражнения
+          format: int64
+          example: 1
+        orderIndex:
+          minimum: 0
+          type: integer
+          description: Порядок упражнения
+          format: int32
+          example: 1
+        sets:
+          type: array
+          description: Плановые подходы
+          items:
+            $ref: "#/components/schemas/TemplateSetRequest"
+      description: Упражнение в шаблоне
+    TemplateSetRequest:
+      type: object
+      properties:
+        orderIndex:
+          minimum: 0
+          type: integer
+          description: Порядок подхода
+          format: int32
+          example: 1
+        plannedReps:
+          minimum: 1
+          type: integer
+          description: Плановые повторы
+          format: int32
+          nullable: true
+          example: 10
+        plannedDurationSeconds:
+          minimum: 1
+          type: integer
+          description: Плановая длительность в секундах
+          format: int32
+          nullable: true
+          example: 60
+        oneOfPlannedFieldsPresent:
+          type: boolean
+          description: Проверка корректности набора полей
+      description: Плановый подход
+    ApiError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Время ошибки
+          format: date-time
+        path:
+          type: string
+          description: Путь запроса
+        code:
+          type: string
+          description: Код ошибки
+          example: NOT_FOUND
+        message:
+          type: string
+          description: Сообщение
+        details:
+          type: object
+          description: Дополнительные детали
+          nullable: true
+      description: Ошибка API
+    TemplateExerciseResponse:
+      type: object
+      properties:
+        exerciseId:
+          type: integer
+          description: Идентификатор упражнения
+          format: int64
+          example: 1
+        orderIndex:
+          type: integer
+          description: Порядок упражнения
+          format: int32
+          example: 1
+        sets:
+          type: array
+          description: Плановые подходы
+          items:
+            $ref: "#/components/schemas/TemplateSetResponse"
+      description: Упражнение в шаблоне
+    TemplateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор шаблона
+          format: int64
+          example: 10
+        name:
+          type: string
+          description: Название шаблона
+          example: Грудь
+        exercises:
+          type: array
+          description: Упражнения в шаблоне
+          items:
+            $ref: "#/components/schemas/TemplateExerciseResponse"
+      description: Ответ с шаблоном тренировки
+    TemplateSetResponse:
+      type: object
+      properties:
+        orderIndex:
+          type: integer
+          description: Порядок подхода
+          format: int32
+          example: 1
+        plannedReps:
+          type: integer
+          description: Плановые повторы
+          format: int32
+          nullable: true
+          example: 10
+        plannedDurationSeconds:
+          type: integer
+          description: Плановая длительность в секундах
+          format: int32
+          nullable: true
+          example: 60
+      description: Плановый подход
+    AddWorkoutExerciseRequest:
+      required:
+      - exerciseId
+      - orderIndex
+      type: object
+      properties:
+        exerciseId:
+          type: integer
+          description: Идентификатор упражнения
+          format: int64
+          example: 123
+        orderIndex:
+          type: integer
+          description: Порядок упражнения
+          format: int32
+          example: 2
+      description: Запрос на добавление упражнения в тренировку
+    SetEntryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор подхода
+          format: int64
+          example: 5000
+        orderIndex:
+          type: integer
+          description: Порядок подхода
+          format: int32
+          example: 1
+        reps:
+          type: integer
+          description: Фактические повторы
+          format: int32
+          nullable: true
+          example: 10
+        weight:
+          type: number
+          description: Вес
+          nullable: true
+          example: 50.0
+        durationSeconds:
+          type: integer
+          description: Длительность в секундах
+          format: int32
+          nullable: true
+          example: 60
+      description: Фактический подход
+    WorkoutExerciseResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор записи упражнения
+          format: int64
+          example: 1000
+        exerciseId:
+          type: integer
+          description: Идентификатор упражнения
+          format: int64
+          example: 1
+        orderIndex:
+          type: integer
+          description: Порядок упражнения
+          format: int32
+          example: 1
+        sets:
+          type: array
+          description: Подходы
+          items:
+            $ref: "#/components/schemas/SetEntryResponse"
+      description: Упражнение в тренировке
+    AddSetEntryRequest:
+      required:
+      - orderIndex
+      type: object
+      properties:
+        orderIndex:
+          type: integer
+          description: Порядок подхода
+          format: int32
+          example: 1
+        reps:
+          type: integer
+          description: Фактические повторы
+          format: int32
+          nullable: true
+          example: 12
+        weight:
+          type: number
+          description: Вес
+          nullable: true
+          example: 80.0
+        durationSeconds:
+          type: integer
+          description: Длительность в секундах
+          format: int32
+          nullable: true
+          example: 60
+      description: Запрос на добавление подхода к упражнению
+    StartWorkoutRequest:
+      type: object
+      properties:
+        templateId:
+          type: integer
+          description: Идентификатор шаблона
+          format: int64
+          nullable: true
+          example: 10
+        title:
+          type: string
+          description: Заголовок тренировки
+          nullable: true
+          example: 2026-02-01 Грудь
+      description: Запрос на старт тренировки
+    WorkoutSessionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор тренировки
+          format: int64
+          example: 100
+        title:
+          type: string
+          description: Заголовок тренировки
+          example: 2026-02-01 Грудь
+        startedAt:
+          type: string
+          description: Дата и время старта
+          format: date-time
+        templateId:
+          type: integer
+          description: Идентификатор шаблона
+          format: int64
+          nullable: true
+          example: 10
+        exercises:
+          type: array
+          description: Упражнения тренировки
+          items:
+            $ref: "#/components/schemas/WorkoutExerciseResponse"
+      description: Ответ с тренировочной сессией
+    ExerciseLastMaxResponse:
+      type: object
+      properties:
+        exerciseId:
+          type: integer
+          description: Идентификатор упражнения
+          format: int64
+          example: 123
+        lastWorkoutId:
+          type: integer
+          description: Идентификатор последней тренировки
+          format: int64
+          nullable: true
+          example: 456
+        lastWorkoutStartedAt:
+          type: string
+          description: Дата и время старта последней тренировки
+          format: date-time
+          nullable: true
+        maxWeight:
+          type: number
+          description: Максимальный вес в последней тренировке
+          nullable: true
+          example: 80.0
+        maxDurationSeconds:
+          type: integer
+          description: Максимальная длительность в секундах в последней тренировке
+          format: int32
+          nullable: true
+          example: 120
+      description: Ответ с последним максимумом по упражнению
