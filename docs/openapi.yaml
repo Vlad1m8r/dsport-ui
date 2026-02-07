@@ -20,18 +20,18 @@ paths:
           type: integer
           format: int64
       responses:
-        "200":
-          description: Шаблон
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/TemplateResponse"
         "404":
           description: Шаблон не найден
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Шаблон
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
     put:
       tags:
       - template-controller
@@ -51,12 +51,6 @@ paths:
               $ref: "#/components/schemas/TemplateCreateRequest"
         required: true
       responses:
-        "400":
-          description: Ошибка валидации
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ApiError"
         "200":
           description: Шаблон обновлен
           content:
@@ -65,6 +59,12 @@ paths:
                 $ref: "#/components/schemas/TemplateResponse"
         "404":
           description: Шаблон не найден
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "400":
+          description: Ошибка валидации
           content:
             '*/*':
               schema:
@@ -82,14 +82,14 @@ paths:
           type: integer
           format: int64
       responses:
-        "204":
-          description: Шаблон удален
         "404":
           description: Шаблон не найден
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "204":
+          description: Шаблон удален
   /api/workouts/{workoutId}/exercises:
     post:
       tags:
@@ -154,12 +154,6 @@ paths:
               $ref: "#/components/schemas/AddSetEntryRequest"
         required: true
       responses:
-        "200":
-          description: Подход добавлен
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SetEntryResponse"
         "404":
           description: Тренировка или упражнение не найдены
           content:
@@ -172,6 +166,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Подход добавлен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SetEntryResponse"
   /api/workouts/start:
     post:
       tags:
@@ -185,6 +185,12 @@ paths:
               $ref: "#/components/schemas/StartWorkoutRequest"
         required: true
       responses:
+        "404":
+          description: Шаблон не найден
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
         "200":
           description: Тренировка создана
           content:
@@ -193,12 +199,6 @@ paths:
                 $ref: "#/components/schemas/WorkoutSessionResponse"
         "400":
           description: Ошибка валидации
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ApiError"
-        "404":
-          description: Шаблон не найден
           content:
             '*/*':
               schema:
@@ -215,7 +215,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/TemplateResponse"
+                type: array
+                items:
+                  $ref: "#/components/schemas/TemplateResponse"
     post:
       tags:
       - template-controller
@@ -228,18 +230,18 @@ paths:
               $ref: "#/components/schemas/TemplateCreateRequest"
         required: true
       responses:
-        "400":
-          description: Ошибка валидации
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ApiError"
         "201":
           description: Шаблон создан
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/TemplateResponse"
+        "400":
+          description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /api/exercises/{exerciseId}/last-max:
     get:
       tags:
@@ -396,28 +398,6 @@ components:
           type: boolean
           description: Проверка корректности набора полей
       description: Плановый подход
-    ApiError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Время ошибки
-          format: date-time
-        path:
-          type: string
-          description: Путь запроса
-        code:
-          type: string
-          description: Код ошибки
-          example: NOT_FOUND
-        message:
-          type: string
-          description: Сообщение
-        details:
-          type: object
-          description: Дополнительные детали
-          nullable: true
-      description: Ошибка API
     TemplateExerciseResponse:
       type: object
       properties:
@@ -476,6 +456,28 @@ components:
           nullable: true
           example: 60
       description: Плановый подход
+    ApiError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Время ошибки
+          format: date-time
+        path:
+          type: string
+          description: Путь запроса
+        code:
+          type: string
+          description: Код ошибки
+          example: NOT_FOUND
+        message:
+          type: string
+          description: Сообщение
+        details:
+          type: object
+          description: Дополнительные детали
+          nullable: true
+      description: Ошибка API
     AddWorkoutExerciseRequest:
       required:
       - exerciseId

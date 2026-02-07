@@ -197,25 +197,6 @@ export interface components {
             /** @description Проверка корректности набора полей */
             oneOfPlannedFieldsPresent?: boolean;
         };
-        /** @description Ошибка API */
-        ApiError: {
-            /**
-             * Format: date-time
-             * @description Время ошибки
-             */
-            timestamp?: string;
-            /** @description Путь запроса */
-            path?: string;
-            /**
-             * @description Код ошибки
-             * @example NOT_FOUND
-             */
-            code?: string;
-            /** @description Сообщение */
-            message?: string;
-            /** @description Дополнительные детали */
-            details?: Record<string, never> | null;
-        };
         /** @description Упражнение в шаблоне */
         TemplateExerciseResponse: {
             /**
@@ -269,6 +250,25 @@ export interface components {
              * @example 60
              */
             plannedDurationSeconds?: number | null;
+        };
+        /** @description Ошибка API */
+        ApiError: {
+            /**
+             * Format: date-time
+             * @description Время ошибки
+             */
+            timestamp?: string;
+            /** @description Путь запроса */
+            path?: string;
+            /**
+             * @description Код ошибки
+             * @example NOT_FOUND
+             */
+            code?: string;
+            /** @description Сообщение */
+            message?: string;
+            /** @description Дополнительные детали */
+            details?: Record<string, never> | null;
         };
         /** @description Запрос на добавление упражнения в тренировку */
         AddWorkoutExerciseRequest: {
@@ -697,7 +697,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["TemplateResponse"];
+                    "*/*": components["schemas"]["TemplateResponse"][];
                 };
             };
         };
