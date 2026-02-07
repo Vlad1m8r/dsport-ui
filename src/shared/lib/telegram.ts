@@ -18,5 +18,10 @@ export const getInitData = (): string => {
   const telegram = (window as TelegramWindow).Telegram;
   const initData = telegram?.WebApp?.initData;
 
-  return initData ?? "";
+  if (initData) {
+    return initData;
+  }
+
+  // Заглушка для локальной разработки без initData.
+  return "user=%7B%22id%22%3A12345%7D";
 };

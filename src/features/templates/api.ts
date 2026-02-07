@@ -10,25 +10,10 @@ type TemplateCreateResponse =
 type TemplateId =
   paths["/api/templates/{id}"]["delete"]["parameters"]["path"]["id"];
 
-type TemplatesListPayload = TemplatesListResponse | TemplatesListResponse[];
-
-const normalizeTemplatesResponse = (
-  response: TemplatesListPayload,
-): TemplateResponse[] => {
-  if (Array.isArray(response)) {
-    return response;
-  }
-
-  if (response) {
-    return [response];
-  }
-
-  return [];
-};
-
-export const listTemplates = async (): Promise<TemplateResponse[]> => {
-  const response = await request<TemplatesListPayload>("/api/templates");
-  return normalizeTemplatesResponse(response);
+export const listTemplates = async (): Promise<TemplateResponse> => {
+  return request<TemplatesListResponse>("/api/templates", {
+    method: "GET",
+  });
 };
 
 export const createTemplate = async (
