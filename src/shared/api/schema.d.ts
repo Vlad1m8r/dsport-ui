@@ -109,6 +109,40 @@ export interface paths {
         patch: operations["updateSetEntry"];
         trace?: never;
     };
+    "/api/workouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить список тренировок пользователя */
+        get: operations["listWorkouts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workouts/{workoutId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить тренировку по идентификатору */
+        get: operations["getWorkout"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/exercises/{exerciseId}/last-max": {
         parameters: {
             query?: never;
@@ -449,6 +483,31 @@ export interface components {
              * @example 45
              */
             durationSeconds?: number | null;
+        };
+        /** @description Краткая информация о тренировке */
+        WorkoutSummaryResponse: {
+            /**
+             * Format: int64
+             * @description Идентификатор тренировки
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description Заголовок тренировки
+             * @example 2026-02-01 Грудь
+             */
+            title?: string;
+            /**
+             * Format: date-time
+             * @description Дата и время старта
+             */
+            startedAt?: string;
+            /**
+             * Format: int64
+             * @description Идентификатор шаблона
+             * @example 10
+             */
+            templateId?: number | null;
         };
         /** @description Ответ с последним максимумом по упражнению */
         ExerciseLastMaxResponse: {
@@ -813,6 +872,68 @@ export interface operations {
                 };
             };
             /** @description Тренировка или подход не найдены */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    listWorkouts: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Лимит записей
+                 * @example 20
+                 */
+                limit?: number;
+                /**
+                 * @description Смещение
+                 * @example 0
+                 */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список тренировок */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WorkoutSummaryResponse"][];
+                };
+            };
+        };
+    };
+    getWorkout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workoutId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Тренировка */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WorkoutSessionResponse"];
+                };
+            };
+            /** @description Тренировка не найдена */
             404: {
                 headers: {
                     [name: string]: unknown;
