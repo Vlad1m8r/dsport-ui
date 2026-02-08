@@ -1,5 +1,9 @@
 # PROMPTS LOG (Frontend)
 
+## F3 — Правило актуализации docs
+Сделано:
+- Введено правило: каждый промпт обновляет docs (PROMPTS_LOG + DEV_NOTES + UI_FLOWS + TODO).
+
 ## F1 — OpenAPI types + http client + initData header
 Сделано:
 - Добавлена генерация типов из `docs/openapi.yaml` → `src/shared/api/schema.d.ts`
