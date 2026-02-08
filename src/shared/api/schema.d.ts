@@ -92,6 +92,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/workouts/{workoutId}/sets/{setEntryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Обновить подход в тренировке */
+        patch: operations["updateSetEntry"];
+        trace?: never;
+    };
     "/api/exercises/{exerciseId}/last-max": {
         parameters: {
             query?: never;
@@ -197,6 +214,25 @@ export interface components {
             /** @description Проверка корректности набора полей */
             oneOfPlannedFieldsPresent?: boolean;
         };
+        /** @description Ошибка API */
+        ApiError: {
+            /**
+             * Format: date-time
+             * @description Время ошибки
+             */
+            timestamp?: string;
+            /** @description Путь запроса */
+            path?: string;
+            /**
+             * @description Код ошибки
+             * @example NOT_FOUND
+             */
+            code?: string;
+            /** @description Сообщение */
+            message?: string;
+            /** @description Дополнительные детали */
+            details?: Record<string, never> | null;
+        };
         /** @description Упражнение в шаблоне */
         TemplateExerciseResponse: {
             /**
@@ -250,25 +286,6 @@ export interface components {
              * @example 60
              */
             plannedDurationSeconds?: number | null;
-        };
-        /** @description Ошибка API */
-        ApiError: {
-            /**
-             * Format: date-time
-             * @description Время ошибки
-             */
-            timestamp?: string;
-            /** @description Путь запроса */
-            path?: string;
-            /**
-             * @description Код ошибки
-             * @example NOT_FOUND
-             */
-            code?: string;
-            /** @description Сообщение */
-            message?: string;
-            /** @description Дополнительные детали */
-            details?: Record<string, never> | null;
         };
         /** @description Запрос на добавление упражнения в тренировку */
         AddWorkoutExerciseRequest: {
@@ -407,6 +424,32 @@ export interface components {
             /** @description Упражнения тренировки */
             exercises?: components["schemas"]["WorkoutExerciseResponse"][];
         };
+        /** @description Запрос на обновление подхода */
+        UpdateSetEntryRequest: {
+            /**
+             * Format: int32
+             * @description Порядок подхода
+             * @example 1
+             */
+            orderIndex?: number | null;
+            /**
+             * Format: int32
+             * @description Фактические повторы
+             * @example 10
+             */
+            reps?: number | null;
+            /**
+             * @description Вес
+             * @example 70
+             */
+            weight?: number | null;
+            /**
+             * Format: int32
+             * @description Длительность в секундах
+             * @example 45
+             */
+            durationSeconds?: number | null;
+        };
         /** @description Ответ с последним максимумом по упражнению */
         ExerciseLastMaxResponse: {
             /**
@@ -427,16 +470,16 @@ export interface components {
              */
             lastWorkoutStartedAt?: string | null;
             /**
-             * @description Максимальный вес в последней тренировке
+             * @description Максимальный вес в последней тренировке (0 если данных нет)
              * @example 80
              */
-            maxWeight?: number | null;
+            maxWeight?: number;
             /**
              * Format: int32
-             * @description Максимальная длительность в секундах в последней тренировке
+             * @description Максимальная длительность в секундах в последней тренировке (0 если данных нет)
              * @example 120
              */
-            maxDurationSeconds?: number | null;
+            maxDurationSeconds?: number;
         };
     };
     responses: never;
@@ -726,6 +769,51 @@ export interface operations {
             };
             /** @description Ошибка валидации */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    updateSetEntry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workoutId: number;
+                setEntryId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSetEntryRequest"];
+            };
+        };
+        responses: {
+            /** @description Подход обновлен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SetEntryResponse"];
+                };
+            };
+            /** @description Ошибка валидации */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiError"];
+                };
+            };
+            /** @description Тренировка или подход не найдены */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

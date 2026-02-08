@@ -51,18 +51,18 @@ paths:
               $ref: "#/components/schemas/TemplateCreateRequest"
         required: true
       responses:
-        "200":
-          description: Шаблон обновлен
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/TemplateResponse"
         "404":
           description: Шаблон не найден
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Шаблон обновлен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
         "400":
           description: Ошибка валидации
           content:
@@ -116,18 +116,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
-        "400":
-          description: Ошибка валидации
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ApiError"
         "200":
           description: Упражнение добавлено
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WorkoutExerciseResponse"
+        "400":
+          description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets:
     post:
       tags:
@@ -154,6 +154,12 @@ paths:
               $ref: "#/components/schemas/AddSetEntryRequest"
         required: true
       responses:
+        "200":
+          description: Подход добавлен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SetEntryResponse"
         "404":
           description: Тренировка или упражнение не найдены
           content:
@@ -166,12 +172,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
-        "200":
-          description: Подход добавлен
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SetEntryResponse"
   /api/workouts/start:
     post:
       tags:
@@ -242,6 +242,50 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+  /api/workouts/{workoutId}/sets/{setEntryId}:
+    patch:
+      tags:
+      - workout-controller
+      summary: Обновить подход в тренировке
+      operationId: updateSetEntry
+      parameters:
+      - name: workoutId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: setEntryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSetEntryRequest"
+        required: true
+      responses:
+        "404":
+          description: Тренировка или подход не найдены
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "400":
+          description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Подход обновлен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SetEntryResponse"
   /api/exercises/{exerciseId}/last-max:
     get:
       tags:
@@ -398,6 +442,28 @@ components:
           type: boolean
           description: Проверка корректности набора полей
       description: Плановый подход
+    ApiError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: Время ошибки
+          format: date-time
+        path:
+          type: string
+          description: Путь запроса
+        code:
+          type: string
+          description: Код ошибки
+          example: NOT_FOUND
+        message:
+          type: string
+          description: Сообщение
+        details:
+          type: object
+          description: Дополнительные детали
+          nullable: true
+      description: Ошибка API
     TemplateExerciseResponse:
       type: object
       properties:
@@ -456,28 +522,6 @@ components:
           nullable: true
           example: 60
       description: Плановый подход
-    ApiError:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: Время ошибки
-          format: date-time
-        path:
-          type: string
-          description: Путь запроса
-        code:
-          type: string
-          description: Код ошибки
-          example: NOT_FOUND
-        message:
-          type: string
-          description: Сообщение
-        details:
-          type: object
-          description: Дополнительные детали
-          nullable: true
-      description: Ошибка API
     AddWorkoutExerciseRequest:
       required:
       - exerciseId
@@ -621,6 +665,33 @@ components:
           items:
             $ref: "#/components/schemas/WorkoutExerciseResponse"
       description: Ответ с тренировочной сессией
+    UpdateSetEntryRequest:
+      type: object
+      properties:
+        orderIndex:
+          type: integer
+          description: Порядок подхода
+          format: int32
+          nullable: true
+          example: 1
+        reps:
+          type: integer
+          description: Фактические повторы
+          format: int32
+          nullable: true
+          example: 10
+        weight:
+          type: number
+          description: Вес
+          nullable: true
+          example: 70.0
+        durationSeconds:
+          type: integer
+          description: Длительность в секундах
+          format: int32
+          nullable: true
+          example: 45
+      description: Запрос на обновление подхода
     ExerciseLastMaxResponse:
       type: object
       properties:
@@ -642,13 +713,12 @@ components:
           nullable: true
         maxWeight:
           type: number
-          description: Максимальный вес в последней тренировке
-          nullable: true
+          description: Максимальный вес в последней тренировке (0 если данных нет)
           example: 80.0
         maxDurationSeconds:
           type: integer
           description: Максимальная длительность в секундах в последней тренировке
+            (0 если данных нет)
           format: int32
-          nullable: true
           example: 120
       description: Ответ с последним максимумом по упражнению
