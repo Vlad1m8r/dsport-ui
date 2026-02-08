@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import App from "../App";
 import { StartWorkoutPage } from "../pages/StartWorkoutPage";
 import { TemplatesPage } from "../pages/TemplatesPage";
+import { WorkoutsHistoryPage } from "../pages/WorkoutsHistoryPage";
 import { WorkoutPage } from "../pages/WorkoutPage";
 
 export const router = createBrowserRouter([
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: "workouts/:workoutId",
         element: <WorkoutPage />,
+      },
+      {
+        path: "workouts",
+        element: <WorkoutsHistoryPage />,
       },
     ],
   },

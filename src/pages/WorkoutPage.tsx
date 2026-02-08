@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type ChangeEvent,
@@ -259,30 +260,27 @@ export const WorkoutPage = (): ReactElement => {
   const [newExerciseId, setNewExerciseId] = useState<string>("");
   const [newExerciseError, setNewExerciseError] = useState<string | null>(null);
 
-  const { data: workoutData } = useWorkout(workoutId, initialWorkout);
+  const {
+    data: workoutData,
+    isLoading: isWorkoutLoading,
+    isError: isWorkoutError,
+    error: workoutError,
+    refetch: refetchWorkout,
+  } = useWorkout(workoutId);
   const addExerciseMutation = useAddExerciseMutation();
   const deleteExerciseMutation = useDeleteExerciseMutation();
   const addSetEntryMutation = useAddSetEntryMutation();
   const deleteSetEntryMutation = useDeleteSetEntryMutation();
 
-  const workoutFallback = useMemo<WorkoutSessionResponse | null>(() => {
-    if (typeof workoutId !== "number") {
-      return null;
+  useEffect(() => {
+    if (typeof workoutId !== "number" || !initialWorkout) {
+      return;
     }
 
-    if (workoutData) {
-      return workoutData;
-    }
+    queryClient.setQueryData(workoutQueryKey(workoutId), initialWorkout);
+  }, [initialWorkout, queryClient, workoutId]);
 
-    return {
-      id: workoutId,
-      title: initialWorkout?.title,
-      startedAt: initialWorkout?.startedAt,
-      exercises: [],
-    };
-  }, [initialWorkout?.startedAt, initialWorkout?.title, workoutData, workoutId]);
-
-  const workout = workoutData ?? workoutFallback;
+  const workout = workoutData ?? initialWorkout ?? null;
 
   const exercises = useMemo(() => {
     const items = workout?.exercises ? [...workout.exercises] : [];
@@ -357,10 +355,12 @@ export const WorkoutPage = (): ReactElement => {
         onSuccess: (response) => {
           updateWorkoutData((previous) => {
             const baseWorkout: WorkoutSessionResponse =
-              previous ?? {
+              previous ??
+              workout ?? {
                 id: workoutId,
                 title: initialWorkout?.title,
                 startedAt: initialWorkout?.startedAt,
+                templateId: initialWorkout?.templateId,
                 exercises: [],
               };
 
@@ -489,16 +489,89 @@ export const WorkoutPage = (): ReactElement => {
             <h1>Тренировка</h1>
             <p className="workout-page__meta">Некорректный идентификатор тренировки.</p>
           </div>
-          <Link to="/start" className="workout-page__link">
-            К запуску
-          </Link>
+          <div>
+            <Link to="/start" className="workout-page__link">
+              К запуску
+            </Link>
+            <Link to="/workouts" className="workout-page__link">
+              К истории
+            </Link>
+          </div>
         </header>
       </section>
     );
   }
 
-  const headerTitle = workout?.title ?? `Тренировка #${workoutId}`;
-  const startedAt = formatDateTime(workout?.startedAt);
+  if (isWorkoutLoading && !workout) {
+    return (
+      <section className="workout-page">
+        <header className="workout-page__header">
+          <div>
+            <h1>Тренировка</h1>
+            <p className="workout-page__meta">Загрузка...</p>
+          </div>
+          <div>
+            <Link to="/start" className="workout-page__link">
+              К запуску
+            </Link>
+            <Link to="/workouts" className="workout-page__link">
+              К истории
+            </Link>
+          </div>
+        </header>
+      </section>
+    );
+  }
+
+  if (isWorkoutError && !workout) {
+    return (
+      <section className="workout-page">
+        <header className="workout-page__header">
+          <div>
+            <h1>Тренировка</h1>
+            <p className="workout-page__meta">
+              Ошибка: {workoutError?.message ?? "Не удалось загрузить тренировку"}
+            </p>
+          </div>
+          <div>
+            <Link to="/start" className="workout-page__link">
+              К запуску
+            </Link>
+            <Link to="/workouts" className="workout-page__link">
+              К истории
+            </Link>
+          </div>
+        </header>
+        <button type="button" onClick={() => refetchWorkout()}>
+          Повторить
+        </button>
+      </section>
+    );
+  }
+
+  if (!workout) {
+    return (
+      <section className="workout-page">
+        <header className="workout-page__header">
+          <div>
+            <h1>Тренировка</h1>
+            <p className="workout-page__meta">Тренировка не найдена.</p>
+          </div>
+          <div>
+            <Link to="/start" className="workout-page__link">
+              К запуску
+            </Link>
+            <Link to="/workouts" className="workout-page__link">
+              К истории
+            </Link>
+          </div>
+        </header>
+      </section>
+    );
+  }
+
+  const headerTitle = workout.title ?? `Тренировка #${workoutId}`;
+  const startedAt = formatDateTime(workout.startedAt);
 
   return (
     <section className="workout-page">
@@ -506,16 +579,25 @@ export const WorkoutPage = (): ReactElement => {
         <div>
           <h1>{headerTitle}</h1>
           {startedAt ? <p className="workout-page__meta">Старт: {startedAt}</p> : null}
-          {!workoutData ? (
-            <p className="workout-page__meta">
-              Детали тренировки отсутствуют в OpenAPI, показаны данные из перехода.
-            </p>
-          ) : null}
         </div>
-        <Link to="/start" className="workout-page__link">
-          К запуску
-        </Link>
+        <div>
+          <Link to="/start" className="workout-page__link">
+            К запуску
+          </Link>
+          <Link to="/workouts" className="workout-page__link">
+            К истории
+          </Link>
+        </div>
       </header>
+
+      {isWorkoutError ? (
+        <div className="workout-page__error">
+          Ошибка загрузки: {workoutError?.message ?? "Не удалось загрузить тренировку"}
+          <button type="button" onClick={() => refetchWorkout()}>
+            Повторить
+          </button>
+        </div>
+      ) : null}
 
       {exercises.length === 0 ? <p>Упражнений пока нет.</p> : null}
 

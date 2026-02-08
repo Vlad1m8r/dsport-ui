@@ -53,7 +53,10 @@ export const StartWorkoutPage = (): ReactElement => {
     <section>
       <header>
         <h1>Старт тренировки</h1>
-        <Link to="/templates">К шаблонам</Link>
+        <nav>
+          <Link to="/templates">К шаблонам</Link>
+          <Link to="/workouts">История</Link>
+        </nav>
       </header>
 
       {isLoading ? <p>Загрузка шаблонов...</p> : null}

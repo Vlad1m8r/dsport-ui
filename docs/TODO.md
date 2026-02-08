@@ -4,6 +4,7 @@
 - [x] F3a: Start workout page (выбрать шаблон / без шаблона)
 - [x] F3b: Workout page (текущая тренировка: упражнения/подходы add/remove, ввод reps/weight/duration)
 - [x] F3c: Last-max подсказки рядом с упражнением
+- [x] F4: История тренировок + загрузка тренировки по id
 
 ## UX & Polish
 - [ ] Форма создания шаблона (react-hook-form + zod)
