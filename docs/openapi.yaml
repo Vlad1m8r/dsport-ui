@@ -90,6 +90,60 @@ paths:
                 $ref: "#/components/schemas/ApiError"
         "204":
           description: Шаблон удален
+  /api/workouts:
+    get:
+      tags:
+      - workout-controller
+      summary: Получить список тренировок
+      operationId: listWorkouts
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Список тренировок
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkoutSessionResponse"
+  /api/workouts/{workoutId}:
+    get:
+      tags:
+      - workout-controller
+      summary: Получить тренировку по id
+      operationId: getWorkoutById
+      parameters:
+      - name: workoutId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Тренировка не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Тренировка
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkoutSessionResponse"
   /api/workouts/{workoutId}/exercises:
     post:
       tags:

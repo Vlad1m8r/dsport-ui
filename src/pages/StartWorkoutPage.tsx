@@ -26,7 +26,7 @@ export const StartWorkoutPage = (): ReactElement => {
       {
         onSuccess: (response) => {
           if (typeof response?.id === "number") {
-            navigate(`/workouts/${response.id}`, { state: { workout: response } });
+            navigate(`/workouts/${response.id}`);
             return;
           }
 
@@ -53,7 +53,10 @@ export const StartWorkoutPage = (): ReactElement => {
     <section>
       <header>
         <h1>Старт тренировки</h1>
-        <Link to="/templates">К шаблонам</Link>
+        <div>
+          <Link to="/templates">К шаблонам</Link>
+          <Link to="/workouts">История</Link>
+        </div>
       </header>
 
       {isLoading ? <p>Загрузка шаблонов...</p> : null}

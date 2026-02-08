@@ -5,7 +5,7 @@ import {
   type ChangeEvent,
   type ReactElement,
 } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -23,10 +23,6 @@ import { useWorkout, workoutQueryKey } from "../features/workouts/view/queries";
 import { useExerciseLastMax } from "../features/exercises/stats/queries";
 
 import "./WorkoutPage.css";
-
-type WorkoutLocationState = {
-  workout?: WorkoutSessionResponse;
-};
 
 type SetDraft = {
   reps: number | null;
@@ -247,52 +243,36 @@ const ExerciseCard = ({
 
 export const WorkoutPage = (): ReactElement => {
   const params = useParams<{ workoutId: string }>();
-  const location = useLocation();
-  const locationState = location.state as WorkoutLocationState | null;
   const workoutIdRaw = params.workoutId ?? "";
   const workoutIdNumber = Number(workoutIdRaw);
   const workoutId = Number.isFinite(workoutIdNumber) ? workoutIdNumber : null;
-  const initialWorkout = locationState?.workout ?? null;
 
   const queryClient = useQueryClient();
   const [setDrafts, setSetDrafts] = useState<SetDraftMap>({});
   const [newExerciseId, setNewExerciseId] = useState<string>("");
   const [newExerciseError, setNewExerciseError] = useState<string | null>(null);
 
-  const { data: workoutData } = useWorkout(workoutId, initialWorkout);
+  const {
+    data: workoutData,
+    isLoading: isWorkoutLoading,
+    isError: isWorkoutError,
+    error: workoutError,
+    refetch: refetchWorkout,
+  } = useWorkout(workoutId);
   const addExerciseMutation = useAddExerciseMutation();
   const deleteExerciseMutation = useDeleteExerciseMutation();
   const addSetEntryMutation = useAddSetEntryMutation();
   const deleteSetEntryMutation = useDeleteSetEntryMutation();
 
-  const workoutFallback = useMemo<WorkoutSessionResponse | null>(() => {
-    if (typeof workoutId !== "number") {
-      return null;
-    }
-
-    if (workoutData) {
-      return workoutData;
-    }
-
-    return {
-      id: workoutId,
-      title: initialWorkout?.title,
-      startedAt: initialWorkout?.startedAt,
-      exercises: [],
-    };
-  }, [initialWorkout?.startedAt, initialWorkout?.title, workoutData, workoutId]);
-
-  const workout = workoutData ?? workoutFallback;
-
   const exercises = useMemo(() => {
-    const items = workout?.exercises ? [...workout.exercises] : [];
+    const items = workoutData?.exercises ? [...workoutData.exercises] : [];
     items.sort((left, right) => {
       const leftIndex = left.orderIndex ?? 0;
       const rightIndex = right.orderIndex ?? 0;
       return leftIndex - rightIndex;
     });
     return items;
-  }, [workout?.exercises]);
+  }, [workoutData?.exercises]);
 
   const updateWorkoutData = useCallback(
     (updater: (previous: WorkoutSessionResponse | null) => WorkoutSessionResponse | null): void => {
@@ -343,7 +323,7 @@ export const WorkoutPage = (): ReactElement => {
       return;
     }
 
-    const nextOrderIndex = getNextOrderIndex(workout?.exercises);
+    const nextOrderIndex = getNextOrderIndex(workoutData?.exercises);
 
     addExerciseMutation.mutate(
       {
@@ -359,8 +339,8 @@ export const WorkoutPage = (): ReactElement => {
             const baseWorkout: WorkoutSessionResponse =
               previous ?? {
                 id: workoutId,
-                title: initialWorkout?.title,
-                startedAt: initialWorkout?.startedAt,
+                title: workoutData?.title,
+                startedAt: workoutData?.startedAt,
                 exercises: [],
               };
 
@@ -497,8 +477,67 @@ export const WorkoutPage = (): ReactElement => {
     );
   }
 
-  const headerTitle = workout?.title ?? `Тренировка #${workoutId}`;
-  const startedAt = formatDateTime(workout?.startedAt);
+  if (isWorkoutLoading) {
+    return (
+      <section className="workout-page">
+        <header className="workout-page__header">
+          <div>
+            <h1>Тренировка</h1>
+            <p className="workout-page__meta">Загрузка...</p>
+          </div>
+          <Link to="/start" className="workout-page__link">
+            К запуску
+          </Link>
+        </header>
+      </section>
+    );
+  }
+
+  if (isWorkoutError) {
+    return (
+      <section className="workout-page">
+        <header className="workout-page__header">
+          <div>
+            <h1>Тренировка</h1>
+            <p className="workout-page__meta">
+              Ошибка загрузки: {workoutError?.message ?? "Не удалось загрузить тренировку."}
+            </p>
+          </div>
+          <Link to="/start" className="workout-page__link">
+            К запуску
+          </Link>
+        </header>
+        <button
+          type="button"
+          className="workout-page__primary-button"
+          onClick={() => {
+            void refetchWorkout();
+          }}
+        >
+          Повторить
+        </button>
+      </section>
+    );
+  }
+
+  if (!workoutData) {
+    return (
+      <section className="workout-page">
+        <header className="workout-page__header">
+          <div>
+            <h1>Тренировка</h1>
+            <p className="workout-page__meta">Тренировка не найдена.</p>
+          </div>
+          <Link to="/start" className="workout-page__link">
+            К запуску
+          </Link>
+        </header>
+      </section>
+    );
+  }
+
+  const headerTitle = workoutData.title ?? `Тренировка #${workoutId}`;
+  const startedAt = formatDateTime(workoutData.startedAt);
 
   return (
     <section className="workout-page">
@@ -506,11 +545,6 @@ export const WorkoutPage = (): ReactElement => {
         <div>
           <h1>{headerTitle}</h1>
           {startedAt ? <p className="workout-page__meta">Старт: {startedAt}</p> : null}
-          {!workoutData ? (
-            <p className="workout-page__meta">
-              Детали тренировки отсутствуют в OpenAPI, показаны данные из перехода.
-            </p>
-          ) : null}
         </div>
         <Link to="/start" className="workout-page__link">
           К запуску

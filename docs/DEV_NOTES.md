@@ -17,9 +17,9 @@
 - Backend должен разрешать preflight без авторизации.
 - Фронт обязан добавлять `X-Tg-Init-Data` во все реальные запросы (GET/POST/PUT/DELETE) через общий fetch-wrapper.
 
-## WorkoutPage: отсутствие GET /api/workouts/{workoutId}
-Сейчас в OpenAPI нет эндпоинта получения тренировки по id, поэтому экран `/workouts/:id` получает данные
-из route state (ответ `startWorkout`) и локально обновляет список упражнений/подходов после мутаций.
+## WorkoutPage: загрузка тренировки по API
+Экран `/workouts/:id` загружает тренировку через `GET /api/workouts/{workoutId}`. Мутации
+add/remove упражнений и подходов инвалидируют запрос и поддерживают актуальность данных.
 Сохранение значений reps/weight/duration остаётся локальным до появления endpoint update set_entry.
 
 ## Add set: backend constraint ck_set_entry_not_empty

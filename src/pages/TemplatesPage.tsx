@@ -36,6 +36,7 @@ export const TemplatesPage = (): ReactElement => {
             Создать шаблон
           </button>
           <Link to="/start">К запуску тренировки</Link>
+          <Link to="/workouts">История</Link>
         </div>
       </header>
 

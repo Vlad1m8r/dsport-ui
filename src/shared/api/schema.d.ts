@@ -23,6 +23,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/workouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить список тренировок */
+        get: operations["listWorkouts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workouts/{workoutId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить тренировку по id */
+        get: operations["getWorkoutById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workouts/{workoutId}/exercises": {
         parameters: {
             query?: never;
@@ -584,6 +618,60 @@ export interface operations {
                 content?: never;
             };
             /** @description Шаблон не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    listWorkouts: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список тренировок */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WorkoutSessionResponse"][];
+                };
+            };
+        };
+    };
+    getWorkoutById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workoutId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Тренировка */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WorkoutSessionResponse"];
+                };
+            };
+            /** @description Тренировка не найдена */
             404: {
                 headers: {
                     [name: string]: unknown;

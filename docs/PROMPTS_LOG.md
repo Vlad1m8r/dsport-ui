@@ -13,6 +13,8 @@
 
 Проверка:
 - `npm run gen:api` — ok
+- `npm run lint` — ok
+- `npm run build` — ok
 - `npm run build` — ok
 
 ## F2 — TanStack Query + Templates page
@@ -57,3 +59,14 @@
 Проверка:
 - Открыть `/workouts/:id` и нажать «Добавить подход».
 - Убедиться, что запрос проходит без ошибки и новый подход появляется в списке.
+
+## F4 — Workouts history + workout fetch
+Сделано:
+- Добавлены эндпоинты `/api/workouts` и `/api/workouts/{workoutId}` в OpenAPI и сгенерированы типы.
+- Feature `workouts/history`: API-функция списка тренировок и query-хук.
+- Обновлён feature `workouts/view`: загрузка тренировки по id через API.
+- Страница `/workouts` с состояниями loading/empty/error и переходом к деталям.
+- Навигация к истории из `/templates` и `/start`.
+
+Проверка:
+- `npm run gen:api` — ok

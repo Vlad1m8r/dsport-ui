@@ -1,6 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
-import type { WorkoutSessionResponse } from "./api";
+import { fetchWorkout, type WorkoutSessionResponse } from "./api";
 
 export const workoutQueryKey = (workoutId: number): readonly ["workout", number] => [
   "workout",
@@ -9,12 +9,10 @@ export const workoutQueryKey = (workoutId: number): readonly ["workout", number]
 
 export const useWorkout = (
   workoutId: number | null,
-  initialData: WorkoutSessionResponse | null,
-): UseQueryResult<WorkoutSessionResponse | null, Error> => {
+): UseQueryResult<WorkoutSessionResponse, Error> => {
   return useQuery({
     queryKey: typeof workoutId === "number" ? workoutQueryKey(workoutId) : ["workout", "unknown"],
-    queryFn: async () => initialData,
-    enabled: false,
-    initialData,
+    queryFn: () => fetchWorkout(workoutId as number),
+    enabled: typeof workoutId === "number",
   });
 };

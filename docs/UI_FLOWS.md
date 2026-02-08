@@ -114,6 +114,7 @@
 - Кнопки «Добавить упражнение/подход».
 
 **API endpoints:**
+- `GET /api/workouts/{workoutId}` — загрузить тренировку.
 - `POST /api/workouts/{workoutId}/exercises` — добавить упражнение.
 - `DELETE /api/workouts/{workoutId}/exercises/{workoutExerciseId}` — удалить упражнение.
 - `POST /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets` — добавить подход.
@@ -134,7 +135,8 @@
 - Пустое состояние.
 
 **API endpoints:**
-- TBD: эндпоинт списка тренировок отсутствует в OpenAPI и требует уточнения.
+- `GET /api/workouts` — список тренировок.
+- `GET /api/workouts/{workoutId}` — детали тренировки.
 
 ## Правило docs
 В каждом промпте актуализируем полный набор документации: `PROMPTS_LOG` + `DEV_NOTES` + `UI_FLOWS` + `TODO`.
