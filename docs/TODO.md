@@ -1,0 +1,16 @@
+# TODO / Roadmap (MVP)
+
+## UI Flow MVP
+- [ ] F3a: Start workout page (выбрать шаблон / без шаблона)
+- [ ] F3b: Workout page (текущая тренировка: упражнения/подходы add/remove, ввод reps/weight/duration)
+- [ ] F3c: Last-max подсказки рядом с упражнением
+
+## UX & Polish
+- [ ] Форма создания шаблона (react-hook-form + zod)
+- [ ] Редактирование шаблона: добавление упражнений/подходов
+- [ ] Нормальные состояния загрузки/ошибок (skeleton/loading, error blocks)
+- [ ] Telegram theme params → CSS variables + базовые компоненты (кнопки/инпуты)
+
+## Tech debt / Safety
+- [ ] Убедиться что PROD режим не использует dev fallback initData
+- [ ] Обновление openapi.yaml: описать процесс/команду (источник — backend /v3/api-docs.yaml)
