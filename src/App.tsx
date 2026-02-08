@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, type ReactElement } from "react";
 import WebApp, { applyThemeParams } from "@twa-dev/sdk";
 import { Outlet } from "react-router-dom";
 
@@ -42,7 +42,7 @@ const extractThemeParams = (): Record<string, string> => {
   return nextTheme;
 };
 
-function App(): JSX.Element {
+function App(): ReactElement {
   const applyCssVariables = useCallback((variables: Record<string, string>): void => {
     const root = document.documentElement;
     Object.entries(variables).forEach(([key, value]) => {
