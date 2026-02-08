@@ -9,9 +9,11 @@ import {
   addSetEntry,
   deleteExercise,
   deleteSetEntry,
+  updateSetEntry,
   type AddSetEntryRequest,
   type AddWorkoutExerciseRequest,
   type SetEntryResponse,
+  type UpdateSetEntryRequest,
   type WorkoutExerciseResponse,
 } from "./api";
 import { workoutQueryKey } from "../view/queries";
@@ -36,6 +38,11 @@ export type DeleteSetEntryVariables = {
   workoutId: number;
   workoutExerciseId: number;
   setEntryId: number;
+};
+
+export type UpdateSetEntryVariables = {
+  setEntryId: number;
+  payload: UpdateSetEntryRequest;
 };
 
 export const useAddExerciseMutation = (): UseMutationResult<
@@ -97,6 +104,29 @@ export const useDeleteSetEntryMutation = (): UseMutationResult<
       deleteSetEntry(workoutId, workoutExerciseId, setEntryId),
     onSuccess: async (_data, variables) => {
       await queryClient.invalidateQueries({ queryKey: workoutQueryKey(variables.workoutId) });
+    },
+  });
+};
+
+export const useUpdateSetEntry = (
+  workoutId: number | null,
+): UseMutationResult<SetEntryResponse, Error, UpdateSetEntryVariables> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["updateSetEntry", workoutId],
+    mutationFn: ({ setEntryId, payload }) => {
+      if (typeof workoutId !== "number") {
+        return Promise.reject(new Error("Некорректный идентификатор тренировки."));
+      }
+
+      return updateSetEntry(workoutId, setEntryId, payload);
+    },
+    onSuccess: async () => {
+      if (typeof workoutId !== "number") {
+        return;
+      }
+      await queryClient.invalidateQueries({ queryKey: workoutQueryKey(workoutId) });
     },
   });
 };

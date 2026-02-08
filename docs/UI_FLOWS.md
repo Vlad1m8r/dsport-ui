@@ -120,11 +120,12 @@
 - `POST /api/workouts/{workoutId}/exercises` — добавить упражнение.
 - `DELETE /api/workouts/{workoutId}/exercises/{workoutExerciseId}` — удалить упражнение.
 - `POST /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets` — добавить подход.
+- `PATCH /api/workouts/{workoutId}/sets/{setEntryId}` — обновить подход (autosave по blur/debounce).
 - `DELETE /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets/{setEntryId}` — удалить подход.
 - `GET /api/exercises/{exerciseId}/last-max` — last-max подсказки.
 
 **Примечание:**
-- Сохранение изменений reps/weight/duration пока локальное (endpoint update set_entry отсутствует в OpenAPI).
+- Значения reps/weight/duration сохраняются автоматически при вводе (blur и debounce 600ms).
 
 ## Экран: /workouts
 **Цель:** список тренировок пользователя и переход к деталям.
