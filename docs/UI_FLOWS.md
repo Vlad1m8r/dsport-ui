@@ -18,7 +18,9 @@
 - `/templates` → `/templates/new` (создать шаблон).
 - `/templates` → `/templates/:id/edit` (редактировать шаблон).
 - `/templates` → `/start` (перейти к запуску тренировки).
+- `/templates` → `/workouts` (перейти к истории тренировок).
 - `/start` → `/workouts/:id` (после старта тренировки).
+- `/start` → `/workouts` (перейти к истории тренировок).
 - `/workouts/:id` → `/workouts` (завершить/выйти к списку тренировок).
 - `/workouts` → `/workouts/:id` (открыть тренировку из списка).
 - Любой экран → `/templates` (через навигацию/BackButton).
@@ -114,6 +116,7 @@
 - Кнопки «Добавить упражнение/подход».
 
 **API endpoints:**
+- `GET /api/workouts/{workoutId}` — загрузить тренировку.
 - `POST /api/workouts/{workoutId}/exercises` — добавить упражнение.
 - `DELETE /api/workouts/{workoutId}/exercises/{workoutExerciseId}` — удалить упражнение.
 - `POST /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets` — добавить подход.
@@ -134,7 +137,7 @@
 - Пустое состояние.
 
 **API endpoints:**
-- TBD: эндпоинт списка тренировок отсутствует в OpenAPI и требует уточнения.
+- `GET /api/workouts` — список тренировок.
 
 ## Правило docs
 В каждом промпте актуализируем полный набор документации: `PROMPTS_LOG` + `DEV_NOTES` + `UI_FLOWS` + `TODO`.

@@ -1,5 +1,16 @@
 # PROMPTS LOG (Frontend)
 
+## F4 — Workouts history + workout fetch
+Сделано:
+- Добавлен API слой и TanStack Query хуки для списка тренировок и загрузки тренировки по id.
+- Добавлен экран `/workouts` (история) со статусами загрузки/пустым/ошибкой и CTA на старт.
+- Экран `/workouts/:id` теперь загружает данные через `GET /api/workouts/{workoutId}`.
+- Добавлены переходы к истории тренировок из `/templates` и `/start`, а также ссылка из `/workouts/:id`.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## F3 — Правило актуализации docs
 Сделано:
 - Введено правило: каждый промпт обновляет docs (PROMPTS_LOG + DEV_NOTES + UI_FLOWS + TODO).
