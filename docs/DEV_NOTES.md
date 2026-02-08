@@ -21,3 +21,8 @@
 Сейчас в OpenAPI нет эндпоинта получения тренировки по id, поэтому экран `/workouts/:id` получает данные
 из route state (ответ `startWorkout`) и локально обновляет список упражнений/подходов после мутаций.
 Сохранение значений reps/weight/duration остаётся локальным до появления endpoint update set_entry.
+
+## Add set: backend constraint ck_set_entry_not_empty
+При добавлении подхода фронт отправляет `reps=0` по умолчанию, чтобы пройти ограничение
+`ck_set_entry_not_empty` (должно быть reps != null или durationSeconds != null).
+Позже можно выбирать дефолт в зависимости от типа упражнения (reps vs duration).

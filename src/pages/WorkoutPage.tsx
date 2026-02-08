@@ -412,6 +412,9 @@ export const WorkoutPage = (): ReactElement => {
         workoutExerciseId,
         payload: {
           orderIndex: nextOrderIndex,
+          reps: 0,
+          weight: null,
+          durationSeconds: null,
         },
       },
       {
