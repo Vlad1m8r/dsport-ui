@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import App from "../App";
+import { StartWorkoutPage } from "../pages/StartWorkoutPage";
 import { TemplatesPage } from "../pages/TemplatesPage";
 
 export const router = createBrowserRouter([
@@ -15,6 +16,10 @@ export const router = createBrowserRouter([
       {
         path: "templates",
         element: <TemplatesPage />,
+      },
+      {
+        path: "start",
+        element: <StartWorkoutPage />,
       },
     ],
   },

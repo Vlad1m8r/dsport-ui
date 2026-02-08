@@ -1,10 +1,13 @@
+import type { ReactElement } from "react";
+import { Link } from "react-router-dom";
+
 import {
   useCreateTemplateMutation,
   useDeleteTemplateMutation,
   useTemplatesQuery,
 } from "../features/templates/queries";
 
-export const TemplatesPage = (): JSX.Element => {
+export const TemplatesPage = (): ReactElement => {
   const { data, isLoading, isError, error } = useTemplatesQuery();
   const createMutation = useCreateTemplateMutation();
   const deleteMutation = useDeleteTemplateMutation();
@@ -28,9 +31,12 @@ export const TemplatesPage = (): JSX.Element => {
     <section>
       <header>
         <h1>Шаблоны тренировок</h1>
-        <button type="button" onClick={handleCreate} disabled={createMutation.isPending}>
-          Создать шаблон
-        </button>
+        <div>
+          <button type="button" onClick={handleCreate} disabled={createMutation.isPending}>
+            Создать шаблон
+          </button>
+          <Link to="/start">К запуску тренировки</Link>
+        </div>
       </header>
 
       {isLoading ? <p>Загрузка...</p> : null}
