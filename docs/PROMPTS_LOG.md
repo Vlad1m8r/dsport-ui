@@ -40,3 +40,15 @@
 - Открыть `/start`, дождаться загрузки списка шаблонов.
 - Нажать «Начать по шаблону» (после выбора) или «Начать без шаблона».
 - Убедиться, что происходит переход на `/workouts/:id`.
+
+## F3b — WorkoutPage
+Сделано:
+- Добавлена страница `/workouts/:workoutId` и маршрут в роутере.
+- Добавлены feature API/queries: `workouts/view`, `workouts/edit`, `exercises/stats`.
+- Мутации add/delete упражнений и подходов через `request()` + TanStack Query.
+- Подсказки last-max через `GET /api/exercises/{exerciseId}/last-max`.
+- Редактирование reps/weight/duration реализовано локально без сохранения (endpoint update set отсутствует).
+- При переходе со `/start` прокидывается состояние тренировки.
+
+Ограничения:
+- В OpenAPI отсутствует `GET /api/workouts/{workoutId}`: детали тренировки берём из route state и локально обновляем после мутаций.

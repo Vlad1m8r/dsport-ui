@@ -16,3 +16,8 @@
 - В OPTIONS (CORS preflight) невозможно принудительно добавить `X-Tg-Init-Data` с фронта.
 - Backend должен разрешать preflight без авторизации.
 - Фронт обязан добавлять `X-Tg-Init-Data` во все реальные запросы (GET/POST/PUT/DELETE) через общий fetch-wrapper.
+
+## WorkoutPage: отсутствие GET /api/workouts/{workoutId}
+Сейчас в OpenAPI нет эндпоинта получения тренировки по id, поэтому экран `/workouts/:id` получает данные
+из route state (ответ `startWorkout`) и локально обновляет список упражнений/подходов после мутаций.
+Сохранение значений reps/weight/duration остаётся локальным до появления endpoint update set_entry.

@@ -26,7 +26,7 @@ export const StartWorkoutPage = (): ReactElement => {
       {
         onSuccess: (response) => {
           if (typeof response?.id === "number") {
-            navigate(`/workouts/${response.id}`);
+            navigate(`/workouts/${response.id}`, { state: { workout: response } });
             return;
           }
 

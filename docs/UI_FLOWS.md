@@ -120,6 +120,9 @@
 - `DELETE /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets/{setEntryId}` — удалить подход.
 - `GET /api/exercises/{exerciseId}/last-max` — last-max подсказки.
 
+**Примечание:**
+- Сохранение изменений reps/weight/duration пока локальное (endpoint update set_entry отсутствует в OpenAPI).
+
 ## Экран: /workouts
 **Цель:** список тренировок пользователя и переход к деталям.
 
