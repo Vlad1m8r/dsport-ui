@@ -1,9 +1,9 @@
 # TODO / Roadmap (MVP)
 
 ## UI Flow MVP
-- [ ] F3a: Start workout page (выбрать шаблон / без шаблона)
-- [ ] F3b: Workout page (текущая тренировка: упражнения/подходы add/remove, ввод reps/weight/duration)
-- [ ] F3c: Last-max подсказки рядом с упражнением
+- [x] F3a: Start workout page (выбрать шаблон / без шаблона)
+- [x] F3b: Workout page (текущая тренировка: упражнения/подходы add/remove, ввод reps/weight/duration)
+- [x] F3c: Last-max подсказки рядом с упражнением
 
 ## UX & Polish
 - [ ] Форма создания шаблона (react-hook-form + zod)
@@ -14,3 +14,5 @@
 ## Tech debt / Safety
 - [ ] Убедиться что PROD режим не использует dev fallback initData
 - [ ] Обновление openapi.yaml: описать процесс/команду (источник — backend /v3/api-docs.yaml)
+- [ ] Backend: endpoint update set_entry в тренировке (PUT/PATCH)
+- [ ] Frontend: сохранение изменений reps/weight/duration в подходах

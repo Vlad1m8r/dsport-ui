@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 export type WebAppColorScheme = 'light' | 'dark'
 
 export interface WebAppThemeParams {
