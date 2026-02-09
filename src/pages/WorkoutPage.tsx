@@ -53,7 +53,7 @@ type SetDraftValues = Pick<SetDraft, "reps" | "weight" | "durationSeconds" | "or
 type ExerciseCardProps = {
   workoutExercise: WorkoutExerciseResponse;
   isReadOnly: boolean;
-  highlightEmptySets: boolean;
+  highlightEmptyFields: boolean;
   setDrafts: SetDraftMap;
   onChangeSetValue: (
     setKey: string,
@@ -116,8 +116,44 @@ const getSetValues = (setEntry: SetEntryResponse): SetDraftValues => ({
   orderIndex: normalizeNumber(setEntry.orderIndex),
 });
 
-const isSetEmpty = (setEntry: SetEntryResponse): boolean => {
-  return setEntry.reps == null && setEntry.durationSeconds == null;
+const getSetValuesForValidation = (
+  setEntry: SetEntryResponse,
+  draft?: SetDraft,
+): SetDraftValues => ({
+  reps: draft?.reps ?? normalizeNumber(setEntry.reps),
+  weight: draft?.weight ?? normalizeNumber(setEntry.weight),
+  durationSeconds: draft?.durationSeconds ?? normalizeNumber(setEntry.durationSeconds),
+  orderIndex: draft?.orderIndex ?? normalizeNumber(setEntry.orderIndex),
+});
+
+type SetValidationResult = {
+  isValid: boolean;
+  missingReps: boolean;
+  missingWeight: boolean;
+  missingDuration: boolean;
+};
+
+const getSetValidation = (values: SetDraftValues): SetValidationResult => {
+  const hasDuration = values.durationSeconds != null;
+  if (hasDuration) {
+    return {
+      isValid: true,
+      missingReps: false,
+      missingWeight: false,
+      missingDuration: false,
+    };
+  }
+
+  const hasReps = values.reps != null;
+  const hasWeight = values.weight != null;
+  const isValid = hasReps && hasWeight;
+
+  return {
+    isValid,
+    missingReps: !hasReps,
+    missingWeight: !hasWeight,
+    missingDuration: !hasDuration && !hasReps && !hasWeight,
+  };
 };
 
 const buildUpdatePayload = (
@@ -159,7 +195,7 @@ const getNextOrderIndex = (items: Array<{ orderIndex?: number }> | undefined): n
 const ExerciseCard = ({
   workoutExercise,
   isReadOnly,
-  highlightEmptySets,
+  highlightEmptyFields,
   setDrafts,
   onChangeSetValue,
   onBlurSetValue,
@@ -238,12 +274,12 @@ const ExerciseCard = ({
         const setKey = getSetKey(workoutExerciseId, setEntry, index);
         const draft = setDrafts[setKey];
         const status = draft?.status ?? "idle";
-        const isInvalid = highlightEmptySets && isSetEmpty(setEntry);
-        const repsValue = formatNumber(draft?.reps ?? setEntry.reps ?? null);
-        const weightValue = formatNumber(draft?.weight ?? setEntry.weight ?? null);
-        const durationValue = formatNumber(
-          draft?.durationSeconds ?? setEntry.durationSeconds ?? null,
-        );
+        const values = getSetValuesForValidation(setEntry, draft);
+        const validation = getSetValidation(values);
+        const isInvalid = highlightEmptyFields && !validation.isValid;
+        const repsValue = formatNumber(values.reps);
+        const weightValue = formatNumber(values.weight);
+        const durationValue = formatNumber(values.durationSeconds);
 
         return (
           <div
@@ -314,6 +350,11 @@ const ExerciseCard = ({
                   }
                   onBlur={() => onBlurSetValue(setKey, setEntry)}
                   disabled={isReadOnly}
+                  className={
+                    isInvalid && validation.missingReps
+                      ? "workout-card__input--invalid"
+                      : undefined
+                  }
                 />
               </label>
               <label className="workout-card__field">
@@ -328,6 +369,11 @@ const ExerciseCard = ({
                   }
                   onBlur={() => onBlurSetValue(setKey, setEntry)}
                   disabled={isReadOnly}
+                  className={
+                    isInvalid && validation.missingWeight
+                      ? "workout-card__input--invalid"
+                      : undefined
+                  }
                 />
               </label>
               <label className="workout-card__field">
@@ -341,6 +387,11 @@ const ExerciseCard = ({
                   }
                   onBlur={() => onBlurSetValue(setKey, setEntry)}
                   disabled={isReadOnly}
+                  className={
+                    isInvalid && validation.missingDuration
+                      ? "workout-card__input--invalid"
+                      : undefined
+                  }
                 />
               </label>
             </div>
@@ -380,6 +431,7 @@ export const WorkoutPage = (): ReactElement => {
   const [finishErrorMessage, setFinishErrorMessage] = useState<string | null>(null);
   const [finishErrorCode, setFinishErrorCode] = useState<string | null>(null);
   const [forceReadOnly, setForceReadOnly] = useState<boolean>(false);
+  const [finishAttempted, setFinishAttempted] = useState<boolean>(false);
 
   const setDraftsRef = useRef<SetDraftMap>({});
   const debounceTimersRef = useRef<Record<string, number>>({});
@@ -422,7 +474,8 @@ export const WorkoutPage = (): ReactElement => {
   const workout = workoutData ?? initialWorkout ?? null;
   const finishedAt = workout?.finishedAt ?? null;
   const isReadOnly = Boolean(finishedAt) || forceReadOnly;
-  const shouldHighlightEmptySets = finishErrorCode === "WORKOUT_HAS_EMPTY_SETS";
+  const shouldHighlightEmptyFields =
+    !isReadOnly && (finishAttempted || finishErrorCode === "WORKOUT_HAS_EMPTY_SETS");
 
   const exercises = useMemo(() => {
     const items = workout?.exercises ? [...workout.exercises] : [];
@@ -844,6 +897,22 @@ export const WorkoutPage = (): ReactElement => {
     );
   };
 
+  const hasInvalidSets = useCallback((): boolean => {
+    const workoutExercises = workout?.exercises ?? [];
+    if (workoutExercises.length === 0) {
+      return false;
+    }
+
+    return workoutExercises.some((exercise) =>
+      (exercise.sets ?? []).some((setEntry, index) => {
+        const setKey = getSetKey(exercise.id, setEntry, index);
+        const draft = setDraftsRef.current[setKey];
+        const values = getSetValuesForValidation(setEntry, draft);
+        return !getSetValidation(values).isValid;
+      }),
+    );
+  }, [workout?.exercises]);
+
   const handleFinishWorkout = (): void => {
     setFinishErrorMessage(null);
     setFinishErrorCode(null);
@@ -855,6 +924,14 @@ export const WorkoutPage = (): ReactElement => {
 
     const confirmed = window.confirm("Закончить тренировку?");
     if (!confirmed) {
+      return;
+    }
+
+    setFinishAttempted(true);
+
+    if (hasInvalidSets()) {
+      setFinishErrorMessage("Заполни все подходы перед завершением");
+      setFinishErrorCode("WORKOUT_HAS_EMPTY_SETS");
       return;
     }
 
@@ -1018,7 +1095,7 @@ export const WorkoutPage = (): ReactElement => {
               key={exerciseKey}
               workoutExercise={exercise}
               isReadOnly={isReadOnly}
-              highlightEmptySets={shouldHighlightEmptySets}
+              highlightEmptyFields={shouldHighlightEmptyFields}
               setDrafts={setDrafts}
               onChangeSetValue={handleSetFieldChange}
               onBlurSetValue={handleSetFieldBlur}

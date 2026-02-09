@@ -141,6 +141,10 @@
   font-size: 14px;
 }
 
+.workout-card__input--invalid {
+  border-color: var(--tg-theme-destructive-text-color, #ef4444);
+}
+
 .workout-card__field input:disabled,
 .workout-page__field input:disabled {
   opacity: 0.6;

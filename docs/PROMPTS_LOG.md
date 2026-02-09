@@ -1,5 +1,13 @@
 # PROMPTS LOG (Frontend)
 
+## F6.1 — Finish workout: валидация заполнения подходов
+Сделано:
+- Добавлена проверка заполнения: подход считается валидным, если заполнены (reps + weight) или duration.
+- После попытки завершить тренировку пустые поля подсвечиваются красным.
+
+Проверка:
+- `npm run build` — ok
+
 ## F6 — Finish workout
 Сделано:
 - Добавлен API/React Query слой для завершения тренировки (`POST /api/workouts/{workoutId}/finish`).
