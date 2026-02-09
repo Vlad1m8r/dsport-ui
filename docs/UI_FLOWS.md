@@ -21,7 +21,7 @@
 - `/templates` → `/workouts` (перейти к истории тренировок).
 - `/start` → `/workouts/:id` (после старта тренировки).
 - `/start` → `/workouts` (перейти к истории тренировок).
-- `/workouts/:id` → `/workouts` (завершить/выйти к списку тренировок).
+- `/workouts/:id` → `/workouts` (завершить тренировку и вернуться в историю).
 - `/workouts` → `/workouts/:id` (открыть тренировку из списка).
 - Любой экран → `/templates` (через навигацию/BackButton).
 
@@ -114,6 +114,7 @@
 - Карточки подходов с инпутами.
 - Подсказки last-max рядом с упражнением.
 - Кнопки «Добавить упражнение/подход».
+- Кнопка «Закончить тренировку» и статус «Завершена» для read-only режима.
 
 **API endpoints:**
 - `GET /api/workouts/{workoutId}` — загрузить тренировку.
@@ -122,10 +123,12 @@
 - `POST /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets` — добавить подход.
 - `PATCH /api/workouts/{workoutId}/sets/{setEntryId}` — обновить подход (autosave по blur/debounce).
 - `DELETE /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets/{setEntryId}` — удалить подход.
+- `POST /api/workouts/{workoutId}/finish` — завершить тренировку.
 - `GET /api/exercises/{exerciseId}/last-max` — last-max подсказки.
 
 **Примечание:**
 - Значения reps/weight/duration сохраняются автоматически при вводе (blur и debounce 600ms).
+- После завершения тренировки UI переходит в read-only и возвращает пользователя в историю.
 
 ## Экран: /workouts
 **Цель:** список тренировок пользователя и переход к деталям.

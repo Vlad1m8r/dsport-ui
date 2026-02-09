@@ -1,7 +1,13 @@
 import { getInitData } from "../lib/telegram";
 
+export type ApiError = Error & {
+  code?: string;
+  status?: number;
+};
+
 type ErrorPayload = {
   message?: string;
+  code?: string;
 };
 
 const getBaseUrl = (): string => {
@@ -24,30 +30,36 @@ const buildHeaders = (options?: RequestInit): Headers => {
   return headers;
 };
 
-const parseErrorMessage = async (response: Response): Promise<string> => {
+const parseErrorPayload = async (
+  response: Response,
+): Promise<{ message: string; code?: string }> => {
   const contentType = response.headers.get("content-type") ?? "";
+  let errorCode: string | undefined;
 
   if (contentType.includes("application/json")) {
     const data: unknown = await response.json().catch(() => null);
 
-    if (data && typeof data === "object" && "message" in data) {
+    if (data && typeof data === "object") {
       const payload = data as ErrorPayload;
+      if (typeof payload.code === "string") {
+        errorCode = payload.code;
+      }
       if (typeof payload.message === "string") {
-        return payload.message;
+        return { message: payload.message, code: errorCode };
       }
     }
 
     if (data !== null) {
-      return JSON.stringify(data);
+      return { message: JSON.stringify(data), code: errorCode };
     }
   }
 
   const text = await response.text().catch(() => "");
   if (text) {
-    return text;
+    return { message: text, code: errorCode };
   }
 
-  return `Request failed with status ${response.status}`;
+  return { message: `Request failed with status ${response.status}`, code: errorCode };
 };
 
 const parseResponse = async <T>(response: Response): Promise<T> => {
@@ -82,8 +94,11 @@ export const request = async <T>(
   }
 
   if (!response.ok) {
-    const message = await parseErrorMessage(response);
-    throw new Error(message);
+    const payload = await parseErrorPayload(response);
+    const error: ApiError = new Error(payload.message);
+    error.code = payload.code;
+    error.status = response.status;
+    throw error;
   }
 
   return parseResponse<T>(response);
