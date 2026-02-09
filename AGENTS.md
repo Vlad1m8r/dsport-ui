@@ -47,6 +47,34 @@
 - Серверное состояние (загрузка, кэш, мутации) реализуется только через TanStack Query.
 - Запрещено хранить серверные данные в Zustand.
 
+## Server state / TanStack Query rules
+1) Single source of truth:
+   - Данные сущностей (workouts/templates/exercises/sets) считаются "server state" и рендерятся только из TanStack Query (useQuery).
+   - Локальный state используется только для UI (draft values, input focus, status saving/error), но НЕ для хранения копий списков сущностей.
+
+2) Mutation update strategy (choose one, consistently):
+   - По умолчанию: после успешной мутации делать invalidateQueries(queryKey) и НЕ делать ручной append/merge в массивы.
+   - Если требуется optimistic update:
+     - обновления делаются через queryClient.setQueryData
+     - обязательно делать дедупликацию по id (никогда не допускать дубликатов одинакового id в массиве)
+     - запрещено использовать index/orderIndex в качестве key или идентификатора сущности.
+
+3) React keys:
+   - При рендере списков всегда использовать стабильные keys:
+     - workoutExercise: key = workoutExercise.id
+     - setEntry: key = setEntry.id
+   - Нельзя использовать index массива, orderIndex или exerciseId как key (кроме временных fallback, явно помеченных DEV ONLY).
+
+4) Invalidate responsibility:
+   - invalidateQueries должен быть в одном месте (предпочтительно внутри hooks в features/*/queries.ts).
+   - Компоненты страниц НЕ должны одновременно делать ручной append и invalidate на те же данные.
+
+5) Debug checklist for duplicates:
+   - если в UI появился дубль: проверить
+     a) одинаковые React keys
+     b) ручной append + refetch/invalidate
+     c) draft state по index вместо id
+
 ## OpenAPI и типы
 - OpenAPI схема (`docs/openapi.yaml`) является единственным источником правды по DTO и эндпоинтам.
 - TypeScript-типы генерируются автоматически из OpenAPI.
