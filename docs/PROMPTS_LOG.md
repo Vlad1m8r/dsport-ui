@@ -1,5 +1,16 @@
 # PROMPTS LOG (Frontend)
 
+## F4.6 — Fix UI duplicates after addExercise/addSet
+Сделано:
+- Fix — removed UI duplicates after addExercise/addSet (double-append with same keys).
+- Причина: ручной append в query cache дублировал ответ параллельно с refetch, из-за чего появлялись элементы с одинаковыми id и зеркалились инпуты.
+- Обновлено: опираемся на refetch как на single source of truth после мутаций addExercise/addSet.
+- Updated AGENTS.md: added TanStack Query mutation rules to prevent UI duplicates.
+
+Проверка:
+- Открыть `/workouts/:id`, добавить упражнение и подход — в списках появляется по одному элементу, значения инпутов не зеркалятся.
+- `npm run build` — ok
+
 ## F4.5 — Autosave set entries
 Сделано:
 - Добавлено сохранение подходов через `PATCH /api/workouts/{workoutId}/sets/{setEntryId}` с debounce 600ms и сохранением по blur.
