@@ -23,6 +23,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/workouts/{workoutId}/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Завершить тренировку */
+        post: operations["finishWorkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workouts/{workoutId}/exercises": {
         parameters: {
             query?: never;
@@ -321,21 +338,6 @@ export interface components {
              */
             plannedDurationSeconds?: number | null;
         };
-        /** @description Запрос на добавление упражнения в тренировку */
-        AddWorkoutExerciseRequest: {
-            /**
-             * Format: int64
-             * @description Идентификатор упражнения
-             * @example 123
-             */
-            exerciseId: number;
-            /**
-             * Format: int32
-             * @description Порядок упражнения
-             * @example 2
-             */
-            orderIndex: number;
-        };
         /** @description Фактический подход */
         SetEntryResponse: {
             /**
@@ -391,6 +393,53 @@ export interface components {
             /** @description Подходы */
             sets?: components["schemas"]["SetEntryResponse"][];
         };
+        /** @description Ответ с тренировочной сессией */
+        WorkoutSessionResponse: {
+            /**
+             * Format: int64
+             * @description Идентификатор тренировки
+             * @example 100
+             */
+            id?: number;
+            /**
+             * @description Заголовок тренировки
+             * @example 2026-02-01 Грудь
+             */
+            title?: string;
+            /**
+             * Format: date-time
+             * @description Дата и время старта
+             */
+            startedAt?: string;
+            /**
+             * Format: date-time
+             * @description Дата и время завершения
+             */
+            finishedAt?: string | null;
+            /**
+             * Format: int64
+             * @description Идентификатор шаблона
+             * @example 10
+             */
+            templateId?: number | null;
+            /** @description Упражнения тренировки */
+            exercises?: components["schemas"]["WorkoutExerciseResponse"][];
+        };
+        /** @description Запрос на добавление упражнения в тренировку */
+        AddWorkoutExerciseRequest: {
+            /**
+             * Format: int64
+             * @description Идентификатор упражнения
+             * @example 123
+             */
+            exerciseId: number;
+            /**
+             * Format: int32
+             * @description Порядок упражнения
+             * @example 2
+             */
+            orderIndex: number;
+        };
         /** @description Запрос на добавление подхода к упражнению */
         AddSetEntryRequest: {
             /**
@@ -430,33 +479,6 @@ export interface components {
              * @example 2026-02-01 Грудь
              */
             title?: string | null;
-        };
-        /** @description Ответ с тренировочной сессией */
-        WorkoutSessionResponse: {
-            /**
-             * Format: int64
-             * @description Идентификатор тренировки
-             * @example 100
-             */
-            id?: number;
-            /**
-             * @description Заголовок тренировки
-             * @example 2026-02-01 Грудь
-             */
-            title?: string;
-            /**
-             * Format: date-time
-             * @description Дата и время старта
-             */
-            startedAt?: string;
-            /**
-             * Format: int64
-             * @description Идентификатор шаблона
-             * @example 10
-             */
-            templateId?: number | null;
-            /** @description Упражнения тренировки */
-            exercises?: components["schemas"]["WorkoutExerciseResponse"][];
         };
         /** @description Запрос на обновление подхода */
         UpdateSetEntryRequest: {
@@ -502,6 +524,11 @@ export interface components {
              * @description Дата и время старта
              */
             startedAt?: string;
+            /**
+             * Format: date-time
+             * @description Дата и время завершения
+             */
+            finishedAt?: string | null;
             /**
              * Format: int64
              * @description Идентификатор шаблона
@@ -643,6 +670,46 @@ export interface operations {
                 content?: never;
             };
             /** @description Шаблон не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    finishWorkout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workoutId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Тренировка завершена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["WorkoutSessionResponse"];
+                };
+            };
+            /** @description Ошибка валидации */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiError"];
+                };
+            };
+            /** @description Тренировка не найдена */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -994,6 +1061,15 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Тренировка завершена */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiError"];
+                };
+            };
             /** @description Тренировка или упражнение не найдены */
             404: {
                 headers: {
@@ -1024,6 +1100,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Тренировка завершена */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiError"];
+                };
             };
             /** @description Тренировка или подход не найдены */
             404: {
