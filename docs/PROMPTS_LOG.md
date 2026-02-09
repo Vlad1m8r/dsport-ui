@@ -1,5 +1,22 @@
 # PROMPTS LOG (Frontend)
 
+## F6.1 — Finish workout: валидация заполнения подходов
+Сделано:
+- Добавлена проверка заполнения: подход считается валидным, если заполнены (reps + weight) или duration.
+- После попытки завершить тренировку пустые поля подсвечиваются красным.
+
+Проверка:
+- `npm run build` — ok
+
+## F6 — Finish workout
+Сделано:
+- Добавлен API/React Query слой для завершения тренировки (`POST /api/workouts/{workoutId}/finish`).
+- На `/workouts/:id` добавлена кнопка «Закончить тренировку», обработка ошибок и переход в read-only.
+- В UI добавлен статус «Завершена», блокировка редактирования и подсветка пустых подходов при ошибке.
+
+Проверка:
+- `npm run build` — ok
+
 ## F4.6 — Fix UI duplicates after addExercise/addSet
 Сделано:
 - Fix — removed UI duplicates after addExercise/addSet (double-append with same keys).
