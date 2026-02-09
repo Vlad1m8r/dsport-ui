@@ -5,6 +5,7 @@ export type AddWorkoutExerciseRequest = components["schemas"]["AddWorkoutExercis
 export type WorkoutExerciseResponse = components["schemas"]["WorkoutExerciseResponse"];
 export type AddSetEntryRequest = components["schemas"]["AddSetEntryRequest"];
 export type SetEntryResponse = components["schemas"]["SetEntryResponse"];
+export type UpdateSetEntryRequest = components["schemas"]["UpdateSetEntryRequest"];
 
 export const addExercise = async (
   workoutId: number,
@@ -50,4 +51,15 @@ export const deleteSetEntry = async (
       method: "DELETE",
     },
   );
+};
+
+export const updateSetEntry = async (
+  workoutId: number,
+  setEntryId: number,
+  payload: UpdateSetEntryRequest,
+): Promise<SetEntryResponse> => {
+  return request<SetEntryResponse>(`/api/workouts/${workoutId}/sets/${setEntryId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
 };

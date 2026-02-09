@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ChangeEvent,
   type ReactElement,
@@ -14,9 +15,11 @@ import {
   useAddSetEntryMutation,
   useDeleteExerciseMutation,
   useDeleteSetEntryMutation,
+  useUpdateSetEntry,
 } from "../features/workouts/edit/queries";
 import type {
   SetEntryResponse,
+  UpdateSetEntryRequest,
   WorkoutExerciseResponse,
 } from "../features/workouts/edit/api";
 import type { WorkoutSessionResponse } from "../features/workouts/view/api";
@@ -29,18 +32,33 @@ type WorkoutLocationState = {
   workout?: WorkoutSessionResponse;
 };
 
+type SetSaveStatus = "idle" | "saving" | "saved" | "error";
+
 type SetDraft = {
   reps: number | null;
   weight: number | null;
   durationSeconds: number | null;
+  orderIndex: number | null;
+  status: SetSaveStatus;
+  isEditing: boolean;
+  lastPayload?: UpdateSetEntryRequest;
 };
 
 type SetDraftMap = Record<string, SetDraft>;
 
+type SetDraftValues = Pick<SetDraft, "reps" | "weight" | "durationSeconds" | "orderIndex">;
+
 type ExerciseCardProps = {
   workoutExercise: WorkoutExerciseResponse;
   setDrafts: SetDraftMap;
-  onChangeSetValue: (setKey: string, field: keyof SetDraft, value: string) => void;
+  onChangeSetValue: (
+    setKey: string,
+    setEntry: SetEntryResponse,
+    field: keyof SetDraftValues,
+    value: string,
+  ) => void;
+  onBlurSetValue: (setKey: string, setEntry: SetEntryResponse) => void;
+  onRetrySetSave: (setKey: string, setEntry: SetEntryResponse) => void;
   onAddSet: (workoutExerciseId: number, nextOrderIndex: number) => void;
   onDeleteSet: (workoutExerciseId: number, setEntryId: number) => void;
   onDeleteExercise: (workoutExerciseId: number) => void;
@@ -67,6 +85,14 @@ const formatNumber = (value?: number | null): string => {
   return "";
 };
 
+const normalizeNumber = (value?: number | null): number | null => {
+  if (typeof value === "number") {
+    return value;
+  }
+
+  return null;
+};
+
 const getSetKey = (
   workoutExerciseId: number | undefined,
   setEntry: SetEntryResponse,
@@ -77,6 +103,38 @@ const getSetKey = (
   }
 
   return `set-${workoutExerciseId ?? "exercise"}-${setEntry.orderIndex ?? fallbackIndex}`;
+};
+
+const getSetValues = (setEntry: SetEntryResponse): SetDraftValues => ({
+  reps: normalizeNumber(setEntry.reps),
+  weight: normalizeNumber(setEntry.weight),
+  durationSeconds: normalizeNumber(setEntry.durationSeconds),
+  orderIndex: normalizeNumber(setEntry.orderIndex),
+});
+
+const buildUpdatePayload = (
+  draft: SetDraftValues,
+  base: SetDraftValues,
+): UpdateSetEntryRequest => {
+  const payload: UpdateSetEntryRequest = {};
+
+  if (draft.orderIndex !== base.orderIndex) {
+    payload.orderIndex = draft.orderIndex;
+  }
+
+  if (draft.reps !== base.reps) {
+    payload.reps = draft.reps;
+  }
+
+  if (draft.weight !== base.weight) {
+    payload.weight = draft.weight;
+  }
+
+  if (draft.durationSeconds !== base.durationSeconds) {
+    payload.durationSeconds = draft.durationSeconds;
+  }
+
+  return payload;
 };
 
 const getNextOrderIndex = (items: Array<{ orderIndex?: number }> | undefined): number => {
@@ -94,6 +152,8 @@ const ExerciseCard = ({
   workoutExercise,
   setDrafts,
   onChangeSetValue,
+  onBlurSetValue,
+  onRetrySetSave,
   onAddSet,
   onDeleteSet,
   onDeleteExercise,
@@ -167,6 +227,7 @@ const ExerciseCard = ({
       {sortedSets.map((setEntry, index) => {
         const setKey = getSetKey(workoutExerciseId, setEntry, index);
         const draft = setDrafts[setKey];
+        const status = draft?.status ?? "idle";
         const repsValue = formatNumber(draft?.reps ?? setEntry.reps ?? null);
         const weightValue = formatNumber(draft?.weight ?? setEntry.weight ?? null);
         const durationValue = formatNumber(
@@ -179,20 +240,45 @@ const ExerciseCard = ({
               <span className="workout-card__set-title">
                 Подход {setEntry.orderIndex ?? index + 1}
               </span>
-              <button
-                type="button"
-                className="workout-card__ghost-button"
-                onClick={() => {
-                  if (typeof workoutExerciseId === "number" && typeof setEntry.id === "number") {
-                    onDeleteSet(workoutExerciseId, setEntry.id);
+              <div className="workout-card__set-actions">
+                {status === "saving" ? (
+                  <span className="workout-card__set-status">сохранение…</span>
+                ) : null}
+                {status === "saved" ? (
+                  <span className="workout-card__set-status">сохранено</span>
+                ) : null}
+                {status === "error" ? (
+                  <span className="workout-card__set-status workout-card__set-status--error">
+                    ошибка
+                  </span>
+                ) : null}
+                {status === "error" ? (
+                  <button
+                    type="button"
+                    className="workout-card__retry-button"
+                    onClick={() => onRetrySetSave(setKey, setEntry)}
+                  >
+                    Повторить
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="workout-card__ghost-button"
+                  onClick={() => {
+                    if (
+                      typeof workoutExerciseId === "number" &&
+                      typeof setEntry.id === "number"
+                    ) {
+                      onDeleteSet(workoutExerciseId, setEntry.id);
+                    }
+                  }}
+                  disabled={
+                    typeof workoutExerciseId !== "number" || typeof setEntry.id !== "number"
                   }
-                }}
-                disabled={
-                  typeof workoutExerciseId !== "number" || typeof setEntry.id !== "number"
-                }
-              >
-                Удалить подход
-              </button>
+                >
+                  Удалить подход
+                </button>
+              </div>
             </div>
             <div className="workout-card__set-grid">
               <label className="workout-card__field">
@@ -201,7 +287,10 @@ const ExerciseCard = ({
                   type="number"
                   inputMode="numeric"
                   value={repsValue}
-                  onChange={(event) => onChangeSetValue(setKey, "reps", event.target.value)}
+                  onChange={(event) =>
+                    onChangeSetValue(setKey, setEntry, "reps", event.target.value)
+                  }
+                  onBlur={() => onBlurSetValue(setKey, setEntry)}
                 />
               </label>
               <label className="workout-card__field">
@@ -211,7 +300,10 @@ const ExerciseCard = ({
                   inputMode="decimal"
                   step={0.5}
                   value={weightValue}
-                  onChange={(event) => onChangeSetValue(setKey, "weight", event.target.value)}
+                  onChange={(event) =>
+                    onChangeSetValue(setKey, setEntry, "weight", event.target.value)
+                  }
+                  onBlur={() => onBlurSetValue(setKey, setEntry)}
                 />
               </label>
               <label className="workout-card__field">
@@ -221,8 +313,9 @@ const ExerciseCard = ({
                   inputMode="numeric"
                   value={durationValue}
                   onChange={(event) =>
-                    onChangeSetValue(setKey, "durationSeconds", event.target.value)
+                    onChangeSetValue(setKey, setEntry, "durationSeconds", event.target.value)
                   }
+                  onBlur={() => onBlurSetValue(setKey, setEntry)}
                 />
               </label>
             </div>
@@ -260,6 +353,9 @@ export const WorkoutPage = (): ReactElement => {
   const [newExerciseId, setNewExerciseId] = useState<string>("");
   const [newExerciseError, setNewExerciseError] = useState<string | null>(null);
 
+  const setDraftsRef = useRef<SetDraftMap>({});
+  const debounceTimersRef = useRef<Record<string, number>>({});
+
   const {
     data: workoutData,
     isLoading: isWorkoutLoading,
@@ -271,6 +367,7 @@ export const WorkoutPage = (): ReactElement => {
   const deleteExerciseMutation = useDeleteExerciseMutation();
   const addSetEntryMutation = useAddSetEntryMutation();
   const deleteSetEntryMutation = useDeleteSetEntryMutation();
+  const updateSetEntryMutation = useUpdateSetEntry(workoutId);
 
   useEffect(() => {
     if (typeof workoutId !== "number" || !initialWorkout) {
@@ -279,6 +376,19 @@ export const WorkoutPage = (): ReactElement => {
 
     queryClient.setQueryData(workoutQueryKey(workoutId), initialWorkout);
   }, [initialWorkout, queryClient, workoutId]);
+
+  useEffect(() => {
+    setDraftsRef.current = setDrafts;
+  }, [setDrafts]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(debounceTimersRef.current).forEach((timerId) => {
+        window.clearTimeout(timerId);
+      });
+      debounceTimersRef.current = {};
+    };
+  }, []);
 
   const workout = workoutData ?? initialWorkout ?? null;
 
@@ -292,6 +402,52 @@ export const WorkoutPage = (): ReactElement => {
     return items;
   }, [workout?.exercises]);
 
+  useEffect(() => {
+    const workoutExercises = workout?.exercises ?? [];
+    if (workoutExercises.length === 0) {
+      return;
+    }
+
+    setSetDrafts((current) => {
+      const nextDrafts: SetDraftMap = { ...current };
+      const seenKeys = new Set<string>();
+
+      workoutExercises.forEach((exercise) => {
+        const workoutExerciseId = exercise.id;
+        (exercise.sets ?? []).forEach((setEntry, index) => {
+          const setKey = getSetKey(workoutExerciseId, setEntry, index);
+          seenKeys.add(setKey);
+          const serverValues = getSetValues(setEntry);
+          const existing = nextDrafts[setKey];
+
+          if (!existing) {
+            nextDrafts[setKey] = {
+              ...serverValues,
+              status: "idle",
+              isEditing: false,
+            };
+            return;
+          }
+
+          if (!existing.isEditing) {
+            nextDrafts[setKey] = {
+              ...existing,
+              ...serverValues,
+            };
+          }
+        });
+      });
+
+      Object.keys(nextDrafts).forEach((key) => {
+        if (!seenKeys.has(key)) {
+          delete nextDrafts[key];
+        }
+      });
+
+      return nextDrafts;
+    });
+  }, [workout?.exercises]);
+
   const updateWorkoutData = useCallback(
     (updater: (previous: WorkoutSessionResponse | null) => WorkoutSessionResponse | null): void => {
       if (typeof workoutId !== "number") {
@@ -303,16 +459,152 @@ export const WorkoutPage = (): ReactElement => {
     [queryClient, workoutId],
   );
 
+  const applyUpdatePayload = useCallback(
+    (setEntry: SetEntryResponse, setKey: string, payload: UpdateSetEntryRequest): void => {
+      if (typeof workoutId !== "number" || typeof setEntry.id !== "number") {
+        return;
+      }
+
+      setSetDrafts((current) => {
+        const baseValues = getSetValues(setEntry);
+        const existing = current[setKey] ?? {
+          ...baseValues,
+          status: "idle",
+          isEditing: false,
+        };
+
+        return {
+          ...current,
+          [setKey]: {
+            ...existing,
+            status: "saving",
+            lastPayload: payload,
+            isEditing: false,
+          },
+        };
+      });
+
+      updateSetEntryMutation.mutate(
+        { setEntryId: setEntry.id, payload },
+        {
+          onSuccess: (response) => {
+            updateWorkoutData((previous) => {
+              if (!previous) {
+                return previous;
+              }
+
+              return {
+                ...previous,
+                exercises: (previous.exercises ?? []).map((exercise) => ({
+                  ...exercise,
+                  sets: (exercise.sets ?? []).map((setItem) =>
+                    setItem.id === response.id ? response : setItem,
+                  ),
+                })),
+              };
+            });
+
+            setSetDrafts((current) => {
+              const existing = current[setKey];
+              const nextValues = getSetValues(response);
+
+              return {
+                ...current,
+                [setKey]: {
+                  ...existing,
+                  ...nextValues,
+                  status: "saved",
+                  isEditing: false,
+                  lastPayload: payload,
+                },
+              };
+            });
+          },
+          onError: () => {
+            setSetDrafts((current) => {
+              const existing = current[setKey];
+              if (!existing) {
+                return current;
+              }
+
+              return {
+                ...current,
+                [setKey]: {
+                  ...existing,
+                  status: "error",
+                  isEditing: false,
+                  lastPayload: payload,
+                },
+              };
+            });
+          },
+        },
+      );
+    },
+    [updateSetEntryMutation, updateWorkoutData, workoutId],
+  );
+
+  const attemptSaveSetEntry = useCallback(
+    (setEntry: SetEntryResponse, setKey: string): void => {
+      const draft = setDraftsRef.current[setKey];
+      const baseValues = getSetValues(setEntry);
+      const draftValues: SetDraftValues = draft
+        ? {
+            reps: draft.reps,
+            weight: draft.weight,
+            durationSeconds: draft.durationSeconds,
+            orderIndex: draft.orderIndex,
+          }
+        : baseValues;
+
+      if (draftValues.reps == null && draftValues.durationSeconds == null) {
+        return;
+      }
+
+      const payload = buildUpdatePayload(draftValues, baseValues);
+      if (Object.keys(payload).length === 0) {
+        return;
+      }
+
+      applyUpdatePayload(setEntry, setKey, payload);
+    },
+    [applyUpdatePayload],
+  );
+
+  const clearDebounceTimer = useCallback((setKey: string): void => {
+    const timerId = debounceTimersRef.current[setKey];
+    if (timerId) {
+      window.clearTimeout(timerId);
+      delete debounceTimersRef.current[setKey];
+    }
+  }, []);
+
+  const scheduleDebouncedSave = useCallback(
+    (setEntry: SetEntryResponse, setKey: string): void => {
+      clearDebounceTimer(setKey);
+      debounceTimersRef.current[setKey] = window.setTimeout(() => {
+        attemptSaveSetEntry(setEntry, setKey);
+      }, 600);
+    },
+    [attemptSaveSetEntry, clearDebounceTimer],
+  );
+
   const handleSetFieldChange = useCallback(
-    (setKey: string, field: keyof SetDraft, value: string): void => {
+    (
+      setKey: string,
+      setEntry: SetEntryResponse,
+      field: keyof SetDraftValues,
+      value: string,
+    ): void => {
       const parsed = value.trim() === "" ? null : Number(value);
       const nextValue = Number.isNaN(parsed) ? null : parsed;
 
       setSetDrafts((current) => {
+        const baseValues = getSetValues(setEntry);
         const existing = current[setKey] ?? {
-          reps: null,
-          weight: null,
-          durationSeconds: null,
+          ...baseValues,
+          status: "idle",
+          isEditing: false,
         };
 
         return {
@@ -320,11 +612,50 @@ export const WorkoutPage = (): ReactElement => {
           [setKey]: {
             ...existing,
             [field]: nextValue,
+            status: "idle",
+            isEditing: true,
           },
         };
       });
+
+      scheduleDebouncedSave(setEntry, setKey);
     },
-    [],
+    [scheduleDebouncedSave],
+  );
+
+  const handleSetFieldBlur = useCallback(
+    (setKey: string, setEntry: SetEntryResponse): void => {
+      clearDebounceTimer(setKey);
+      setSetDrafts((current) => {
+        const existing = current[setKey];
+        if (!existing) {
+          return current;
+        }
+
+        return {
+          ...current,
+          [setKey]: {
+            ...existing,
+            isEditing: false,
+          },
+        };
+      });
+      attemptSaveSetEntry(setEntry, setKey);
+    },
+    [attemptSaveSetEntry, clearDebounceTimer],
+  );
+
+  const handleRetrySetSave = useCallback(
+    (setKey: string, setEntry: SetEntryResponse): void => {
+      const draft = setDraftsRef.current[setKey];
+      if (draft?.lastPayload) {
+        applyUpdatePayload(setEntry, setKey, draft.lastPayload);
+        return;
+      }
+
+      attemptSaveSetEntry(setEntry, setKey);
+    },
+    [applyUpdatePayload, attemptSaveSetEntry],
   );
 
   const handleAddExercise = (): void => {
@@ -476,6 +807,7 @@ export const WorkoutPage = (): ReactElement => {
             delete nextDrafts[`set-${setEntryId}`];
             return nextDrafts;
           });
+          clearDebounceTimer(`set-${setEntryId}`);
         },
       },
     );
@@ -611,6 +943,8 @@ export const WorkoutPage = (): ReactElement => {
               workoutExercise={exercise}
               setDrafts={setDrafts}
               onChangeSetValue={handleSetFieldChange}
+              onBlurSetValue={handleSetFieldBlur}
+              onRetrySetSave={handleRetrySetSave}
               onAddSet={handleAddSet}
               onDeleteSet={handleDeleteSet}
               onDeleteExercise={handleDeleteExercise}

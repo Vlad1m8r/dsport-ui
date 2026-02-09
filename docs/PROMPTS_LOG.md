@@ -1,5 +1,15 @@
 # PROMPTS LOG (Frontend)
 
+## F4.5 — Autosave set entries
+Сделано:
+- Добавлено сохранение подходов через `PATCH /api/workouts/{workoutId}/sets/{setEntryId}` с debounce 600ms и сохранением по blur.
+- Добавлены статусы "сохранение/сохранено/ошибка" с ретраем для подходов на WorkoutPage.
+- Добавлен API/React Query слой для обновления подходов через общий fetch-wrapper.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## F4 — Workouts history + workout fetch
 Сделано:
 - Добавлен API слой и TanStack Query хуки для списка тренировок и загрузки тренировки по id.

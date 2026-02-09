@@ -79,6 +79,32 @@
   font-weight: 600;
 }
 
+.workout-card__set-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.workout-card__set-status {
+  font-size: 12px;
+  color: var(--tg-theme-hint-color, #64748b);
+}
+
+.workout-card__set-status--error {
+  color: var(--tg-theme-destructive-text-color, #ef4444);
+}
+
+.workout-card__retry-button {
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: 1px solid
+    color-mix(in srgb, var(--tg-theme-text-color, #0f172a) 20%, transparent);
+  background-color: transparent;
+  color: inherit;
+  font-size: 12px;
+}
+
 .workout-card__set-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
