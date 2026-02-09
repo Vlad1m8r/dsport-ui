@@ -1,5 +1,21 @@
 # PROMPTS LOG (Frontend)
 
+## Fix — removed UI duplicates after addExercise/addSet (double-append with same keys)
+Сделано:
+- Убрано ручное добавление упражнений и подходов в query-cache на WorkoutPage; обновление идёт через invalidate/refetch.
+- Сброс поля exerciseId оставлен после успешного добавления.
+
+Причина:
+- После addExercise/addSet данные добавлялись вручную в кэш и параллельно приходил refetch → появлялись дубликаты с одинаковыми id и React keys.
+
+Проверка:
+- Открыть `/workouts/:id`, добавить упражнение и подход.
+- Убедиться, что элемент появляется один раз и инпуты не зеркалятся.
+
+## Updated AGENTS.md: added TanStack Query mutation rules to prevent UI duplicates
+Сделано:
+- Добавлены правила по server state и стратегиям мутаций, чтобы избегать дубликатов и нестабильных ключей.
+
 ## F4.5 — Autosave set entries
 Сделано:
 - Добавлено сохранение подходов через `PATCH /api/workouts/{workoutId}/sets/{setEntryId}` с debounce 600ms и сохранением по blur.
