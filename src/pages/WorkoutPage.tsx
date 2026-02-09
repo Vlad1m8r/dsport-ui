@@ -683,23 +683,7 @@ export const WorkoutPage = (): ReactElement => {
         },
       },
       {
-        onSuccess: (response) => {
-          updateWorkoutData((previous) => {
-            const baseWorkout: WorkoutSessionResponse =
-              previous ??
-              workout ?? {
-                id: workoutId,
-                title: initialWorkout?.title,
-                startedAt: initialWorkout?.startedAt,
-                templateId: initialWorkout?.templateId,
-                exercises: [],
-              };
-
-            return {
-              ...baseWorkout,
-              exercises: [...(baseWorkout.exercises ?? []), response],
-            };
-          });
+        onSuccess: () => {
           setNewExerciseId("");
         },
       },
@@ -746,29 +730,6 @@ export const WorkoutPage = (): ReactElement => {
           reps: 0,
           weight: null,
           durationSeconds: null,
-        },
-      },
-      {
-        onSuccess: (response) => {
-          updateWorkoutData((previous) => {
-            if (!previous) {
-              return previous;
-            }
-
-            return {
-              ...previous,
-              exercises: (previous.exercises ?? []).map((exercise) => {
-                if (exercise.id !== workoutExerciseId) {
-                  return exercise;
-                }
-
-                return {
-                  ...exercise,
-                  sets: [...(exercise.sets ?? []), response],
-                };
-              }),
-            };
-          });
         },
       },
     );
