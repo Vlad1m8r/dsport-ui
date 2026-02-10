@@ -1,5 +1,16 @@
 # PROMPTS LOG (Frontend)
 
+## F9 — Template editor (exercises + planned sets)
+Сделано:
+- На `/templates/:id/edit` реализовано полноценное редактирование шаблона: локальный draft, добавление упражнения через ExercisePicker, удаление упражнения, добавление/удаление плановых подходов.
+- Добавлено сохранение шаблона через `PUT /api/templates/{id}` (API + TanStack Query mutation с invalidate списка и детального запроса).
+- Поля подхода зависят от `exercise.type`: для `REPS_WEIGHT` показываются `plannedReps`, для `TIME` — `plannedDurationSeconds`.
+- Добавлена клиентская валидация: непустое `name`, значения подходов строго больше 0 перед сохранением.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## F8 — ExercisePicker (shared)
 Сделано:
 - Добавлен переиспользуемый ExercisePicker с загрузкой `GET /api/exercises` и `GET /api/muscle-groups` через TanStack Query.
