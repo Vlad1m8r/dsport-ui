@@ -1,5 +1,15 @@
 # PROMPTS LOG (Frontend)
 
+## F8 — ExercisePicker (shared)
+Сделано:
+- Добавлен переиспользуемый ExercisePicker с загрузкой `GET /api/exercises` и `GET /api/muscle-groups` через TanStack Query.
+- Реализован локальный быстрый поиск по имени с debounce 200ms, фильтры `scope` (ALL/SYSTEM/MY) и `muscle group` на фронте.
+- Добавлена страница `/pickers/exercises` с query params `returnTo` и `mode`, по выбору упражнения выполняется переход на `returnTo` с `pickedExerciseId`.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## F7 — Template create flow (no auto POST)
 Сделано:
 - Убрано автосоздание шаблона с `POST /api/templates` по клику в `/templates`.

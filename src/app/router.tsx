@@ -4,6 +4,7 @@ import App from "../App";
 import { TemplateCreatePage } from "../pages/TemplateCreatePage";
 import { TemplateEditPage } from "../pages/TemplateEditPage";
 import { StartWorkoutPage } from "../pages/StartWorkoutPage";
+import { ExercisePickerPage } from "../pages/ExercisePickerPage";
 import { TemplatesPage } from "../pages/TemplatesPage";
 import { WorkoutsHistoryPage } from "../pages/WorkoutsHistoryPage";
 import { WorkoutPage } from "../pages/WorkoutPage";
@@ -36,6 +37,10 @@ export const router = createBrowserRouter([
       {
         path: "workouts/:workoutId",
         element: <WorkoutPage />,
+      },
+      {
+        path: "pickers/exercises",
+        element: <ExercisePickerPage />,
       },
       {
         path: "workouts",
