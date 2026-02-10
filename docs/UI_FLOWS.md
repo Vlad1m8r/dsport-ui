@@ -143,5 +143,28 @@
 **API endpoints:**
 - `GET /api/workouts` — список тренировок.
 
+## Экран: /pickers/exercises
+**Цель:** выбрать упражнение в едином picker и вернуть `exerciseId` на исходный экран.
+
+**Ввод пользователя:**
+- Ввести текст в поиске по названию.
+- Выбрать `scope` (ALL/SYSTEM/MY).
+- Выбрать группу мышц.
+- Нажать на упражнение в списке.
+
+**Основные компоненты:**
+- Поле поиска с debounce 200ms.
+- Два фильтра: `scope` и `muscle group`.
+- Список упражнений с количеством найденных результатов.
+
+**API endpoints:**
+- `GET /api/exercises` — каталог упражнений.
+- `GET /api/muscle-groups` — список групп мышц.
+
+**Навигация/переиспользование:**
+- Экран вызывается как shared picker с параметрами `returnTo` и `mode`.
+- После выбора происходит переход на `returnTo` с query param `pickedExerciseId`.
+- Picker используется в потоках TemplateEditor и WorkoutPage.
+
 ## Правило docs
 В каждом промпте актуализируем полный набор документации: `PROMPTS_LOG` + `DEV_NOTES` + `UI_FLOWS` + `TODO`.
