@@ -160,6 +160,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/muscle-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить список групп мышц */
+        get: operations["listMuscleGroups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exercises": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить упражнения для picker */
+        get: operations["listExercises"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/exercises/{exerciseId}/last-max": {
         parameters: {
             query?: never;
@@ -535,6 +569,41 @@ export interface components {
              * @example 10
              */
             templateId?: number | null;
+        };
+        /** @description Код группы мышц */
+        MuscleGroupCodeResponse: {
+            /**
+             * @description Код группы мышц
+             * @example CHEST
+             */
+            code?: string;
+        };
+        /** @description Краткая карточка упражнения для picker */
+        ExerciseSummaryResponse: {
+            /**
+             * Format: int64
+             * @description Идентификатор упражнения
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description Название упражнения
+             * @example Bench Press
+             */
+            name?: string;
+            /**
+             * @description Тип упражнения
+             * @example REPS_WEIGHT
+             * @enum {string}
+             */
+            type?: "REPS_WEIGHT" | "TIME";
+            muscleGroups?: string[];
+            /**
+             * @description Источник упражнения
+             * @example SYSTEM
+             * @enum {string}
+             */
+            scope?: "SYSTEM" | "MY";
         };
         /** @description Ответ с последним максимумом по упражнению */
         ExerciseLastMaxResponse: {
@@ -1007,6 +1076,53 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiError"];
+                };
+            };
+        };
+    };
+    listMuscleGroups: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список групп мышц */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MuscleGroupCodeResponse"][];
+                };
+            };
+        };
+    };
+    listExercises: {
+        parameters: {
+            query?: {
+                /** @description Поиск по названию упражнения (опционально) */
+                query?: string | null;
+                /** @description Фильтр по группе мышц (опционально) */
+                muscleGroup?: string | null;
+                /** @description Область поиска: ALL (по умолчанию), SYSTEM или MY */
+                scope?: "ALL" | "SYSTEM" | "MY";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список упражнений */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExerciseSummaryResponse"][];
                 };
             };
         };
