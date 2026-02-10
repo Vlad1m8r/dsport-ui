@@ -1,13 +1,13 @@
 import type { ChangeEvent, ReactElement } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { useExercisesCatalog } from "../features/exercises/catalog/queries";
 import {
-  useTemplateQuery,
-  useUpdateTemplateMutation
-} from "../features/templates/queries";
-import type { TemplateByIdResponse } from "../features/templates/api";
+  templateEditorStoreActions,
+  useTemplateEditorDraft,
+} from "../features/templates/editor/store";
+import { useTemplateQuery, useUpdateTemplateMutation } from "../features/templates/queries";
 
 const parseTemplateId = (templateIdParam: string | undefined): number | null => {
   if (typeof templateIdParam !== "string") {
@@ -21,24 +21,6 @@ const parseTemplateId = (templateIdParam: string | undefined): number | null => 
 
 type ExerciseType = "REPS_WEIGHT" | "TIME";
 
-interface DraftSet {
-  localId: string;
-  orderIndex: number;
-  plannedReps: number | null;
-  plannedDurationSeconds: number | null;
-}
-
-interface DraftExercise {
-  exerciseId: number;
-  orderIndex: number;
-  sets: DraftSet[];
-}
-
-interface DraftTemplate {
-  name: string;
-  exercises: DraftExercise[];
-}
-
 interface ValidationErrorState {
   name: string | null;
   sets: Record<string, string>;
@@ -50,36 +32,6 @@ interface ExerciseOption {
   type: ExerciseType;
 }
 
-const createSetLocalId = (): string => {
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-};
-
-const normalizeTemplateToDraft = (template: TemplateByIdResponse): DraftTemplate => {
-  const draftExercises: DraftExercise[] = (template.exercises ?? []).map((exercise) => ({
-    exerciseId: exercise.exerciseId ?? -1,
-    orderIndex: exercise.orderIndex ?? 0,
-    sets: (exercise.sets ?? []).map((setEntry) => ({
-      localId: createSetLocalId(),
-      orderIndex: setEntry.orderIndex ?? 0,
-      plannedReps: setEntry.plannedReps ?? null,
-      plannedDurationSeconds: setEntry.plannedDurationSeconds ?? null,
-    })),
-  }));
-
-  return {
-    name: template.name ?? "",
-    exercises: draftExercises.filter((exercise) => exercise.exerciseId > 0),
-  };
-};
-
-const getMaxOrderIndex = (orderIndexes: number[]): number => {
-  if (orderIndexes.length === 0) {
-    return 0;
-  }
-
-  return Math.max(...orderIndexes);
-};
-
 const parsePositiveNumber = (value: string): number | null => {
   const parsed: number = Number(value);
 
@@ -90,34 +42,44 @@ const parsePositiveNumber = (value: string): number | null => {
   return parsed;
 };
 
-const getSetErrorKey = (exerciseId: number, setLocalId: string): string => {
-  return `${exerciseId}:${setLocalId}`;
+const getSetErrorKey = (exerciseOrderIndex: number, setLocalId: string): string => {
+  return `${exerciseOrderIndex}:${setLocalId}`;
+};
+
+const toTemplateIdKey = (templateId: number | null): string | null => {
+  if (templateId === null) {
+    return null;
+  }
+
+  return String(templateId);
 };
 
 export const TemplateEditPage = (): ReactElement => {
   const params = useParams<{ id: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const templateId: number | null = parseTemplateId(params.id);
+  const templateIdKey = toTemplateIdKey(templateId);
   const templateQuery = useTemplateQuery(templateId);
   const catalogQuery = useExercisesCatalog();
   const updateTemplateMutation = useUpdateTemplateMutation();
+  const draft = useTemplateEditorDraft(templateIdKey);
 
-  const [draft, setDraft] = useState<DraftTemplate | null>(null);
-  const [hasDraftChanges, setHasDraftChanges] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrorState>({
     name: null,
     sets: {},
   });
+  const [isSaveSuccessful, setIsSaveSuccessful] = useState<boolean>(false);
 
   useEffect((): void => {
-    if (!templateQuery.data || hasDraftChanges) {
+    if (!templateIdKey || !templateQuery.data || draft) {
       return;
     }
 
-    setDraft(normalizeTemplateToDraft(templateQuery.data));
-  }, [hasDraftChanges, templateQuery.data]);
+    templateEditorStoreActions.initDraft(templateIdKey, templateQuery.data);
+  }, [draft, templateIdKey, templateQuery.data]);
 
   const exerciseById = useMemo<Map<number, ExerciseOption>>(() => {
     const map = new Map<number, ExerciseOption>();
@@ -143,66 +105,32 @@ export const TemplateEditPage = (): ReactElement => {
     const mode = searchParams.get("mode");
     const pickedExerciseId = searchParams.get("pickedExerciseId");
 
-    if (mode !== "template" || !pickedExerciseId || draft === null) {
+    if (mode !== "template" || !pickedExerciseId || !templateIdKey || draft === null) {
       return;
     }
 
     const pickedId = Number(pickedExerciseId);
 
-    if (!Number.isInteger(pickedId) || pickedId <= 0) {
-      return;
+    if (Number.isInteger(pickedId) && pickedId > 0) {
+      templateEditorStoreActions.addExercise(templateIdKey, pickedId);
+      setIsSaveSuccessful(false);
     }
-
-    setDraft((previousDraft) => {
-      if (previousDraft === null) {
-        return previousDraft;
-      }
-
-      const alreadyExists = previousDraft.exercises.some((item) => item.exerciseId === pickedId);
-
-      if (alreadyExists) {
-        return previousDraft;
-      }
-
-      const nextOrderIndex = getMaxOrderIndex(
-        previousDraft.exercises.map((exercise) => exercise.orderIndex),
-      );
-
-      setHasDraftChanges(true);
-
-      return {
-        ...previousDraft,
-        exercises: [
-          ...previousDraft.exercises,
-          {
-            exerciseId: pickedId,
-            orderIndex: nextOrderIndex + 1,
-            sets: [],
-          },
-        ],
-      };
-    });
 
     const nextParams = new URLSearchParams(searchParams);
     nextParams.delete("pickedExerciseId");
     nextParams.delete("mode");
     setSearchParams(nextParams, { replace: true });
-  }, [draft, searchParams, setSearchParams]);
+  }, [draft, searchParams, setSearchParams, templateIdKey]);
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const value = event.target.value;
+    if (!templateIdKey) {
+      return;
+    }
 
-    setDraft((previousDraft) => {
-      if (previousDraft === null) {
-        return previousDraft;
-      }
-
-      return {
-        ...previousDraft,
-        name: value,
-      };
+    templateEditorStoreActions.updateDraft(templateIdKey, {
+      name: event.target.value,
     });
-    setHasDraftChanges(true);
+    setIsSaveSuccessful(false);
 
     if (validationErrors.name) {
       setValidationErrors((previousErrors) => ({
@@ -217,79 +145,46 @@ export const TemplateEditPage = (): ReactElement => {
       return;
     }
 
-    navigate(`/pickers/exercises?returnTo=/templates/${templateId}/edit&mode=template`);
+    const returnTo = `${location.pathname}${location.search}`;
+    const pickerParams = new URLSearchParams({
+      returnTo,
+      mode: "template",
+    });
+
+    navigate(`/pickers/exercises?${pickerParams.toString()}`);
   };
 
-  const handleRemoveExercise = (exerciseId: number): void => {
-    setDraft((previousDraft) => {
-      if (previousDraft === null) {
-        return previousDraft;
-      }
+  const handleRemoveExercise = (exerciseOrderIndex: number): void => {
+    if (!templateIdKey) {
+      return;
+    }
 
-      return {
-        ...previousDraft,
-        exercises: previousDraft.exercises.filter((exercise) => exercise.exerciseId !== exerciseId),
-      };
-    });
-    setHasDraftChanges(true);
+    templateEditorStoreActions.removeExercise(templateIdKey, exerciseOrderIndex);
+    setIsSaveSuccessful(false);
   };
 
-  const handleAddSet = (exerciseId: number): void => {
-    setDraft((previousDraft) => {
-      if (previousDraft === null) {
-        return previousDraft;
-      }
+  const handleAddSet = (exerciseOrderIndex: number, exerciseType: ExerciseType): void => {
+    if (!templateIdKey) {
+      return;
+    }
 
-      return {
-        ...previousDraft,
-        exercises: previousDraft.exercises.map((exercise) => {
-          if (exercise.exerciseId !== exerciseId) {
-            return exercise;
-          }
-
-          const exerciseType = exerciseById.get(exerciseId)?.type;
-          const nextOrderIndex = getMaxOrderIndex(exercise.sets.map((setEntry) => setEntry.orderIndex)) + 1;
-
-          const nextSet: DraftSet = {
-            localId: createSetLocalId(),
-            orderIndex: nextOrderIndex,
-            plannedReps: exerciseType === "REPS_WEIGHT" ? 0 : null,
-            plannedDurationSeconds: exerciseType === "TIME" ? 0 : null,
-          };
-
-          return {
-            ...exercise,
-            sets: [...exercise.sets, nextSet],
-          };
-        }),
-      };
-    });
-    setHasDraftChanges(true);
+    templateEditorStoreActions.addSet(templateIdKey, exerciseOrderIndex, exerciseType);
+    setIsSaveSuccessful(false);
   };
 
-  const handleRemoveSet = (exerciseId: number, setLocalId: string): void => {
-    setDraft((previousDraft) => {
-      if (previousDraft === null) {
-        return previousDraft;
-      }
+  const handleRemoveSet = (exerciseOrderIndex: number, setLocalId: string): void => {
+    if (!templateIdKey) {
+      return;
+    }
 
-      return {
-        ...previousDraft,
-        exercises: previousDraft.exercises.map((exercise) => {
-          if (exercise.exerciseId !== exerciseId) {
-            return exercise;
-          }
-
-          return {
-            ...exercise,
-            sets: exercise.sets.filter((setEntry) => setEntry.localId !== setLocalId),
-          };
-        }),
-      };
+    templateEditorStoreActions.removeSet({
+      templateId: templateIdKey,
+      exerciseOrderIndex,
+      setLocalId,
     });
-    setHasDraftChanges(true);
+    setIsSaveSuccessful(false);
 
-    const setErrorKey = getSetErrorKey(exerciseId, setLocalId);
+    const setErrorKey = getSetErrorKey(exerciseOrderIndex, setLocalId);
 
     setValidationErrors((previousErrors) => {
       if (!previousErrors.sets[setErrorKey]) {
@@ -307,44 +202,27 @@ export const TemplateEditPage = (): ReactElement => {
   };
 
   const handleSetValueChange = (
-    exerciseId: number,
+    exerciseOrderIndex: number,
     setLocalId: string,
     field: "plannedReps" | "plannedDurationSeconds",
     value: string,
   ): void => {
+    if (!templateIdKey) {
+      return;
+    }
+
     const numericValue = value.length === 0 ? null : Number(value);
 
-    setDraft((previousDraft) => {
-      if (previousDraft === null) {
-        return previousDraft;
-      }
-
-      return {
-        ...previousDraft,
-        exercises: previousDraft.exercises.map((exercise) => {
-          if (exercise.exerciseId !== exerciseId) {
-            return exercise;
-          }
-
-          return {
-            ...exercise,
-            sets: exercise.sets.map((setEntry) => {
-              if (setEntry.localId !== setLocalId) {
-                return setEntry;
-              }
-
-              return {
-                ...setEntry,
-                [field]: Number.isFinite(numericValue) ? numericValue : null,
-              };
-            }),
-          };
-        }),
-      };
+    templateEditorStoreActions.updateSetField({
+      templateId: templateIdKey,
+      exerciseOrderIndex,
+      setLocalId,
+      field,
+      value: Number.isFinite(numericValue) ? numericValue : null,
     });
-    setHasDraftChanges(true);
+    setIsSaveSuccessful(false);
 
-    const setErrorKey = getSetErrorKey(exerciseId, setLocalId);
+    const setErrorKey = getSetErrorKey(exerciseOrderIndex, setLocalId);
 
     setValidationErrors((previousErrors) => {
       if (!previousErrors.sets[setErrorKey]) {
@@ -361,8 +239,23 @@ export const TemplateEditPage = (): ReactElement => {
     });
   };
 
+  const handleResetDraft = (): void => {
+    if (!templateIdKey) {
+      return;
+    }
+
+    templateEditorStoreActions.clearDraft(templateIdKey);
+
+    if (templateQuery.data) {
+      templateEditorStoreActions.initDraft(templateIdKey, templateQuery.data);
+    }
+
+    setValidationErrors({ name: null, sets: {} });
+    setIsSaveSuccessful(false);
+  };
+
   const handleSave = (): void => {
-    if (templateId === null || draft === null) {
+    if (templateId === null || templateIdKey === null || draft === null) {
       return;
     }
 
@@ -380,7 +273,7 @@ export const TemplateEditPage = (): ReactElement => {
       const exerciseType = exerciseById.get(exercise.exerciseId)?.type;
 
       exercise.sets.forEach((setEntry) => {
-        const setErrorKey = getSetErrorKey(exercise.exerciseId, setEntry.localId);
+        const setErrorKey = getSetErrorKey(exercise.orderIndex, setEntry.localId);
 
         if (exerciseType === "REPS_WEIGHT") {
           if (parsePositiveNumber(String(setEntry.plannedReps ?? "")) === null) {
@@ -426,7 +319,10 @@ export const TemplateEditPage = (): ReactElement => {
       },
       {
         onSuccess: (): void => {
-          setHasDraftChanges(false);
+          templateEditorStoreActions.clearDraft(templateIdKey);
+          setValidationErrors({ name: null, sets: {} });
+          setIsSaveSuccessful(true);
+          navigate("/templates");
         },
       },
     );
@@ -474,17 +370,20 @@ export const TemplateEditPage = (): ReactElement => {
               const exerciseInfo = exerciseById.get(exercise.exerciseId);
 
               return (
-                <article key={exercise.exerciseId}>
+                <article key={`${exercise.exerciseId}-${exercise.orderIndex}`}>
                   <header>
                     <h3>{exerciseInfo?.name ?? `Упражнение #${exercise.exerciseId}`}</h3>
                     <p>Тип: {exerciseInfo?.type ?? "UNKNOWN"}</p>
-                    <button type="button" onClick={() => handleRemoveExercise(exercise.exerciseId)}>
+                    <button type="button" onClick={() => handleRemoveExercise(exercise.orderIndex)}>
                       Удалить упражнение
                     </button>
                   </header>
 
                   <div>
-                    <button type="button" onClick={() => handleAddSet(exercise.exerciseId)}>
+                    <button
+                      type="button"
+                      onClick={() => handleAddSet(exercise.orderIndex, exerciseInfo?.type ?? "REPS_WEIGHT")}
+                    >
                       Добавить подход
                     </button>
                   </div>
@@ -492,9 +391,7 @@ export const TemplateEditPage = (): ReactElement => {
                   {exercise.sets.length === 0 ? <p>Подходов пока нет.</p> : null}
 
                   {exercise.sets.map((setEntry) => {
-                    const setError = validationErrors.sets[
-                      getSetErrorKey(exercise.exerciseId, setEntry.localId)
-                    ];
+                    const setError = validationErrors.sets[getSetErrorKey(exercise.orderIndex, setEntry.localId)];
 
                     return (
                       <div key={setEntry.localId}>
@@ -510,7 +407,7 @@ export const TemplateEditPage = (): ReactElement => {
                               value={setEntry.plannedReps ?? ""}
                               onChange={(event) => {
                                 handleSetValueChange(
-                                  exercise.exerciseId,
+                                  exercise.orderIndex,
                                   setEntry.localId,
                                   "plannedReps",
                                   event.target.value,
@@ -531,7 +428,7 @@ export const TemplateEditPage = (): ReactElement => {
                               value={setEntry.plannedDurationSeconds ?? ""}
                               onChange={(event) => {
                                 handleSetValueChange(
-                                  exercise.exerciseId,
+                                  exercise.orderIndex,
                                   setEntry.localId,
                                   "plannedDurationSeconds",
                                   event.target.value,
@@ -546,7 +443,7 @@ export const TemplateEditPage = (): ReactElement => {
 
                         <button
                           type="button"
-                          onClick={() => handleRemoveSet(exercise.exerciseId, setEntry.localId)}
+                          onClick={() => handleRemoveSet(exercise.orderIndex, setEntry.localId)}
                         >
                           Удалить подход
                         </button>
@@ -566,10 +463,13 @@ export const TemplateEditPage = (): ReactElement => {
             >
               {updateTemplateMutation.isPending ? "Сохранение..." : "Сохранить"}
             </button>
+            <button type="button" onClick={handleResetDraft} disabled={updateTemplateMutation.isPending}>
+              Сбросить
+            </button>
             {updateTemplateMutation.isError ? (
               <p>Ошибка сохранения: {updateTemplateMutation.error?.message ?? "Не удалось сохранить"}</p>
             ) : null}
-            {updateTemplateMutation.isSuccess && !hasDraftChanges ? <p>Шаблон сохранён.</p> : null}
+            {isSaveSuccessful ? <p>Шаблон сохранён.</p> : null}
           </section>
         </>
       ) : null}

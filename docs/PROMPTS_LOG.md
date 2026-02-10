@@ -1,5 +1,16 @@
 # PROMPTS LOG (Frontend)
 
+## F9.1 — Template editor draft persisted (no auto-save)
+Сделано:
+- Для `/templates/:id/edit` добавлен client-only черновик шаблона с хранением в `sessionStorage`.
+- Черновик переживает переходы между `/templates/:id/edit` и `/pickers/exercises`, включая возврат с `pickedExerciseId`.
+- Автосохранение отключено: `PUT /api/templates/{id}` вызывается только по кнопке «Сохранить».
+- После успешного сохранения или по кнопке «Сбросить» черновик очищается.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## F10 — Кнопка «Изменить» в списке шаблонов
 Сделано:
 - На `/templates` в каждой карточке шаблона добавлена кнопка «Изменить».
