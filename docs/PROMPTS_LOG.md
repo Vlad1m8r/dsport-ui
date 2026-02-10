@@ -1,5 +1,15 @@
 # PROMPTS LOG (Frontend)
 
+## F7 — Template create flow (no auto POST)
+Сделано:
+- Убрано автосоздание шаблона с `POST /api/templates` по клику в `/templates`.
+- Добавлена страница `/templates/new` с контролируемым полем `name` и кнопкой «Создать».
+- После успешного `POST /api/templates` реализован переход на `/templates/:id/edit`.
+- Добавлена страница `/templates/:id/edit` с загрузкой `GET /api/templates/{id}` через TanStack Query и базовым отображением имени.
+
+Проверка:
+- `npm run build` — ok
+
 ## F6.1 — Finish workout: валидация заполнения подходов
 Сделано:
 - Добавлена проверка заполнения: подход считается валидным, если заполнены (reps + weight) или duration.
