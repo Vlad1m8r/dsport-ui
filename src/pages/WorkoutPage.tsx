@@ -4,10 +4,9 @@ import {
   useMemo,
   useRef,
   useState,
-  type ChangeEvent,
   type ReactElement,
 } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -49,6 +48,7 @@ type SetDraft = {
 type SetDraftMap = Record<string, SetDraft>;
 
 type SetDraftValues = Pick<SetDraft, "reps" | "weight" | "durationSeconds" | "orderIndex">;
+type ExerciseType = "REPS_WEIGHT" | "TIME";
 
 type ExerciseCardProps = {
   workoutExercise: WorkoutExerciseResponse;
@@ -58,12 +58,13 @@ type ExerciseCardProps = {
   onChangeSetValue: (
     setKey: string,
     setEntry: SetEntryResponse,
+    exerciseType: ExerciseType,
     field: keyof SetDraftValues,
     value: string,
   ) => void;
-  onBlurSetValue: (setKey: string, setEntry: SetEntryResponse) => void;
-  onRetrySetSave: (setKey: string, setEntry: SetEntryResponse) => void;
-  onAddSet: (workoutExerciseId: number, nextOrderIndex: number) => void;
+  onBlurSetValue: (setKey: string, setEntry: SetEntryResponse, exerciseType: ExerciseType) => void;
+  onRetrySetSave: (setKey: string, setEntry: SetEntryResponse, exerciseType: ExerciseType) => void;
+  onAddSet: (workoutExerciseId: number, nextOrderIndex: number, exerciseType: ExerciseType) => void;
   onDeleteSet: (workoutExerciseId: number, setEntryId: number) => void;
   onDeleteExercise: (workoutExerciseId: number) => void;
 };
@@ -126,6 +127,36 @@ const getSetValuesForValidation = (
   orderIndex: draft?.orderIndex ?? normalizeNumber(setEntry.orderIndex),
 });
 
+const getWorkoutExerciseType = (workoutExercise: WorkoutExerciseResponse): ExerciseType => {
+  const exerciseType = (
+    workoutExercise as WorkoutExerciseResponse & {
+      exerciseType?: string;
+    }
+  ).exerciseType;
+
+  if (exerciseType === "TIME") {
+    return "TIME";
+  }
+
+  return "REPS_WEIGHT";
+};
+
+const getWorkoutExerciseName = (workoutExercise: WorkoutExerciseResponse): string => {
+  const exerciseName = (
+    workoutExercise as WorkoutExerciseResponse & {
+      exerciseName?: string;
+    }
+  ).exerciseName;
+
+  if (exerciseName && exerciseName.trim().length > 0) {
+    return exerciseName;
+  }
+
+  return typeof workoutExercise.exerciseId === "number"
+    ? `Exercise #${workoutExercise.exerciseId}`
+    : "Exercise";
+};
+
 type SetValidationResult = {
   isValid: boolean;
   missingReps: boolean;
@@ -133,14 +164,17 @@ type SetValidationResult = {
   missingDuration: boolean;
 };
 
-const getSetValidation = (values: SetDraftValues): SetValidationResult => {
-  const hasDuration = values.durationSeconds != null;
-  if (hasDuration) {
+const getSetValidation = (
+  values: SetDraftValues,
+  exerciseType: ExerciseType,
+): SetValidationResult => {
+  if (exerciseType === "TIME") {
+    const hasDuration = values.durationSeconds != null;
     return {
-      isValid: true,
+      isValid: hasDuration,
       missingReps: false,
       missingWeight: false,
-      missingDuration: false,
+      missingDuration: !hasDuration,
     };
   }
 
@@ -152,13 +186,14 @@ const getSetValidation = (values: SetDraftValues): SetValidationResult => {
     isValid,
     missingReps: !hasReps,
     missingWeight: !hasWeight,
-    missingDuration: !hasDuration && !hasReps && !hasWeight,
+    missingDuration: false,
   };
 };
 
 const buildUpdatePayload = (
   draft: SetDraftValues,
   base: SetDraftValues,
+  exerciseType: ExerciseType,
 ): UpdateSetEntryRequest => {
   const payload: UpdateSetEntryRequest = {};
 
@@ -166,15 +201,17 @@ const buildUpdatePayload = (
     payload.orderIndex = draft.orderIndex;
   }
 
-  if (draft.reps !== base.reps) {
-    payload.reps = draft.reps;
+  if (exerciseType === "REPS_WEIGHT") {
+    if (draft.reps !== base.reps) {
+      payload.reps = draft.reps;
+    }
+
+    if (draft.weight !== base.weight) {
+      payload.weight = draft.weight;
+    }
   }
 
-  if (draft.weight !== base.weight) {
-    payload.weight = draft.weight;
-  }
-
-  if (draft.durationSeconds !== base.durationSeconds) {
+  if (exerciseType === "TIME" && draft.durationSeconds !== base.durationSeconds) {
     payload.durationSeconds = draft.durationSeconds;
   }
 
@@ -235,11 +272,9 @@ const ExerciseCard = ({
   }, [workoutExercise.sets]);
 
   const workoutExerciseId = workoutExercise.id;
+  const exerciseType = getWorkoutExerciseType(workoutExercise);
   const nextSetOrderIndex = getNextOrderIndex(workoutExercise.sets);
-  const exerciseTitle =
-    typeof workoutExercise.exerciseId === "number"
-      ? `Exercise #${workoutExercise.exerciseId}`
-      : "Exercise";
+  const exerciseTitle = getWorkoutExerciseName(workoutExercise);
 
   return (
     <article className="workout-card">
@@ -275,7 +310,7 @@ const ExerciseCard = ({
         const draft = setDrafts[setKey];
         const status = draft?.status ?? "idle";
         const values = getSetValuesForValidation(setEntry, draft);
-        const validation = getSetValidation(values);
+        const validation = getSetValidation(values, exerciseType);
         const isInvalid = highlightEmptyFields && !validation.isValid;
         const repsValue = formatNumber(values.reps);
         const weightValue = formatNumber(values.weight);
@@ -311,7 +346,7 @@ const ExerciseCard = ({
                   <button
                     type="button"
                     className="workout-card__retry-button"
-                    onClick={() => onRetrySetSave(setKey, setEntry)}
+                    onClick={() => onRetrySetSave(setKey, setEntry, exerciseType)}
                     disabled={isReadOnly}
                   >
                     Повторить
@@ -339,61 +374,74 @@ const ExerciseCard = ({
               </div>
             </div>
             <div className="workout-card__set-grid">
-              <label className="workout-card__field">
-                <span>Reps</span>
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  value={repsValue}
-                  onChange={(event) =>
-                    onChangeSetValue(setKey, setEntry, "reps", event.target.value)
-                  }
-                  onBlur={() => onBlurSetValue(setKey, setEntry)}
-                  disabled={isReadOnly}
-                  className={
-                    isInvalid && validation.missingReps
-                      ? "workout-card__input--invalid"
-                      : undefined
-                  }
-                />
-              </label>
-              <label className="workout-card__field">
-                <span>Вес</span>
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  step={0.5}
-                  value={weightValue}
-                  onChange={(event) =>
-                    onChangeSetValue(setKey, setEntry, "weight", event.target.value)
-                  }
-                  onBlur={() => onBlurSetValue(setKey, setEntry)}
-                  disabled={isReadOnly}
-                  className={
-                    isInvalid && validation.missingWeight
-                      ? "workout-card__input--invalid"
-                      : undefined
-                  }
-                />
-              </label>
-              <label className="workout-card__field">
-                <span>Секунды</span>
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  value={durationValue}
-                  onChange={(event) =>
-                    onChangeSetValue(setKey, setEntry, "durationSeconds", event.target.value)
-                  }
-                  onBlur={() => onBlurSetValue(setKey, setEntry)}
-                  disabled={isReadOnly}
-                  className={
-                    isInvalid && validation.missingDuration
-                      ? "workout-card__input--invalid"
-                      : undefined
-                  }
-                />
-              </label>
+              {exerciseType === "REPS_WEIGHT" ? (
+                <>
+                  <label className="workout-card__field">
+                    <span>Reps</span>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      value={repsValue}
+                      onChange={(event) =>
+                        onChangeSetValue(setKey, setEntry, exerciseType, "reps", event.target.value)
+                      }
+                      onBlur={() => onBlurSetValue(setKey, setEntry, exerciseType)}
+                      disabled={isReadOnly}
+                      className={
+                        isInvalid && validation.missingReps
+                          ? "workout-card__input--invalid"
+                          : undefined
+                      }
+                    />
+                  </label>
+                  <label className="workout-card__field">
+                    <span>Вес</span>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      step={0.5}
+                      value={weightValue}
+                      onChange={(event) =>
+                        onChangeSetValue(setKey, setEntry, exerciseType, "weight", event.target.value)
+                      }
+                      onBlur={() => onBlurSetValue(setKey, setEntry, exerciseType)}
+                      disabled={isReadOnly}
+                      className={
+                        isInvalid && validation.missingWeight
+                          ? "workout-card__input--invalid"
+                          : undefined
+                      }
+                    />
+                  </label>
+                </>
+              ) : null}
+
+              {exerciseType === "TIME" ? (
+                <label className="workout-card__field">
+                  <span>Секунды</span>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    value={durationValue}
+                    onChange={(event) =>
+                      onChangeSetValue(
+                        setKey,
+                        setEntry,
+                        exerciseType,
+                        "durationSeconds",
+                        event.target.value,
+                      )
+                    }
+                    onBlur={() => onBlurSetValue(setKey, setEntry, exerciseType)}
+                    disabled={isReadOnly}
+                    className={
+                      isInvalid && validation.missingDuration
+                        ? "workout-card__input--invalid"
+                        : undefined
+                    }
+                  />
+                </label>
+              ) : null}
             </div>
           </div>
         );
@@ -404,7 +452,7 @@ const ExerciseCard = ({
         className="workout-card__primary-button"
         onClick={() => {
           if (typeof workoutExerciseId === "number") {
-            onAddSet(workoutExerciseId, nextSetOrderIndex);
+            onAddSet(workoutExerciseId, nextSetOrderIndex, exerciseType);
           }
         }}
         disabled={isReadOnly || typeof workoutExerciseId !== "number"}
@@ -418,6 +466,8 @@ const ExerciseCard = ({
 export const WorkoutPage = (): ReactElement => {
   const params = useParams<{ workoutId: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const locationState = location.state as WorkoutLocationState | null;
   const workoutIdRaw = params.workoutId ?? "";
   const workoutIdNumber = Number(workoutIdRaw);
@@ -426,8 +476,6 @@ export const WorkoutPage = (): ReactElement => {
 
   const queryClient = useQueryClient();
   const [setDrafts, setSetDrafts] = useState<SetDraftMap>({});
-  const [newExerciseId, setNewExerciseId] = useState<string>("");
-  const [newExerciseError, setNewExerciseError] = useState<string | null>(null);
   const [finishErrorMessage, setFinishErrorMessage] = useState<string | null>(null);
   const [finishErrorCode, setFinishErrorCode] = useState<string | null>(null);
   const [forceReadOnly, setForceReadOnly] = useState<boolean>(false);
@@ -435,6 +483,7 @@ export const WorkoutPage = (): ReactElement => {
 
   const setDraftsRef = useRef<SetDraftMap>({});
   const debounceTimersRef = useRef<Record<string, number>>({});
+  const handledPickedExerciseIdRef = useRef<number | null>(null);
 
   const {
     data: workoutData,
@@ -486,6 +535,66 @@ export const WorkoutPage = (): ReactElement => {
     });
     return items;
   }, [workout?.exercises]);
+
+  useEffect(() => {
+    const pickedExerciseId = searchParams.get("pickedExerciseId");
+    const mode = searchParams.get("mode");
+
+    if (
+      mode !== "workout" ||
+      isReadOnly ||
+      typeof workoutId !== "number" ||
+      !pickedExerciseId ||
+      addExerciseMutation.isPending
+    ) {
+      return;
+    }
+
+    const parsedExerciseId = Number(pickedExerciseId);
+    if (!Number.isInteger(parsedExerciseId) || parsedExerciseId <= 0) {
+      return;
+    }
+
+    if (handledPickedExerciseIdRef.current === parsedExerciseId) {
+      return;
+    }
+
+    handledPickedExerciseIdRef.current = parsedExerciseId;
+    const nextOrderIndex = getNextOrderIndex(workout?.exercises);
+
+    addExerciseMutation.mutate(
+      {
+        workoutId,
+        payload: {
+          exerciseId: parsedExerciseId,
+          orderIndex: nextOrderIndex,
+        },
+      },
+      {
+        onSuccess: () => {
+          const nextParams = new URLSearchParams(searchParams);
+          nextParams.delete("pickedExerciseId");
+          nextParams.delete("mode");
+          const serializedParams = nextParams.toString();
+          navigate(`${location.pathname}${serializedParams ? `?${serializedParams}` : ""}`, {
+            replace: true,
+          });
+          handledPickedExerciseIdRef.current = null;
+        },
+        onError: () => {
+          handledPickedExerciseIdRef.current = null;
+        },
+      },
+    );
+  }, [
+    addExerciseMutation,
+    isReadOnly,
+    location.pathname,
+    navigate,
+    searchParams,
+    workout?.exercises,
+    workoutId,
+  ]);
 
   useEffect(() => {
     if (!isReadOnly) {
@@ -644,7 +753,7 @@ export const WorkoutPage = (): ReactElement => {
   );
 
   const attemptSaveSetEntry = useCallback(
-    (setEntry: SetEntryResponse, setKey: string): void => {
+    (setEntry: SetEntryResponse, setKey: string, exerciseType: ExerciseType): void => {
       if (isReadOnly) {
         return;
       }
@@ -659,11 +768,14 @@ export const WorkoutPage = (): ReactElement => {
           }
         : baseValues;
 
-      if (draftValues.reps == null && draftValues.durationSeconds == null) {
+      if (
+        (exerciseType === "REPS_WEIGHT" && draftValues.reps == null && draftValues.weight == null) ||
+        (exerciseType === "TIME" && draftValues.durationSeconds == null)
+      ) {
         return;
       }
 
-      const payload = buildUpdatePayload(draftValues, baseValues);
+      const payload = buildUpdatePayload(draftValues, baseValues, exerciseType);
       if (Object.keys(payload).length === 0) {
         return;
       }
@@ -682,10 +794,10 @@ export const WorkoutPage = (): ReactElement => {
   }, []);
 
   const scheduleDebouncedSave = useCallback(
-    (setEntry: SetEntryResponse, setKey: string): void => {
+    (setEntry: SetEntryResponse, setKey: string, exerciseType: ExerciseType): void => {
       clearDebounceTimer(setKey);
       debounceTimersRef.current[setKey] = window.setTimeout(() => {
-        attemptSaveSetEntry(setEntry, setKey);
+        attemptSaveSetEntry(setEntry, setKey, exerciseType);
       }, 600);
     },
     [attemptSaveSetEntry, clearDebounceTimer],
@@ -695,6 +807,7 @@ export const WorkoutPage = (): ReactElement => {
     (
       setKey: string,
       setEntry: SetEntryResponse,
+      exerciseType: ExerciseType,
       field: keyof SetDraftValues,
       value: string,
     ): void => {
@@ -723,13 +836,13 @@ export const WorkoutPage = (): ReactElement => {
         };
       });
 
-      scheduleDebouncedSave(setEntry, setKey);
+      scheduleDebouncedSave(setEntry, setKey, exerciseType);
     },
     [isReadOnly, scheduleDebouncedSave],
   );
 
   const handleSetFieldBlur = useCallback(
-    (setKey: string, setEntry: SetEntryResponse): void => {
+    (setKey: string, setEntry: SetEntryResponse, exerciseType: ExerciseType): void => {
       if (isReadOnly) {
         return;
       }
@@ -748,13 +861,13 @@ export const WorkoutPage = (): ReactElement => {
           },
         };
       });
-      attemptSaveSetEntry(setEntry, setKey);
+      attemptSaveSetEntry(setEntry, setKey, exerciseType);
     },
     [attemptSaveSetEntry, clearDebounceTimer, isReadOnly],
   );
 
   const handleRetrySetSave = useCallback(
-    (setKey: string, setEntry: SetEntryResponse): void => {
+    (setKey: string, setEntry: SetEntryResponse, exerciseType: ExerciseType): void => {
       if (isReadOnly) {
         return;
       }
@@ -764,44 +877,22 @@ export const WorkoutPage = (): ReactElement => {
         return;
       }
 
-      attemptSaveSetEntry(setEntry, setKey);
+      attemptSaveSetEntry(setEntry, setKey, exerciseType);
     },
     [applyUpdatePayload, attemptSaveSetEntry, isReadOnly],
   );
 
-  const handleAddExercise = (): void => {
-    if (isReadOnly) {
-      return;
-    }
-    setNewExerciseError(null);
-
+  const handleGoToExercisePicker = (): void => {
     if (typeof workoutId !== "number") {
-      setNewExerciseError("Некорректный идентификатор тренировки.");
       return;
     }
 
-    const parsedExerciseId = Number(newExerciseId);
-    if (!Number.isFinite(parsedExerciseId)) {
-      setNewExerciseError("Введите корректный exerciseId.");
-      return;
-    }
+    const pickerParams = new URLSearchParams({
+      returnTo: `/workouts/${workoutId}`,
+      mode: "workout",
+    });
 
-    const nextOrderIndex = getNextOrderIndex(workout?.exercises);
-
-    addExerciseMutation.mutate(
-      {
-        workoutId,
-        payload: {
-          exerciseId: parsedExerciseId,
-          orderIndex: nextOrderIndex,
-        },
-      },
-      {
-        onSuccess: () => {
-          setNewExerciseId("");
-        },
-      },
-    );
+    navigate(`/pickers/exercises?${pickerParams.toString()}`);
   };
 
   const handleDeleteExercise = (workoutExerciseId: number): void => {
@@ -833,7 +924,11 @@ export const WorkoutPage = (): ReactElement => {
     );
   };
 
-  const handleAddSet = (workoutExerciseId: number, nextOrderIndex: number): void => {
+  const handleAddSet = (
+    workoutExerciseId: number,
+    nextOrderIndex: number,
+    exerciseType: ExerciseType,
+  ): void => {
     if (isReadOnly) {
       return;
     }
@@ -847,9 +942,9 @@ export const WorkoutPage = (): ReactElement => {
         workoutExerciseId,
         payload: {
           orderIndex: nextOrderIndex,
-          reps: 0,
-          weight: null,
-          durationSeconds: null,
+          reps: exerciseType === "REPS_WEIGHT" ? 0 : null,
+          weight: exerciseType === "REPS_WEIGHT" ? 0 : null,
+          durationSeconds: exerciseType === "TIME" ? 0 : null,
         },
       },
     );
@@ -908,7 +1003,7 @@ export const WorkoutPage = (): ReactElement => {
         const setKey = getSetKey(exercise.id, setEntry, index);
         const draft = setDraftsRef.current[setKey];
         const values = getSetValuesForValidation(setEntry, draft);
-        return !getSetValidation(values).isValid;
+        return !getSetValidation(values, getWorkoutExerciseType(exercise)).isValid;
       }),
     );
   }, [workout?.exercises]);
@@ -1088,7 +1183,10 @@ export const WorkoutPage = (): ReactElement => {
 
       <div className="workout-page__list">
         {exercises.map((exercise) => {
-          const exerciseKey = exercise.id ?? `exercise-${exercise.exerciseId ?? "unknown"}`;
+          const exerciseKey =
+            typeof exercise.id === "number"
+              ? `workout-exercise-${exercise.id}`
+              : `workout-exercise-dev-only-${exercise.orderIndex ?? "unknown"}`;
 
           return (
             <ExerciseCard
@@ -1133,29 +1231,14 @@ export const WorkoutPage = (): ReactElement => {
 
       <section className="workout-page__add">
         <h2>Добавить упражнение</h2>
-        <div className="workout-page__add-row">
-          <label className="workout-page__field">
-            <span>exerciseId</span>
-            <input
-              type="number"
-              inputMode="numeric"
-              value={newExerciseId}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setNewExerciseId(event.target.value)
-              }
-              disabled={isReadOnly}
-            />
-          </label>
-          <button
-            type="button"
-            className="workout-page__primary-button"
-            onClick={handleAddExercise}
-            disabled={isReadOnly || addExerciseMutation.isPending}
-          >
-            Добавить
-          </button>
-        </div>
-        {newExerciseError ? <p className="workout-page__error">{newExerciseError}</p> : null}
+        <button
+          type="button"
+          className="workout-page__primary-button"
+          onClick={handleGoToExercisePicker}
+          disabled={isReadOnly || addExerciseMutation.isPending}
+        >
+          Добавить упражнение
+        </button>
         {addExerciseMutation.isError ? (
           <p className="workout-page__error">
             Ошибка добавления упражнения: {addExerciseMutation.error?.message}

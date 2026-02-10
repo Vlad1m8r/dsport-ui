@@ -1,5 +1,17 @@
 # PROMPTS LOG (Frontend)
 
+## F10 — WorkoutPage uses exerciseName/type + picker
+Сделано:
+- На `/workouts/:id` заголовок упражнения теперь берётся из `exerciseName` (с fallback на `Exercise #id`).
+- Поля подхода зависят от `exerciseType`: для `REPS_WEIGHT` показываются только `reps` и `weight`, для `TIME` — только `durationSeconds`.
+- Autosave (`PATCH /api/workouts/{workoutId}/sets/{setEntryId}`) отправляет только релевантные для типа поля подхода.
+- Добавление упражнения переведено на общий ExercisePicker: кнопка «Добавить упражнение» ведёт на `/pickers/exercises?returnTo=/workouts/:id&mode=workout`.
+- При возврате с `pickedExerciseId` WorkoutPage автоматически вызывает `addExercise` и очищает query params через replace-навигацию.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## F9.1 — Template editor draft persisted (no auto-save)
 Сделано:
 - Для `/templates/:id/edit` добавлен client-only черновик шаблона с хранением в `sessionStorage`.

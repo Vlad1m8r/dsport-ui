@@ -8,7 +8,7 @@
 - [x] F6: Завершение тренировки (read-only + возврат в историю)
 
 ## UX & Polish
-- [ ] Переиспользовать ExercisePicker в добавлении упражнения на WorkoutPage
+- [x] Переиспользовать ExercisePicker в добавлении упражнения на WorkoutPage
 - [ ] Форма создания шаблона (react-hook-form + zod)
 - [x] F9: Редактирование шаблона: добавление/удаление упражнений и подходов, сохранение PUT /api/templates/{id}
 - [ ] Нормальные состояния загрузки/ошибок (skeleton/loading, error blocks)
