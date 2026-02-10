@@ -2,22 +2,13 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
 import {
-  useCreateTemplateMutation,
   useDeleteTemplateMutation,
   useTemplatesQuery,
 } from "../features/templates/queries";
 
 export const TemplatesPage = (): ReactElement => {
   const { data, isLoading, isError, error } = useTemplatesQuery();
-  const createMutation = useCreateTemplateMutation();
   const deleteMutation = useDeleteTemplateMutation();
-
-  const handleCreate = (): void => {
-    createMutation.mutate({
-      name: "Новый шаблон",
-      exercises: [],
-    });
-  };
 
   const handleDelete = (id: number | undefined): void => {
     if (typeof id !== "number") {
@@ -32,9 +23,9 @@ export const TemplatesPage = (): ReactElement => {
       <header>
         <h1>Шаблоны тренировок</h1>
         <div>
-          <button type="button" onClick={handleCreate} disabled={createMutation.isPending}>
+          <Link to="/templates/new">
             Создать шаблон
-          </button>
+          </Link>
           <Link to="/start">К запуску тренировки</Link>
           <Link to="/workouts">История</Link>
         </div>
@@ -42,9 +33,6 @@ export const TemplatesPage = (): ReactElement => {
 
       {isLoading ? <p>Загрузка...</p> : null}
       {isError ? <p>Ошибка: {error?.message ?? "Не удалось загрузить шаблоны"}</p> : null}
-      {createMutation.isError ? (
-        <p>Ошибка: {createMutation.error?.message ?? "Не удалось создать шаблон"}</p>
-      ) : null}
       {deleteMutation.isError ? (
         <p>Ошибка: {deleteMutation.error?.message ?? "Не удалось удалить шаблон"}</p>
       ) : null}
@@ -52,8 +40,8 @@ export const TemplatesPage = (): ReactElement => {
       {data && data.length === 0 ? <p>Шаблоны пока не созданы.</p> : null}
 
       <ul>
-        {data?.map((template, index) => (
-          <li key={template.id ?? `${template.name ?? "template"}-${index}`}>
+        {data?.map((template) => (
+          <li key={template.id ?? template.name ?? "template-without-id"}>
             <div>
               <strong>{template.name ?? "Без названия"}</strong>
               <span>Упражнений: {template.exercises?.length ?? 0}</span>
