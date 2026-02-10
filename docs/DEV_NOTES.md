@@ -27,3 +27,16 @@ endpoint update set_entry.
 При добавлении подхода фронт отправляет `reps=0` по умолчанию, чтобы пройти ограничение
 `ck_set_entry_not_empty` (должно быть reps != null или durationSeconds != null).
 Позже можно выбирать дефолт в зависимости от типа упражнения (reps vs duration).
+
+## TemplateEdit draft storage (sessionStorage)
+Экран `/templates/:id/edit` хранит черновики локально в `sessionStorage`.
+
+Детали:
+- Ключ хранилища: `templateEditorDrafts`.
+- Черновики индексируются по `templateId`.
+- Draft включает `name`, список `exercises` и `sets` с `plannedReps` / `plannedDurationSeconds`.
+- `PUT /api/templates/{id}` вызывается только по кнопке «Сохранить».
+
+Как сбросить:
+- В UI: кнопка «Сбросить» на экране редактирования.
+- В браузере вручную: удалить ключ `templateEditorDrafts` из `sessionStorage`.
