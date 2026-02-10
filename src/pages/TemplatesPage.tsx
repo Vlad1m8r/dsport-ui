@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   useDeleteTemplateMutation,
@@ -7,8 +7,17 @@ import {
 } from "../features/templates/queries";
 
 export const TemplatesPage = (): ReactElement => {
+  const navigate = useNavigate();
   const { data, isLoading, isError, error } = useTemplatesQuery();
   const deleteMutation = useDeleteTemplateMutation();
+
+  const handleEdit = (id: number | undefined): void => {
+    if (typeof id !== "number") {
+      return;
+    }
+
+    navigate(`/templates/${id}/edit`);
+  };
 
   const handleDelete = (id: number | undefined): void => {
     if (typeof id !== "number") {
@@ -46,6 +55,13 @@ export const TemplatesPage = (): ReactElement => {
               <strong>{template.name ?? "Без названия"}</strong>
               <span>Упражнений: {template.exercises?.length ?? 0}</span>
             </div>
+            <button
+              type="button"
+              onClick={() => handleEdit(template.id)}
+              disabled={deleteMutation.isPending}
+            >
+              Изменить
+            </button>
             <button
               type="button"
               onClick={() => handleDelete(template.id)}
