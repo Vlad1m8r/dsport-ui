@@ -1235,7 +1235,7 @@ export const WorkoutPage = (): ReactElement => {
           type="button"
           className="workout-page__primary-button"
           onClick={handleGoToExercisePicker}
-          disabled={isReadOnly || addExerciseMutation.isPending}
+          disabled={isReadOnly}
         >
           Добавить упражнение
         </button>
