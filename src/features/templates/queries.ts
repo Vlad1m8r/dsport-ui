@@ -11,9 +11,12 @@ import {
   deleteTemplate,
   fetchTemplate,
   fetchTemplates,
+  updateTemplate,
   type TemplateByIdResponse,
   type TemplateCreateRequest,
   type TemplateResponse,
+  type TemplateUpdateRequest,
+  type TemplateUpdateResponse,
   type TemplatesListResponse,
 } from "./api";
 
@@ -69,6 +72,31 @@ export const useDeleteTemplateMutation = (): UseMutationResult<void, Error, numb
     mutationFn: deleteTemplate,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: templatesQueryKey });
+    },
+  });
+};
+
+interface UpdateTemplateMutationPayload {
+  templateId: number;
+  payload: TemplateUpdateRequest;
+}
+
+export const useUpdateTemplateMutation = (): UseMutationResult<
+  TemplateUpdateResponse,
+  Error,
+  UpdateTemplateMutationPayload
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ templateId, payload }: UpdateTemplateMutationPayload) => {
+      return updateTemplate(templateId, payload);
+    },
+    onSuccess: async (_, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: templatesQueryKey }),
+        queryClient.invalidateQueries({ queryKey: templateQueryKey(variables.templateId) }),
+      ]);
     },
   });
 };
