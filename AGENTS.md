@@ -115,3 +115,15 @@
 - Описание MVP и пользовательских флоу: см. `PRODUCT.md` в корне репозитория.
 - OpenAPI контракт: `docs/openapi.yaml`
 - Описание проекта: см. `docs/`
+
+## Навигация по docs для AI-агента
+- `docs/PRODUCT_STATE.md` — актуальный срез MVP: что реализовано и что явно не реализовано.
+- `docs/UI_CONTRACT.md` — UX/UI-контракты по экранам: purpose, inputs, actions, states, navigation.
+- `docs/TECH_DECISIONS.md` — архитектурные решения и их обоснования (почему сделано именно так).
+- `docs/TEMPORARY_SOLUTIONS.md` — временные компромиссы: что временно, почему и план замены.
+- `docs/ROADMAP.md` — этапы дальнейшей разработки (short/mid/long-term).
+- `docs/UI_FLOWS.md` — сквозные пользовательские потоки и связи между экранами.
+- `docs/DEV_NOTES.md` — инженерные заметки по реализации и ограничениям.
+- `docs/TODO.md` — список задач и текущий статус выполнения.
+- `docs/PROMPTS_LOG.md` — журнал изменений по промптам/итерациям.
+- `docs/openapi.yaml` — единственный источник правды по API-контракту (DTO и endpoints).
