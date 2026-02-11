@@ -1,5 +1,10 @@
 # PROMPTS LOG (Frontend)
 
+## 2026-02-10 — MVP functional scope frozen
+Сделано:
+- Зафиксирован функциональный scope MVP в docs как источник правды для AI-агентов.
+- Кратко закреплены реализованные блоки: templates, workouts, exercise picker, autosave, finish, history.
+
 ## F10 — WorkoutPage uses exerciseName/type + picker
 Сделано:
 - На `/workouts/:id` заголовок упражнения теперь берётся из `exerciseName` (с fallback на `Exercise #id`).
