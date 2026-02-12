@@ -53,6 +53,7 @@ type ExerciseType = "REPS_WEIGHT" | "TIME";
 type ExerciseCardProps = {
   workoutExercise: WorkoutExerciseResponse;
   isReadOnly: boolean;
+  isFinished: boolean;
   highlightEmptyFields: boolean;
   setDrafts: SetDraftMap;
   onChangeSetValue: (
@@ -232,6 +233,7 @@ const getNextOrderIndex = (items: Array<{ orderIndex?: number }> | undefined): n
 const ExerciseCard = ({
   workoutExercise,
   isReadOnly,
+  isFinished,
   highlightEmptyFields,
   setDrafts,
   onChangeSetValue,
@@ -242,7 +244,9 @@ const ExerciseCard = ({
   onDeleteExercise,
 }: ExerciseCardProps): ReactElement => {
   const exerciseId = workoutExercise.exerciseId ?? null;
-  const lastMaxQuery = useExerciseLastMax(typeof exerciseId === "number" ? exerciseId : null);
+  const lastMaxQuery = useExerciseLastMax(
+    !isFinished && typeof exerciseId === "number" ? exerciseId : null,
+  );
   const lastMax = lastMaxQuery.data;
 
   const lastMaxText = useMemo(() => {
@@ -281,26 +285,28 @@ const ExerciseCard = ({
       <header className="workout-card__header">
         <div>
           <h2 className="workout-card__title">{exerciseTitle}</h2>
-          {lastMaxText ? <p className="workout-card__hint">{lastMaxText}</p> : null}
-          {lastMaxQuery.isLoading ? (
+          {!isFinished && lastMaxText ? <p className="workout-card__hint">{lastMaxText}</p> : null}
+          {!isFinished && lastMaxQuery.isLoading ? (
             <p className="workout-card__hint">Загрузка last-max...</p>
           ) : null}
-          {lastMaxQuery.isError ? (
+          {!isFinished && lastMaxQuery.isError ? (
             <p className="workout-card__hint">Не удалось загрузить last-max.</p>
           ) : null}
         </div>
-        <button
-          type="button"
-          className="workout-card__ghost-button"
-          onClick={() => {
-            if (typeof workoutExerciseId === "number") {
-              onDeleteExercise(workoutExerciseId);
-            }
-          }}
-          disabled={isReadOnly || typeof workoutExerciseId !== "number"}
-        >
-          Удалить упражнение
-        </button>
+        {!isFinished ? (
+          <button
+            type="button"
+            className="workout-card__ghost-button"
+            onClick={() => {
+              if (typeof workoutExerciseId === "number") {
+                onDeleteExercise(workoutExerciseId);
+              }
+            }}
+            disabled={isReadOnly || typeof workoutExerciseId !== "number"}
+          >
+            Удалить упражнение
+          </button>
+        ) : null}
       </header>
 
       {sortedSets.length === 0 ? <p>Подходов пока нет.</p> : null}
@@ -352,25 +358,27 @@ const ExerciseCard = ({
                     Повторить
                   </button>
                 ) : null}
-                <button
-                  type="button"
-                  className="workout-card__ghost-button"
-                  onClick={() => {
-                    if (
-                      typeof workoutExerciseId === "number" &&
-                      typeof setEntry.id === "number"
-                    ) {
-                      onDeleteSet(workoutExerciseId, setEntry.id);
+                {!isFinished ? (
+                  <button
+                    type="button"
+                    className="workout-card__ghost-button"
+                    onClick={() => {
+                      if (
+                        typeof workoutExerciseId === "number" &&
+                        typeof setEntry.id === "number"
+                      ) {
+                        onDeleteSet(workoutExerciseId, setEntry.id);
+                      }
+                    }}
+                    disabled={
+                      isReadOnly ||
+                      typeof workoutExerciseId !== "number" ||
+                      typeof setEntry.id !== "number"
                     }
-                  }}
-                  disabled={
-                    isReadOnly ||
-                    typeof workoutExerciseId !== "number" ||
-                    typeof setEntry.id !== "number"
-                  }
-                >
-                  Удалить подход
-                </button>
+                  >
+                    Удалить подход
+                  </button>
+                ) : null}
               </div>
             </div>
             <div className="workout-card__set-grid">
@@ -447,18 +455,20 @@ const ExerciseCard = ({
         );
       })}
 
-      <button
-        type="button"
-        className="workout-card__primary-button"
-        onClick={() => {
-          if (typeof workoutExerciseId === "number") {
-            onAddSet(workoutExerciseId, nextSetOrderIndex, exerciseType);
-          }
-        }}
-        disabled={isReadOnly || typeof workoutExerciseId !== "number"}
-      >
-        Добавить подход
-      </button>
+      {!isFinished ? (
+        <button
+          type="button"
+          className="workout-card__primary-button"
+          onClick={() => {
+            if (typeof workoutExerciseId === "number") {
+              onAddSet(workoutExerciseId, nextSetOrderIndex, exerciseType);
+            }
+          }}
+          disabled={isReadOnly || typeof workoutExerciseId !== "number"}
+        >
+          Добавить подход
+        </button>
+      ) : null}
     </article>
   );
 };
@@ -522,7 +532,8 @@ export const WorkoutPage = (): ReactElement => {
 
   const workout = workoutData ?? initialWorkout ?? null;
   const finishedAt = workout?.finishedAt ?? null;
-  const isReadOnly = Boolean(finishedAt) || forceReadOnly;
+  const isFinished = Boolean(finishedAt);
+  const isReadOnly = isFinished || forceReadOnly;
   const shouldHighlightEmptyFields =
     !isReadOnly && (finishAttempted || finishErrorCode === "WORKOUT_HAS_EMPTY_SETS");
 
@@ -1154,7 +1165,7 @@ export const WorkoutPage = (): ReactElement => {
         <div>
           <h1>{headerTitle}</h1>
           {startedAt ? <p className="workout-page__meta">Старт: {startedAt}</p> : null}
-          {isReadOnly ? (
+          {isFinished ? (
             <p className="workout-page__status">
               Завершена{finishedAtText ? `: ${finishedAtText}` : ""}
             </p>
@@ -1193,6 +1204,7 @@ export const WorkoutPage = (): ReactElement => {
               key={exerciseKey}
               workoutExercise={exercise}
               isReadOnly={isReadOnly}
+              isFinished={isFinished}
               highlightEmptyFields={shouldHighlightEmptyFields}
               setDrafts={setDrafts}
               onChangeSetValue={handleSetFieldChange}
@@ -1229,37 +1241,39 @@ export const WorkoutPage = (): ReactElement => {
         ) : null}
       </section>
 
-      <section className="workout-page__add">
-        <h2>Добавить упражнение</h2>
-        <button
-          type="button"
-          className="workout-page__primary-button"
-          onClick={handleGoToExercisePicker}
-          disabled={isReadOnly}
-        >
-          Добавить упражнение
-        </button>
-        {addExerciseMutation.isError ? (
-          <p className="workout-page__error">
-            Ошибка добавления упражнения: {addExerciseMutation.error?.message}
-          </p>
-        ) : null}
-        {deleteExerciseMutation.isError ? (
-          <p className="workout-page__error">
-            Ошибка удаления упражнения: {deleteExerciseMutation.error?.message}
-          </p>
-        ) : null}
-        {addSetEntryMutation.isError ? (
-          <p className="workout-page__error">
-            Ошибка добавления подхода: {addSetEntryMutation.error?.message}
-          </p>
-        ) : null}
-        {deleteSetEntryMutation.isError ? (
-          <p className="workout-page__error">
-            Ошибка удаления подхода: {deleteSetEntryMutation.error?.message}
-          </p>
-        ) : null}
-      </section>
+      {!isFinished ? (
+        <section className="workout-page__add">
+          <h2>Добавить упражнение</h2>
+          <button
+            type="button"
+            className="workout-page__primary-button"
+            onClick={handleGoToExercisePicker}
+            disabled={isReadOnly}
+          >
+            Добавить упражнение
+          </button>
+          {addExerciseMutation.isError ? (
+            <p className="workout-page__error">
+              Ошибка добавления упражнения: {addExerciseMutation.error?.message}
+            </p>
+          ) : null}
+          {deleteExerciseMutation.isError ? (
+            <p className="workout-page__error">
+              Ошибка удаления упражнения: {deleteExerciseMutation.error?.message}
+            </p>
+          ) : null}
+          {addSetEntryMutation.isError ? (
+            <p className="workout-page__error">
+              Ошибка добавления подхода: {addSetEntryMutation.error?.message}
+            </p>
+          ) : null}
+          {deleteSetEntryMutation.isError ? (
+            <p className="workout-page__error">
+              Ошибка удаления подхода: {deleteSetEntryMutation.error?.message}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
     </section>
   );
 };
