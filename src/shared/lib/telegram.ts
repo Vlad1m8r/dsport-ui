@@ -1,5 +1,14 @@
+export type TelegramUser = {
+  id: number;
+  username?: string;
+  photo_url?: string;
+};
+
 export type TelegramWebApp = {
   initData?: string;
+  initDataUnsafe?: {
+    user?: TelegramUser;
+  };
 };
 
 type TelegramNamespace = {
@@ -10,13 +19,17 @@ type TelegramWindow = Window & {
   Telegram?: TelegramNamespace;
 };
 
-export const getInitData = (): string => {
+const getTelegramWebApp = (): TelegramWebApp | undefined => {
   if (typeof window === "undefined") {
-    return "";
+    return undefined;
   }
 
-  const telegram = (window as TelegramWindow).Telegram;
-  const initData = telegram?.WebApp?.initData;
+  return (window as TelegramWindow).Telegram?.WebApp;
+};
+
+export const getInitData = (): string => {
+  const telegramWebApp = getTelegramWebApp();
+  const initData = telegramWebApp?.initData;
 
   if (initData && initData.trim() !== "") {
     return initData;
@@ -28,4 +41,14 @@ export const getInitData = (): string => {
   }
 
   return "";
+};
+
+export const getTelegramUser = (): TelegramUser | null => {
+  const user = getTelegramWebApp()?.initDataUnsafe?.user;
+
+  if (!user || typeof user.id !== "number") {
+    return null;
+  }
+
+  return user;
 };

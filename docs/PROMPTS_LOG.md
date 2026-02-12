@@ -1,5 +1,27 @@
 # PROMPTS LOG (Frontend)
 
+## F11.1 — Home: профиль из Telegram
+Сделано:
+- На Home заменена заглушка профиля: имя и аватар берутся из Telegram WebApp user (`initDataUnsafe.user`).
+- Логика Telegram изолирована в `src/shared/lib/telegram.ts` через `getTelegramUser`.
+- Добавлен fallback: если нет username и/или фото, показывается пустой аватар и имя `пользователь`.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
+## F11 — Home + AppHeader + active workout hook
+Сделано:
+- Добавлен новый главный экран `/` с профилем-заглушкой, CTA и плейсхолдером календаря.
+- Добавлен общий `AppHeader` (кнопки «Назад»/«Главная») и `AppLayout`, подключённый для всех экранов через роутер.
+- Добавлен хук `useActiveWorkout`: запрос `GET /api/workouts?status=IN_PROGRESS&limit=1` и возврат `workoutId | null`.
+- Обновлён API слоя истории тренировок: поддержка query-параметра `status`.
+- CTA на Home учитывает активную тренировку: «Продолжить тренировку» ведёт на `/workouts/:id`, иначе «Начать тренировку» ведёт на `/start`.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## 2026-02-10 — MVP functional scope frozen
 Сделано:
 - Зафиксирован функциональный scope MVP в docs как источник правды для AI-агентов.

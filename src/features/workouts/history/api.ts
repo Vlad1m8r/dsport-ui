@@ -14,6 +14,10 @@ const buildQueryParams = (params?: WorkoutsListParams): string => {
 
   const searchParams = new URLSearchParams();
 
+  if (typeof params.status === "string" && params.status.length > 0) {
+    searchParams.set("status", params.status);
+  }
+
   if (typeof params.limit === "number") {
     searchParams.set("limit", String(params.limit));
   }
