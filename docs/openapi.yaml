@@ -20,18 +20,18 @@ paths:
           type: integer
           format: int64
       responses:
-        "200":
-          description: Шаблон
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/TemplateResponse"
         "404":
           description: Шаблон не найден
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Шаблон
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
     put:
       tags:
       - template-controller
@@ -57,18 +57,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
-        "200":
-          description: Шаблон обновлен
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/TemplateResponse"
         "404":
           description: Шаблон не найден
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Шаблон обновлен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TemplateResponse"
     delete:
       tags:
       - template-controller
@@ -104,12 +104,6 @@ paths:
           type: integer
           format: int64
       responses:
-        "200":
-          description: Тренировка завершена
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WorkoutSessionResponse"
         "400":
           description: Ошибка валидации
           content:
@@ -122,6 +116,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Тренировка завершена
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkoutSessionResponse"
   /api/workouts/{workoutId}/exercises:
     post:
       tags:
@@ -142,6 +142,12 @@ paths:
               $ref: "#/components/schemas/AddWorkoutExerciseRequest"
         required: true
       responses:
+        "400":
+          description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
         "404":
           description: Тренировка или упражнение не найдены
           content:
@@ -154,12 +160,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WorkoutExerciseResponse"
-        "400":
-          description: Ошибка валидации
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ApiError"
   /api/workouts/{workoutId}/exercises/{workoutExerciseId}/sets:
     post:
       tags:
@@ -186,24 +186,24 @@ paths:
               $ref: "#/components/schemas/AddSetEntryRequest"
         required: true
       responses:
-        "200":
-          description: Подход добавлен
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SetEntryResponse"
-        "404":
-          description: Тренировка или упражнение не найдены
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ApiError"
         "400":
           description: Ошибка валидации
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "404":
+          description: Тренировка или упражнение не найдены
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Подход добавлен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SetEntryResponse"
   /api/workouts/start:
     post:
       tags:
@@ -219,6 +219,12 @@ paths:
       responses:
         "400":
           description: Ошибка валидации
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "409":
+          description: У пользователя уже есть активная тренировка
           content:
             '*/*':
               schema:
@@ -300,12 +306,6 @@ paths:
               $ref: "#/components/schemas/UpdateSetEntryRequest"
         required: true
       responses:
-        "200":
-          description: Подход обновлен
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SetEntryResponse"
         "400":
           description: Ошибка валидации
           content:
@@ -318,6 +318,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Подход обновлен
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SetEntryResponse"
   /api/workouts:
     get:
       tags:
@@ -325,6 +331,13 @@ paths:
       summary: Получить список тренировок пользователя
       operationId: listWorkouts
       parameters:
+      - name: status
+        in: query
+        description: Статус тренировки
+        required: false
+        schema:
+          type: string
+        example: ALL
       - name: limit
         in: query
         description: Лимит записей
@@ -364,18 +377,18 @@ paths:
           type: integer
           format: int64
       responses:
-        "200":
-          description: Тренировка
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WorkoutSessionResponse"
         "404":
           description: Тренировка не найдена
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "200":
+          description: Тренировка
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WorkoutSessionResponse"
   /api/muscle-groups:
     get:
       tags:
@@ -479,14 +492,14 @@ paths:
           type: integer
           format: int64
       responses:
-        "404":
-          description: Тренировка или упражнение не найдены
+        "400":
+          description: Тренировка завершена
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
-        "400":
-          description: Тренировка завершена
+        "404":
+          description: Тренировка или упражнение не найдены
           content:
             '*/*':
               schema:
@@ -519,14 +532,14 @@ paths:
           type: integer
           format: int64
       responses:
-        "204":
-          description: Подход удален
         "400":
           description: Тренировка завершена
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiError"
+        "204":
+          description: Подход удален
         "404":
           description: Тренировка или подход не найдены
           content:
@@ -622,6 +635,10 @@ components:
           type: object
           description: Дополнительные детали
           nullable: true
+        data:
+          type: object
+          description: Дополнительные данные ошибки
+          nullable: true
       description: Ошибка API
     TemplateExerciseResponse:
       type: object
@@ -696,18 +713,18 @@ components:
           example: 1
         reps:
           type: integer
-          description: Фактические повторы
+          description: Фактические повторы (для REPS_WEIGHT)
           format: int32
           nullable: true
           example: 10
         weight:
           type: number
-          description: Вес
+          description: Вес (для REPS_WEIGHT)
           nullable: true
           example: 50.0
         durationSeconds:
           type: integer
-          description: Длительность в секундах
+          description: Длительность в секундах (для TIME)
           format: int32
           nullable: true
           example: 60
@@ -725,6 +742,18 @@ components:
           description: Идентификатор упражнения
           format: int64
           example: 1
+        exerciseName:
+          type: string
+          description: Название упражнения
+          example: Жим штанги лёжа
+        exerciseType:
+          type: string
+          description: "Тип упражнения. REPS_WEIGHT — силовое (reps/weight), TIME\
+            \ — на время (durationSeconds)"
+          example: REPS_WEIGHT
+          enum:
+          - REPS_WEIGHT
+          - TIME
         orderIndex:
           type: integer
           description: Порядок упражнения

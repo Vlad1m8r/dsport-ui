@@ -317,6 +317,8 @@ export interface components {
             message?: string;
             /** @description Дополнительные детали */
             details?: Record<string, never> | null;
+            /** @description Дополнительные данные ошибки */
+            data?: Record<string, never> | null;
         };
         /** @description Упражнение в шаблоне */
         TemplateExerciseResponse: {
@@ -388,18 +390,18 @@ export interface components {
             orderIndex?: number;
             /**
              * Format: int32
-             * @description Фактические повторы
+             * @description Фактические повторы (для REPS_WEIGHT)
              * @example 10
              */
             reps?: number | null;
             /**
-             * @description Вес
+             * @description Вес (для REPS_WEIGHT)
              * @example 50
              */
             weight?: number | null;
             /**
              * Format: int32
-             * @description Длительность в секундах
+             * @description Длительность в секундах (для TIME)
              * @example 60
              */
             durationSeconds?: number | null;
@@ -418,6 +420,17 @@ export interface components {
              * @example 1
              */
             exerciseId?: number;
+            /**
+             * @description Название упражнения
+             * @example Жим штанги лёжа
+             */
+            exerciseName?: string;
+            /**
+             * @description Тип упражнения. REPS_WEIGHT — силовое (reps/weight), TIME — на время (durationSeconds)
+             * @example REPS_WEIGHT
+             * @enum {string}
+             */
+            exerciseType?: "REPS_WEIGHT" | "TIME";
             /**
              * Format: int32
              * @description Порядок упражнения
@@ -918,6 +931,15 @@ export interface operations {
                     "*/*": components["schemas"]["ApiError"];
                 };
             };
+            /** @description У пользователя уже есть активная тренировка */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiError"];
+                };
+            };
         };
     };
     list: {
@@ -1021,6 +1043,11 @@ export interface operations {
     listWorkouts: {
         parameters: {
             query?: {
+                /**
+                 * @description Статус тренировки
+                 * @example ALL
+                 */
+                status?: string;
                 /**
                  * @description Лимит записей
                  * @example 20
