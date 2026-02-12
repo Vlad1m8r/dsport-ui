@@ -1,5 +1,15 @@
 # PROMPTS LOG (Frontend)
 
+## F11.1 — Home: профиль из Telegram
+Сделано:
+- На Home заменена заглушка профиля: имя и аватар берутся из Telegram WebApp user (`initDataUnsafe.user`).
+- Логика Telegram изолирована в `src/shared/lib/telegram.ts` через `getTelegramUser`.
+- Добавлен fallback: если нет username и/или фото, показывается пустой аватар и имя `пользователь`.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## F11 — Home + AppHeader + active workout hook
 Сделано:
 - Добавлен новый главный экран `/` с профилем-заглушкой, CTA и плейсхолдером календаря.
