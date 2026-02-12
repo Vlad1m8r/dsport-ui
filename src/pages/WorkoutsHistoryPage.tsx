@@ -36,7 +36,9 @@ const getWorkoutTitle = (
 
 export const WorkoutsHistoryPage = (): ReactElement => {
   const navigate = useNavigate();
-  const { data, isLoading, isError, error, refetch } = useWorkouts();
+  const { data, isLoading, isError, error, refetch } = useWorkouts({
+    status: "FINISHED",
+  });
   const workouts = data ?? [];
 
   return (
