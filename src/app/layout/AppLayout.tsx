@@ -6,8 +6,8 @@ import { AppHeader } from "../../components/AppHeader";
 export const AppLayout = (): ReactElement => {
   return (
     <div className="app-layout">
-      <AppHeader />
       <Outlet />
+      <AppHeader />
     </div>
   );
 };
