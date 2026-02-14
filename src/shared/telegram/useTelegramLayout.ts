@@ -19,7 +19,10 @@ type TelegramLayoutApi = {
   offEvent?: (eventType: string, eventHandler: () => void) => void;
 };
 
-const IOS_TOP_RESERVE_PX = 12;
+// ВРЕМЕННОЕ РЕШЕНИЕ: дополнительный верхний запас для iOS Telegram fullscreen.
+// Причина: reported safe/content top inset может быть меньше фактической зоны верхних контролов Telegram.
+// TODO: заменить хардкод на динамическое определение реальной overlay-зоны после стабилизации API/клиента.
+const IOS_TOP_RESERVE_PX = 32;
 
 const ZERO_INSETS: Required<Insets> = {
   top: 0,

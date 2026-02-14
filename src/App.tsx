@@ -3,7 +3,6 @@ import WebApp, { applyThemeParams } from "@twa-dev/sdk";
 import { Outlet } from "react-router-dom";
 import { SafeAreaContainer } from "./shared/layout/SafeAreaContainer";
 import { useTelegramLayout } from "./shared/telegram/useTelegramLayout";
-import { TelegramLayoutDebug } from "./shared/telegram/TelegramLayoutDebug";
 
 import "./App.css";
 
@@ -78,7 +77,6 @@ function App(): ReactElement {
       <SafeAreaContainer>
         <Outlet />
       </SafeAreaContainer>
-      <TelegramLayoutDebug />
     </main>
   );
 }

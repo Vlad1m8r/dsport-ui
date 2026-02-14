@@ -33,7 +33,9 @@
 
 `--tg-layout-*` — это безопасный слой для экранного layout: берётся `max(safeAreaInset, contentSafeAreaInset)` по каждой стороне. Это защищает UI от наложения Telegram-контролов в fullscreen.
 
-Для iOS временно добавляется небольшой верхний запас `--tg-layout-top-reserve` (12px), чтобы снизить риск визуального наложения верхних Telegram-контролов. Итоговый верхний отступ: `--tg-layout-effective-top`.
+Для iOS временно добавляется дополнительный верхний запас `--tg-layout-top-reserve` (32px), чтобы снизить риск визуального наложения верхних Telegram-контролов. Итоговый верхний отступ: `--tg-layout-effective-top`.
+
+Это осознанный временный хардкод. После появления стабильного способа динамически вычислять реальную верхнюю overlay-зону Telegram запас нужно заменить на динамический расчёт.
 
 ## Где выполняется инициализация
 
@@ -74,19 +76,3 @@
 
 Это гарантирует, что элемент не попадёт в жестовую/system зону устройства.
 
-
-## Временный in-app debug (DEV)
-
-Для диагностики на реальном телефоне без desktop devtools доступен временный overlay.
-
-- Работает только в DEV сборке.
-- Включение/выключение: кнопка `Показать debug` в правом нижнем углу.
-- Дополнительно можно открыть сразу в активном режиме через `?tgLayoutDebug=1`.
-- Компонент: `src/shared/telegram/TelegramLayoutDebug.tsx`
-
-Overlay показывает:
-
-- `safeTop/contentTop/layoutTop` из CSS vars;
-- `topReserve/effectiveTop` для контроля итогового верхнего отступа;
-- `safeAreaInset` и `contentSafeAreaInset` из Telegram WebApp;
-- `viewportHeight`, `viewportStableHeight`, `isExpanded`, `version`.
