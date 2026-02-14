@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import WebApp from "@twa-dev/sdk";
 
 type Insets = {
@@ -43,7 +43,7 @@ const readLayoutVars = (): LayoutVars => {
 };
 
 const hasDebugFlag = (): boolean => {
-  if (!import.meta.env.DEV || typeof window === "undefined") {
+  if (typeof window === "undefined") {
     return false;
   }
 
@@ -52,12 +52,13 @@ const hasDebugFlag = (): boolean => {
 };
 
 export const TelegramLayoutDebug = (): ReactElement | null => {
-  const shouldRender = useMemo((): boolean => hasDebugFlag(), []);
+  const isDev = import.meta.env.DEV;
+  const [isOpen, setIsOpen] = useState<boolean>(() => isDev && hasDebugFlag());
   const [layoutVars, setLayoutVars] = useState<LayoutVars>(() => readLayoutVars());
   const tg = WebApp as unknown as TelegramDebugApi;
 
   useEffect(() => {
-    if (!shouldRender) {
+    if (!isDev || !isOpen) {
       return;
     }
 
@@ -71,28 +72,35 @@ export const TelegramLayoutDebug = (): ReactElement | null => {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [shouldRender]);
+  }, [isDev, isOpen]);
 
-  if (!shouldRender) {
+  if (!isDev) {
     return null;
   }
 
+  const toggleDebug = (): void => {
+    setIsOpen((previousState: boolean) => !previousState);
+  };
+
   return (
-    <div className="tg-layout-debug" role="status" aria-live="polite">
-      <p>tgLayoutDebug=1</p>
-      <p>version: {tg.version ?? "n/a"}</p>
-      <p>platform: {tg.platform ?? "n/a"}</p>
-      <p>isExpanded: {String(tg.isExpanded ?? false)}</p>
-      <p>viewport: {tg.viewportHeight ?? 0} / stable: {tg.viewportStableHeight ?? 0}</p>
-      <p>
-        safeTop/contentTop/layoutTop: {layoutVars.safeTop} / {layoutVars.contentTop} / {layoutVars.layoutTop}
-      </p>
-      <p>
-        safeInset: {JSON.stringify(tg.safeAreaInset ?? {})}
-      </p>
-      <p>
-        contentInset: {JSON.stringify(tg.contentSafeAreaInset ?? {})}
-      </p>
-    </div>
+    <>
+      <button type="button" className="tg-layout-debug-toggle" onClick={toggleDebug}>
+        {isOpen ? "Скрыть debug" : "Показать debug"}
+      </button>
+      {isOpen ? (
+        <div className="tg-layout-debug" role="status" aria-live="polite">
+          <p>debug: on</p>
+          <p>version: {tg.version ?? "n/a"}</p>
+          <p>platform: {tg.platform ?? "n/a"}</p>
+          <p>isExpanded: {String(tg.isExpanded ?? false)}</p>
+          <p>viewport: {tg.viewportHeight ?? 0} / stable: {tg.viewportStableHeight ?? 0}</p>
+          <p>
+            safeTop/contentTop/layoutTop: {layoutVars.safeTop} / {layoutVars.contentTop} / {layoutVars.layoutTop}
+          </p>
+          <p>safeInset: {JSON.stringify(tg.safeAreaInset ?? {})}</p>
+          <p>contentInset: {JSON.stringify(tg.contentSafeAreaInset ?? {})}</p>
+        </div>
+      ) : null}
+    </>
   );
 };
