@@ -22,6 +22,8 @@ type LayoutVars = {
   safeTop: string;
   contentTop: string;
   layoutTop: string;
+  layoutTopReserve: string;
+  layoutEffectiveTop: string;
 };
 
 const readLayoutVars = (): LayoutVars => {
@@ -30,6 +32,8 @@ const readLayoutVars = (): LayoutVars => {
       safeTop: "0px",
       contentTop: "0px",
       layoutTop: "0px",
+      layoutTopReserve: "0px",
+      layoutEffectiveTop: "0px",
     };
   }
 
@@ -39,6 +43,8 @@ const readLayoutVars = (): LayoutVars => {
     safeTop: rootStyles.getPropertyValue("--tg-safe-top").trim() || "0px",
     contentTop: rootStyles.getPropertyValue("--tg-content-top").trim() || "0px",
     layoutTop: rootStyles.getPropertyValue("--tg-layout-top").trim() || "0px",
+    layoutTopReserve: rootStyles.getPropertyValue("--tg-layout-top-reserve").trim() || "0px",
+    layoutEffectiveTop: rootStyles.getPropertyValue("--tg-layout-effective-top").trim() || "0px",
   };
 };
 
@@ -97,6 +103,7 @@ export const TelegramLayoutDebug = (): ReactElement | null => {
           <p>
             safeTop/contentTop/layoutTop: {layoutVars.safeTop} / {layoutVars.contentTop} / {layoutVars.layoutTop}
           </p>
+          <p>topReserve/effectiveTop: {layoutVars.layoutTopReserve} / {layoutVars.layoutEffectiveTop}</p>
           <p>safeInset: {JSON.stringify(tg.safeAreaInset ?? {})}</p>
           <p>contentInset: {JSON.stringify(tg.contentSafeAreaInset ?? {})}</p>
         </div>

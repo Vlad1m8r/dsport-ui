@@ -14,9 +14,12 @@ type TelegramLayoutApi = {
   lockOrientation?: () => void;
   safeAreaInset?: Insets;
   contentSafeAreaInset?: Insets;
+  platform?: string;
   onEvent?: (eventType: string, eventHandler: () => void) => void;
   offEvent?: (eventType: string, eventHandler: () => void) => void;
 };
+
+const IOS_TOP_RESERVE_PX = 12;
 
 const ZERO_INSETS: Required<Insets> = {
   top: 0,
@@ -34,7 +37,19 @@ const resolveInsets = (insets: Insets | undefined): Required<Insets> => ({
   left: insets?.left ?? ZERO_INSETS.left,
 });
 
-const applyInsetVariables = (safeAreaInset: Insets | undefined, contentSafeAreaInset: Insets | undefined): void => {
+const resolveTopReserve = (platform: string | undefined): number => {
+  if (platform === "ios") {
+    return IOS_TOP_RESERVE_PX;
+  }
+
+  return 0;
+};
+
+const applyInsetVariables = (
+  safeAreaInset: Insets | undefined,
+  contentSafeAreaInset: Insets | undefined,
+  platform: string | undefined,
+): void => {
   if (typeof document === "undefined") {
     return;
   }
@@ -47,6 +62,8 @@ const applyInsetVariables = (safeAreaInset: Insets | undefined, contentSafeAreaI
     bottom: Math.max(safe.bottom, content.bottom),
     left: Math.max(safe.left, content.left),
   };
+  const topReserve = resolveTopReserve(platform);
+  const effectiveTop = layout.top + topReserve;
   const rootStyle = document.documentElement.style;
 
   rootStyle.setProperty("--tg-safe-top", toPx(safe.top));
@@ -63,13 +80,16 @@ const applyInsetVariables = (safeAreaInset: Insets | undefined, contentSafeAreaI
   rootStyle.setProperty("--tg-layout-right", toPx(layout.right));
   rootStyle.setProperty("--tg-layout-bottom", toPx(layout.bottom));
   rootStyle.setProperty("--tg-layout-left", toPx(layout.left));
+
+  rootStyle.setProperty("--tg-layout-top-reserve", toPx(topReserve));
+  rootStyle.setProperty("--tg-layout-effective-top", toPx(effectiveTop));
 };
 
 export const useTelegramLayout = (): void => {
   useEffect(() => {
     const tg = WebApp as unknown as TelegramLayoutApi;
 
-    applyInsetVariables(tg.safeAreaInset, tg.contentSafeAreaInset);
+    applyInsetVariables(tg.safeAreaInset, tg.contentSafeAreaInset, tg.platform);
 
     if (typeof tg.requestFullscreen === "function") {
       tg.requestFullscreen();
@@ -83,15 +103,13 @@ export const useTelegramLayout = (): void => {
 
     let hasRetriedFullscreen = false;
 
-    const handleSafeAreaChanged = (): void => {
-      applyInsetVariables(tg.safeAreaInset, tg.contentSafeAreaInset);
-    };
-
-    const handleContentSafeAreaChanged = (): void => {
-      applyInsetVariables(tg.safeAreaInset, tg.contentSafeAreaInset);
+    const syncLayoutVariables = (): void => {
+      applyInsetVariables(tg.safeAreaInset, tg.contentSafeAreaInset, tg.platform);
     };
 
     const handleFullscreenChanged = (): void => {
+      syncLayoutVariables();
+
       if (hasRetriedFullscreen) {
         return;
       }
@@ -106,13 +124,13 @@ export const useTelegramLayout = (): void => {
       tg.expand();
     };
 
-    tg.onEvent?.("safeAreaChanged", handleSafeAreaChanged);
-    tg.onEvent?.("contentSafeAreaChanged", handleContentSafeAreaChanged);
+    tg.onEvent?.("safeAreaChanged", syncLayoutVariables);
+    tg.onEvent?.("contentSafeAreaChanged", syncLayoutVariables);
     tg.onEvent?.("fullscreenChanged", handleFullscreenChanged);
 
     return () => {
-      tg.offEvent?.("safeAreaChanged", handleSafeAreaChanged);
-      tg.offEvent?.("contentSafeAreaChanged", handleContentSafeAreaChanged);
+      tg.offEvent?.("safeAreaChanged", syncLayoutVariables);
+      tg.offEvent?.("contentSafeAreaChanged", syncLayoutVariables);
       tg.offEvent?.("fullscreenChanged", handleFullscreenChanged);
     };
   }, []);

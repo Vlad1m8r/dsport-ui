@@ -21,6 +21,8 @@
   --tg-layout-right: 0px;
   --tg-layout-bottom: 0px;
   --tg-layout-left: 0px;
+  --tg-layout-top-reserve: 0px;
+  --tg-layout-effective-top: 0px;
 }
 
 *,

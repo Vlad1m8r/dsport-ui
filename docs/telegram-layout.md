@@ -26,10 +26,14 @@
 - `--tg-layout-right`
 - `--tg-layout-bottom`
 - `--tg-layout-left`
+- `--tg-layout-top-reserve`
+- `--tg-layout-effective-top`
 
 Если Telegram API недоступно (локальная разработка в обычном браузере), все переменные остаются `0px`.
 
 `--tg-layout-*` — это безопасный слой для экранного layout: берётся `max(safeAreaInset, contentSafeAreaInset)` по каждой стороне. Это защищает UI от наложения Telegram-контролов в fullscreen.
+
+Для iOS временно добавляется небольшой верхний запас `--tg-layout-top-reserve` (12px), чтобы снизить риск визуального наложения верхних Telegram-контролов. Итоговый верхний отступ: `--tg-layout-effective-top`.
 
 ## Где выполняется инициализация
 
@@ -52,7 +56,7 @@
 
 ```css
 .safeAreaContainer {
-  padding: var(--tg-layout-top) var(--tg-layout-right) var(--tg-layout-bottom) var(--tg-layout-left);
+  padding: var(--tg-layout-effective-top) var(--tg-layout-right) var(--tg-layout-bottom) var(--tg-layout-left);
 }
 ```
 
@@ -83,5 +87,6 @@
 Overlay показывает:
 
 - `safeTop/contentTop/layoutTop` из CSS vars;
+- `topReserve/effectiveTop` для контроля итогового верхнего отступа;
 - `safeAreaInset` и `contentSafeAreaInset` из Telegram WebApp;
 - `viewportHeight`, `viewportStableHeight`, `isExpanded`, `version`.
