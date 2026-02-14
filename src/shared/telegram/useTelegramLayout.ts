@@ -41,6 +41,12 @@ const applyInsetVariables = (safeAreaInset: Insets | undefined, contentSafeAreaI
 
   const safe = resolveInsets(safeAreaInset);
   const content = resolveInsets(contentSafeAreaInset);
+  const layout = {
+    top: Math.max(safe.top, content.top),
+    right: Math.max(safe.right, content.right),
+    bottom: Math.max(safe.bottom, content.bottom),
+    left: Math.max(safe.left, content.left),
+  };
   const rootStyle = document.documentElement.style;
 
   rootStyle.setProperty("--tg-safe-top", toPx(safe.top));
@@ -52,6 +58,11 @@ const applyInsetVariables = (safeAreaInset: Insets | undefined, contentSafeAreaI
   rootStyle.setProperty("--tg-content-right", toPx(content.right));
   rootStyle.setProperty("--tg-content-bottom", toPx(content.bottom));
   rootStyle.setProperty("--tg-content-left", toPx(content.left));
+
+  rootStyle.setProperty("--tg-layout-top", toPx(layout.top));
+  rootStyle.setProperty("--tg-layout-right", toPx(layout.right));
+  rootStyle.setProperty("--tg-layout-bottom", toPx(layout.bottom));
+  rootStyle.setProperty("--tg-layout-left", toPx(layout.left));
 };
 
 export const useTelegramLayout = (): void => {

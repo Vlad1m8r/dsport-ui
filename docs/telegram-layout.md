@@ -22,8 +22,14 @@
 - `--tg-content-right`
 - `--tg-content-bottom`
 - `--tg-content-left`
+- `--tg-layout-top`
+- `--tg-layout-right`
+- `--tg-layout-bottom`
+- `--tg-layout-left`
 
 Если Telegram API недоступно (локальная разработка в обычном браузере), все переменные остаются `0px`.
+
+`--tg-layout-*` — это безопасный слой для экранного layout: берётся `max(safeAreaInset, contentSafeAreaInset)` по каждой стороне. Это защищает UI от наложения Telegram-контролов в fullscreen.
 
 ## Где выполняется инициализация
 
@@ -42,11 +48,11 @@
 
 ## Применение на страницах
 
-Все страницы должны рендериться внутри общего контейнера `SafeAreaContainer`, который задаёт паддинги от `contentSafeAreaInset`:
+Все страницы должны рендериться внутри общего контейнера `SafeAreaContainer`, который задаёт паддинги от безопасного layout-слоя (`max(contentSafeAreaInset, safeAreaInset)`):
 
 ```css
 .safeAreaContainer {
-  padding: var(--tg-content-top) var(--tg-content-right) var(--tg-content-bottom) var(--tg-content-left);
+  padding: var(--tg-layout-top) var(--tg-layout-right) var(--tg-layout-bottom) var(--tg-layout-left);
 }
 ```
 

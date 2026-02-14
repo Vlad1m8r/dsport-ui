@@ -17,6 +17,10 @@
   --tg-content-right: 0px;
   --tg-content-bottom: 0px;
   --tg-content-left: 0px;
+  --tg-layout-top: 0px;
+  --tg-layout-right: 0px;
+  --tg-layout-bottom: 0px;
+  --tg-layout-left: 0px;
 }
 
 *,

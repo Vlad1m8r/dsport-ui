@@ -9,7 +9,7 @@
 }
 
 .safeAreaContainer {
-  padding: var(--tg-content-top) var(--tg-content-right) var(--tg-content-bottom) var(--tg-content-left);
+  padding: var(--tg-layout-top) var(--tg-layout-right) var(--tg-layout-bottom) var(--tg-layout-left);
   min-height: 100vh;
 }
 
@@ -23,7 +23,7 @@
   display: flex;
   gap: 8px;
   position: sticky;
-  top: 0;
+  top: var(--tg-layout-top);
   z-index: 10;
   padding: 8px;
   border-radius: 12px;
