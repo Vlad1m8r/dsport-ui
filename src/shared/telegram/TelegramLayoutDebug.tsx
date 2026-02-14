@@ -1,0 +1,98 @@
+import { useEffect, useMemo, useState, type ReactElement } from "react";
+import WebApp from "@twa-dev/sdk";
+
+type Insets = {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+};
+
+type TelegramDebugApi = {
+  version?: string;
+  platform?: string;
+  isExpanded?: boolean;
+  viewportHeight?: number;
+  viewportStableHeight?: number;
+  safeAreaInset?: Insets;
+  contentSafeAreaInset?: Insets;
+};
+
+type LayoutVars = {
+  safeTop: string;
+  contentTop: string;
+  layoutTop: string;
+};
+
+const readLayoutVars = (): LayoutVars => {
+  if (typeof window === "undefined") {
+    return {
+      safeTop: "0px",
+      contentTop: "0px",
+      layoutTop: "0px",
+    };
+  }
+
+  const rootStyles = window.getComputedStyle(document.documentElement);
+
+  return {
+    safeTop: rootStyles.getPropertyValue("--tg-safe-top").trim() || "0px",
+    contentTop: rootStyles.getPropertyValue("--tg-content-top").trim() || "0px",
+    layoutTop: rootStyles.getPropertyValue("--tg-layout-top").trim() || "0px",
+  };
+};
+
+const hasDebugFlag = (): boolean => {
+  if (!import.meta.env.DEV || typeof window === "undefined") {
+    return false;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  return params.get("tgLayoutDebug") === "1";
+};
+
+export const TelegramLayoutDebug = (): ReactElement | null => {
+  const shouldRender = useMemo((): boolean => hasDebugFlag(), []);
+  const [layoutVars, setLayoutVars] = useState<LayoutVars>(() => readLayoutVars());
+  const tg = WebApp as unknown as TelegramDebugApi;
+
+  useEffect(() => {
+    if (!shouldRender) {
+      return;
+    }
+
+    const sync = (): void => {
+      setLayoutVars(readLayoutVars());
+    };
+
+    sync();
+    const intervalId = window.setInterval(sync, 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [shouldRender]);
+
+  if (!shouldRender) {
+    return null;
+  }
+
+  return (
+    <div className="tg-layout-debug" role="status" aria-live="polite">
+      <p>tgLayoutDebug=1</p>
+      <p>version: {tg.version ?? "n/a"}</p>
+      <p>platform: {tg.platform ?? "n/a"}</p>
+      <p>isExpanded: {String(tg.isExpanded ?? false)}</p>
+      <p>viewport: {tg.viewportHeight ?? 0} / stable: {tg.viewportStableHeight ?? 0}</p>
+      <p>
+        safeTop/contentTop/layoutTop: {layoutVars.safeTop} / {layoutVars.contentTop} / {layoutVars.layoutTop}
+      </p>
+      <p>
+        safeInset: {JSON.stringify(tg.safeAreaInset ?? {})}
+      </p>
+      <p>
+        contentInset: {JSON.stringify(tg.contentSafeAreaInset ?? {})}
+      </p>
+    </div>
+  );
+};

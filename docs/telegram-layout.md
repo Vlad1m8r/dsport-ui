@@ -69,3 +69,18 @@
 ```
 
 Это гарантирует, что элемент не попадёт в жестовую/system зону устройства.
+
+
+## Временный in-app debug (DEV)
+
+Для диагностики на реальном телефоне без desktop devtools доступен временный overlay.
+
+- Включение: добавить query-параметр `?tgLayoutDebug=1`
+- Работает только в DEV сборке.
+- Компонент: `src/shared/telegram/TelegramLayoutDebug.tsx`
+
+Overlay показывает:
+
+- `safeTop/contentTop/layoutTop` из CSS vars;
+- `safeAreaInset` и `contentSafeAreaInset` из Telegram WebApp;
+- `viewportHeight`, `viewportStableHeight`, `isExpanded`, `version`.
