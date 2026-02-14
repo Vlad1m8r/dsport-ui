@@ -1,6 +1,8 @@
 import { useCallback, useEffect, type ReactElement } from "react";
 import WebApp, { applyThemeParams } from "@twa-dev/sdk";
 import { Outlet } from "react-router-dom";
+import { SafeAreaContainer } from "./shared/layout/SafeAreaContainer";
+import { useTelegramLayout } from "./shared/telegram/useTelegramLayout";
 
 import "./App.css";
 
@@ -43,6 +45,8 @@ const extractThemeParams = (): Record<string, string> => {
 };
 
 function App(): ReactElement {
+  useTelegramLayout();
+
   const applyCssVariables = useCallback((variables: Record<string, string>): void => {
     const root = document.documentElement;
     Object.entries(variables).forEach(([key, value]) => {
@@ -70,7 +74,9 @@ function App(): ReactElement {
 
   return (
     <main className="app">
-      <Outlet />
+      <SafeAreaContainer>
+        <Outlet />
+      </SafeAreaContainer>
     </main>
   );
 }

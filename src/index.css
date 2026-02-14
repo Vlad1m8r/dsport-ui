@@ -9,6 +9,14 @@
   color-scheme: light dark;
   background-color: var(--tg-theme-bg-color, #ffffff);
   color: var(--tg-theme-text-color, #0f172a);
+  --tg-safe-top: 0px;
+  --tg-safe-right: 0px;
+  --tg-safe-bottom: 0px;
+  --tg-safe-left: 0px;
+  --tg-content-top: 0px;
+  --tg-content-right: 0px;
+  --tg-content-bottom: 0px;
+  --tg-content-left: 0px;
 }
 
 *,

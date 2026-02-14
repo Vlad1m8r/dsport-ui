@@ -86,6 +86,13 @@
 - Вся логика работы с Telegram WebApp (initData, themeParams, buttons) должна быть изолирована в shared-слое.
 - При локальной разработке вне Telegram приложение должно корректно работать без initData.
 
+
+## Telegram Layout & Safe Area
+- Запрещены магические паддинги "под Telegram" (например, фиксированные `56px/34px` для системных зон).
+- Любые закреплённые у краёв экрана элементы (sticky/fixed) обязаны учитывать `safeAreaInset` через CSS-переменные (`--tg-safe-*`).
+- Все страницы должны быть обёрнуты в `SafeAreaContainer` (или root-layout-эквивалент), который применяет `contentSafeAreaInset` через `--tg-content-*`.
+- Fullscreen и lockOrientation реализуются в best-effort режиме: без падений, без бесконечных ретраев и без спама запросами.
+
 ## UI и доступность
 - Интерфейс должен корректно работать внутри WebView Telegram.
 - Учитывайте мобильные размеры, клавиатуру и изменение высоты WebView.

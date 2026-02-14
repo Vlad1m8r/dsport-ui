@@ -4,9 +4,13 @@
 
 .app {
   min-height: 100vh;
-  padding: 16px;
   background-color: var(--tg-theme-bg-color, #ffffff);
   color: var(--tg-theme-text-color, #0f172a);
+}
+
+.safeAreaContainer {
+  padding: var(--tg-content-top) var(--tg-content-right) var(--tg-content-bottom) var(--tg-content-left);
+  min-height: 100vh;
 }
 
 .app-layout {
