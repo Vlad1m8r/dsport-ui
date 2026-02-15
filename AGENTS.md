@@ -86,6 +86,39 @@
 - Вся логика работы с Telegram WebApp (initData, themeParams, buttons) должна быть изолирована в shared-слое.
 - При локальной разработке вне Telegram приложение должно корректно работать без initData.
 
+## Telegram Mini Apps (official docs rules)
+Основание:  
+- https://core.telegram.org/bots/webapps  
+- https://core.telegram.org/bots/webapps#contentsafeareainset  
+- https://core.telegram.org/api/bots/webapps  
+- https://core.telegram.org/api/web-events
+
+- **initData и безопасность**:
+  - Для backend-аутентификации используйте только `Telegram.WebApp.initData` (raw string).
+  - `initDataUnsafe` не считать доверенным источником: допускается только для UI/отладки, без security-решений.
+  - Во всех реальных API-запросах отправляйте `initData` в `X-Tg-Init-Data` через общий HTTP-слой.
+  - Валидация `initData` выполняется только на backend по официальному алгоритму (HMAC-SHA-256, `data-check-string`, проверка `auth_date`).
+  - CORS: фронт не может «добавить» кастомный заголовок в preflight `OPTIONS`; backend обязан принимать `OPTIONS` без авторизации. `X-Tg-Init-Data` добавляется только в реальные запросы.
+
+- **Safe Area / Insets / Layout**:
+  - Обязательно учитывайте safe area, чтобы контент не перекрывался системными элементами и Telegram UI.
+  - Используйте Telegram CSS-переменные: `--tg-safe-area-inset-top/bottom/left/right` и `--tg-content-safe-area-inset-top/bottom/left/right`.
+  - `safeAreaInset` = системные отступы (notch/home bar), `contentSafeAreaInset` = дополнительные отступы под интерфейс Telegram.
+  - Базовый layout приложения должен задавать `padding` на основе этих переменных.
+
+- **Theme / Color Scheme**:
+  - Не хардкодьте цвета: используйте `themeParams`, `colorScheme` и Telegram CSS vars (в т.ч. `--tg-color-scheme`).
+  - На событие `themeChanged` обязательно обновляйте CSS variables/tokens в рантайме.
+
+- **Telegram WebApp API usage**:
+  - Управляйте `BackButton` и `MainButton/BottomButton` только в релевантных экранах/флоу.
+  - Всегда очищайте подписки на WebApp-события (`themeChanged`, `viewportChanged`, кнопки) при размонтировании/смене контекста.
+  - Учитывайте `viewportChanged`: корректно обрабатывайте изменение высоты WebView и появление клавиатуры.
+  - Не использовать сторонние SDK «вместо» Telegram WebApp; разрешены только `@twa-dev/sdk` и `telegram-web-app.js`.
+
+- **Документация временных решений**:
+  - Любые временные компромиссы (например, DEV fallback для `initData`) документируйте в `docs/` с пометкой **DEV ONLY** и планом удаления (например, `docs/UI_FLOWS.md` или `docs/theme-architecture.md`).
+
 ## UI и доступность
 - Интерфейс должен корректно работать внутри WebView Telegram.
 - Учитывайте мобильные размеры, клавиатуру и изменение высоты WebView.
@@ -127,3 +160,10 @@
 - `docs/TODO.md` — список задач и текущий статус выполнения.
 - `docs/PROMPTS_LOG.md` — журнал изменений по промптам/итерациям.
 - `docs/openapi.yaml` — единственный источник правды по API-контракту (DTO и endpoints).
+## Перед PR
+- [ ] Safe area и content safe area учтены в базовом layout.
+- [ ] `initData` отправляется в backend через `X-Tg-Init-Data`; `initDataUnsafe` не используется как trusted source.
+- [ ] Цвета и тема не хардкодятся; `themeChanged` обновляет CSS-переменные.
+- [ ] Подписки Telegram WebApp API корректно очищаются.
+- [ ] Временные DEV-only решения задокументированы в `docs/` с планом удаления.
+
