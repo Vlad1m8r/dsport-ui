@@ -104,7 +104,11 @@
   - Обязательно учитывайте safe area, чтобы контент не перекрывался системными элементами и Telegram UI.
   - Используйте Telegram CSS-переменные: `--tg-safe-area-inset-top/bottom/left/right` и `--tg-content-safe-area-inset-top/bottom/left/right`.
   - `safeAreaInset` = системные отступы (notch/home bar), `contentSafeAreaInset` = дополнительные отступы под интерфейс Telegram.
-  - Базовый layout приложения должен задавать `padding` на основе этих переменных.
+  - Базовый layout приложения обязан учитывать content safe area: `padding-top: var(--tg-content-safe-area-inset-top, 0px)` и `padding-bottom: var(--tg-content-safe-area-inset-bottom, 0px)`.
+  - Sticky bottom элементы (CTA/TabBar) обязаны учитывать safe area устройства: `padding-bottom: var(--tg-safe-area-inset-bottom, 0px)`.
+  - ❌ Запрещено использовать `height: 100vh` для корневых контейнеров (ломается при клавиатуре).
+  - ✅ Используйте `min-height: 100dvh` и/или обработку `viewportChanged` через shared-слой.
+  - Подписки на `themeChanged`/`viewportChanged` делаются только в shared-слое (`src/shared/lib/telegram.ts` или TelegramProvider). Страницы и компоненты не подписываются напрямую.
 
 - **Theme / Color Scheme**:
   - Не хардкодьте цвета: используйте `themeParams`, `colorScheme` и Telegram CSS vars (в т.ч. `--tg-color-scheme`).
@@ -116,8 +120,15 @@
   - Учитывайте `viewportChanged`: корректно обрабатывайте изменение высоты WebView и появление клавиатуры.
   - Не использовать сторонние SDK «вместо» Telegram WebApp; разрешены только `@twa-dev/sdk` и `telegram-web-app.js`.
 
+- **Telegram buttons ownership**:
+  - Управление `BackButton`/`MainButton` централизовано (shared/provider/hook).
+  - Нельзя включать/выключать кнопки из произвольных компонентов/страниц без единого контракта.
+  - На root-экранах табов `BackButton` скрыт, на detail/edit экранах — показан (как базовый ориентир).
+
 - **Документация временных решений**:
   - Любые временные компромиссы (например, DEV fallback для `initData`) документируйте в `docs/` с пометкой **DEV ONLY** и планом удаления (например, `docs/UI_FLOWS.md` или `docs/theme-architecture.md`).
+  - DEV fallback для `initData` допускается только при `import.meta.env.DEV`.
+  - В PROD вне Telegram необходимо показывать экран/сообщение «Откройте через Telegram».
 
 ## UI и доступность
 - Интерфейс должен корректно работать внутри WebView Telegram.
@@ -162,8 +173,11 @@
 - `docs/openapi.yaml` — единственный источник правды по API-контракту (DTO и endpoints).
 ## Перед PR
 - [ ] Safe area и content safe area учтены в базовом layout.
+- [ ] нет `100vh` у корневых контейнеров; клавиатура не ломает layout.
+- [ ] учтены `contentSafeAreaInset` и `safeAreaInset` (особенно bottom для Sticky CTA/TabBar).
 - [ ] `initData` отправляется в backend через `X-Tg-Init-Data`; `initDataUnsafe` не используется как trusted source.
 - [ ] Цвета и тема не хардкодятся; `themeChanged` обновляет CSS-переменные.
+- [ ] подписки на Telegram events только в shared и корректно очищаются.
 - [ ] Подписки Telegram WebApp API корректно очищаются.
+- [ ] нет прямых обращений к `window.Telegram` вне shared.
 - [ ] Временные DEV-only решения задокументированы в `docs/` с планом удаления.
-
