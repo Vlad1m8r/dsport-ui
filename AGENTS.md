@@ -130,6 +130,18 @@
   - DEV fallback для `initData` допускается только при `import.meta.env.DEV`.
   - В PROD вне Telegram необходимо показывать экран/сообщение «Откройте через Telegram».
 
+### Telegram Mini Apps Documentation
+
+- Официальные правила и архитектурные договорённости по Mini App находятся в `docs/telegram.md`.
+- Этот файл является источником правды для:
+  - initData / безопасности
+  - Safe Area / Layout
+  - ThemeParams и палитры
+  - viewport events
+  - ограничений Bot API / MTProto
+- При любом изменении Telegram-поведения (auth, layout, theme, WebApp API, safe area и т.д.)
+  необходимо обновить `docs/telegram.md`.
+
 ## UI и доступность
 - Интерфейс должен корректно работать внутри WebView Telegram.
 - Учитывайте мобильные размеры, клавиатуру и изменение высоты WebView.
@@ -181,3 +193,4 @@
 - [ ] Подписки Telegram WebApp API корректно очищаются.
 - [ ] нет прямых обращений к `window.Telegram` вне shared.
 - [ ] Временные DEV-only решения задокументированы в `docs/` с планом удаления.
+- [ ] Если изменения касаются Telegram Mini Apps (auth, safe area, theme, layout, WebApp API), обновлён `docs/telegram.md`
