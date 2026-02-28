@@ -2,8 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  height: calc(100dvh - var(--content-top) - var(--content-bottom) - 80px - var(--safe-bottom));
+  overflow: hidden;
   padding-top: calc(var(--content-top) + var(--space-3));
-  padding-bottom: calc(104px + var(--safe-bottom) + var(--space-4));
+  padding-bottom: calc(80px + var(--safe-bottom) + var(--space-3));
 }
 
 .home-user-header {
@@ -103,6 +105,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  flex: 1;
+  min-height: 0;
 }
 
 .home-slider__viewport {
@@ -124,7 +128,7 @@
 }
 
 .home-slider__slide {
-  min-height: 280px;
+  min-height: 320px;
   border-radius: var(--radius-xl);
   background: color-mix(in srgb, var(--surface-2) 70%, var(--surface));
   color: var(--text);
@@ -182,7 +186,7 @@
 }
 
 .home-slider__slide--stub {
-  min-height: 280px;
+  min-height: 320px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -214,7 +218,7 @@
   bottom: 0;
   z-index: 30;
   padding: var(--space-2) var(--space-4) calc(var(--safe-bottom) + var(--space-2));
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  background: transparent;
 }
 
 .footer-nav__inner {
@@ -223,17 +227,24 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-2);
-  padding: var(--space-2);
+  padding: 0;
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--surface-2) 72%, var(--surface));
+  background: transparent;
 }
 
 .footer-nav__button {
   min-height: 44px;
   border-radius: var(--radius-pill);
-  border: 1px solid transparent;
+  border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--accent);
+}
+
+.footer-nav__button.ui-button,
+.footer-nav__button.ui-button--ghost {
+  border: none;
+  color: var(--accent);
+  background: transparent;
 }
 
 .footer-nav__button--active {
@@ -241,5 +252,5 @@
 }
 
 .footer-nav__button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
 }
