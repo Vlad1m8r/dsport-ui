@@ -42,8 +42,12 @@
 }
 
 html[data-mode="light"] {
-  /* Мягкий светлый mesh-градиент (светло-голубой и нежный персиковый/пурпурный) */
-  --bg: radial-gradient(circle at top right, #e0e7ff 0%, #f8fafc 40%, #fae8ff 100%);
+  /* Базовый цвет + 3 мягких цветных пятна (фиолетовый, голубой, персиковый) */
+  --bg:
+    radial-gradient(circle at 15% 40%, rgba(167, 139, 250, 0.35), transparent 50%),
+    radial-gradient(circle at 85% 20%, rgba(96, 165, 250, 0.3), transparent 50%),
+    radial-gradient(circle at 50% 90%, rgba(244, 114, 182, 0.2), transparent 50%),
+    #f8fafc;
 
   /* Полупрозрачные белые поверхности для матового стекла */
   --surface: rgba(255, 255, 255, 0.65);
