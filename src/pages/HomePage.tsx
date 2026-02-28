@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useActiveWorkout } from "../features/workouts/history/queries";
 import historyIcon from "../shared/assets/icons/history.svg";
 import startIcon from "../shared/assets/icons/start.svg";
 import templatesIcon from "../shared/assets/icons/templates.svg";
@@ -26,6 +27,19 @@ const createMaskStyle = (iconUrl: string): CSSProperties => ({
 export const HomePage = (): ReactElement => {
   const navigate = useNavigate();
   const user = getTgUserView();
+  const { data: activeWorkoutId } = useActiveWorkout();
+
+  const hasActiveWorkout = typeof activeWorkoutId === "number";
+  const startLabel = hasActiveWorkout ? "Продолжить" : "Начать тренировку";
+
+  const handleStart = (): void => {
+    if (hasActiveWorkout) {
+      navigate(`/workouts/${activeWorkoutId}`);
+      return;
+    }
+
+    navigate("/start");
+  };
 
   return (
     <section className="home-page">
@@ -43,8 +57,8 @@ export const HomePage = (): ReactElement => {
         />
         <ActionTile
           icon={<span className="home-action-tile__icon" style={createMaskStyle(startIcon)} />}
-          label="Начать тренировку"
-          onClick={() => navigate("/start")}
+          label={startLabel}
+          onClick={handleStart}
         />
         <ActionTile
           icon={<span className="home-action-tile__icon" style={createMaskStyle(historyIcon)} />}
