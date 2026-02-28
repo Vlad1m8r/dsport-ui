@@ -41,15 +41,27 @@
   --content-bottom: var(--tg-content-safe-area-inset-bottom, 0px);
 }
 
-html[data-mode="light"] {
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --surface-2: #f4f6ff;
+html[data-mode="light"],
+:root {
+  /* Пастельный неоднородный фон для красивого размытия */
+  --bg: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 50%, #e0f2fe 100%);
+
+  /* Полупрозрачное белое "стекло" */
+  --surface: rgba(255, 255, 255, 0.45);
+  --surface-2: rgba(255, 255, 255, 0.65);
+
   --text: #0f172a;
   --text-muted: #64748b;
-  --border: #d9dfeb;
-  --accent: #7c3aed;
+
+  /* Яркая белая рамка имитирует блик на кромке стекла */
+  --border: rgba(255, 255, 255, 0.8);
+
+  --accent: #6366f1;
   --accent-contrast: #ffffff;
+
+  /* Очень мягкие тени, чтобы стекло казалось легким */
+  --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 32px rgba(15, 23, 42, 0.08);
 }
 
 html[data-mode="dark"] {

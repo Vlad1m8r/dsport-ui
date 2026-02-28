@@ -102,19 +102,21 @@
   padding: var(--space-3) var(--space-2);
   color: var(--text);
   transition: transform var(--motion-fast) var(--ease-standard),
-    background var(--motion-fast) var(--ease-standard);
+    background var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard);
 }
 
 .home-action-tile__icon-wrapper {
   width: 44px;
   aspect-ratio: 1;
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 0 8px color-mix(in srgb, var(--accent) 30%, transparent);
+  /* Внутренний блик для объема */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
 .home-action-tile__icon {
@@ -125,14 +127,15 @@
 
 .home-action-tile__label {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
-  letter-spacing: 0.01em;
+  color: var(--text);
 }
 
 .home-action-tile:active {
   transform: scale(0.95);
   background: var(--surface-2);
+  box-shadow: none;
 }
 
 .home-slider {
@@ -171,8 +174,8 @@
   min-height: 320px;
   border-radius: var(--radius-xl);
   background: var(--surface);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   color: var(--text);
@@ -227,8 +230,9 @@
 .home-calendar__cell--today {
   background: var(--accent);
   color: var(--accent-contrast);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 30%, transparent);
   font-weight: 600;
+  border-radius: var(--radius-md);
 }
 
 .home-slider__slide--stub {
@@ -275,11 +279,11 @@
   gap: var(--space-1);
   padding: var(--space-1);
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--surface) 60%, rgba(20, 15, 30, 0.4));
+  background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(24px) saturate(200%);
   -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 1);
   pointer-events: auto;
 }
 
@@ -290,7 +294,7 @@
   border: none;
   background: transparent;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
   transition: all var(--motion-fast) var(--ease-standard);
 }
 
@@ -298,5 +302,5 @@
 .footer-nav__button--active.ui-button--ghost {
   color: var(--accent-contrast);
   background: var(--accent);
-  box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 50%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 35%, transparent);
 }
