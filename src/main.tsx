@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router-dom";
 
 import { Providers } from "./app/providers";
 import { router } from "./app/router";
+import "./shared/ui/theme/tokens.css";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
