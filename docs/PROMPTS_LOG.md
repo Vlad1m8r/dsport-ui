@@ -1,3 +1,13 @@
+## D4.8 — Home: зафиксированы правила нового редизайна в docs
+Сделано:
+- Обновлён `docs/SCREENS.md`: формализованы актуальные UX-правила Home для нового редизайна.
+- Зафиксированы требования к `UserHeader` (display-заголовок, блок controls, theme toggle через `html[data-mode]`).
+- Зафиксированы правила для action-tiles (карточный стиль), drag-follow поведения `HomeSlider` (`--drag-x`, отключение transition в drag, edge resistance) и плавающего `FooterNav` (dock + glassmorphism).
+- Обновлён `docs/design-system.md`: добавлен раздел Home со специальными визуальными и micro-UX правилами.
+
+Проверка:
+- Изменения носят документационный характер (runtime/logic не затронуты).
+
 ## D4.7 — Fix рендера иконок: отказ от CSS mask в Home actions
 Сделано:
 - Исправлен рендер иконок action-тайлов на Home для Telegram WebView:
