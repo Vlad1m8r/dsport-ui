@@ -36,25 +36,29 @@ export const HomePage = (): ReactElement => {
       />
 
       <div className="home-main">
-        <section className="home-actions" aria-label="Основные действия">
-          <ActionTile
-            icon={<TemplatesIcon className="home-action-tile__icon" />}
-            label="Шаблоны"
-            onClick={() => navigate("/templates")}
-          />
-          <ActionTile
-            icon={<StartIcon className="home-action-tile__icon" />}
-            label={startLabel}
-            onClick={handleStart}
-          />
-          <ActionTile
-            icon={<HistoryIcon className="home-action-tile__icon" />}
-            label="История"
-            onClick={() => navigate("/workouts")}
-          />
-        </section>
+        <div className="home-main__section">
+          <section className="home-actions" aria-label="Основные действия">
+            <ActionTile
+              icon={<TemplatesIcon className="home-action-tile__icon" />}
+              label="Шаблоны"
+              onClick={() => navigate("/templates")}
+            />
+            <ActionTile
+              icon={<StartIcon className="home-action-tile__icon" />}
+              label={startLabel}
+              onClick={handleStart}
+            />
+            <ActionTile
+              icon={<HistoryIcon className="home-action-tile__icon" />}
+              label="История"
+              onClick={() => navigate("/workouts")}
+            />
+          </section>
+        </div>
 
-        <HomeSlider />
+        <div className="home-main__section home-main__section--slider">
+          <HomeSlider />
+        </div>
       </div>
     </section>
   );

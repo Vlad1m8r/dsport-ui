@@ -13,19 +13,21 @@ export const UserHeader = ({ displayName, photoUrl, initials }: UserHeaderProps)
 
   return (
     <header className="home-user-header" aria-label="Профиль пользователя">
-      {hasPhoto ? (
-        <img src={photoUrl} alt="" className="home-user-header__avatar-image" />
-      ) : (
-        <div className="home-user-header__avatar" aria-hidden>
-          {initials}
-        </div>
-      )}
       <div className="home-user-header__content">
         <p className="home-user-header__name" title={displayName}>
           {displayName}
         </p>
       </div>
-      <ThemeToggle />
+      <div className="home-user-header__actions">
+        <ThemeToggle />
+        {hasPhoto ? (
+          <img src={photoUrl} alt="" className="home-user-header__avatar-image" />
+        ) : (
+          <div className="home-user-header__avatar" aria-hidden>
+            {initials}
+          </div>
+        )}
+      </div>
     </header>
   );
 };

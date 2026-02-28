@@ -22,17 +22,17 @@ export const FooterNav = (): ReactElement => {
     <nav className="footer-nav" aria-label="Нижняя навигация">
       <div className="footer-nav__inner">
         <Button variant="ghost" className="footer-nav__button" onClick={handleBack}>
-          Назад
+          <span className="footer-nav__button-label">Назад</span>
         </Button>
         <Button
           variant="ghost"
           className={`footer-nav__button ${isHome ? "footer-nav__button--active" : ""}`}
           onClick={() => navigate("/")}
         >
-          Главная
+          <span className="footer-nav__button-label">Главная</span>
         </Button>
         <Button variant="ghost" className="footer-nav__button" disabled>
-          AI
+          <span className="footer-nav__button-label">AI</span>
         </Button>
       </div>
     </nav>
