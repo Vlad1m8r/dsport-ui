@@ -300,3 +300,27 @@
   background: var(--accent);
   box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 50%, transparent);
 }
+
+/* --- Специфичные переопределения для Светлого Глассморфизма --- */
+html[data-mode="light"] .footer-nav__inner {
+  /* В светлой теме футер делаем более белым и прозрачным */
+  background: color-mix(in srgb, var(--surface) 80%, rgba(255, 255, 255, 0.5));
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+html[data-mode="light"] .home-action-tile__icon-wrapper {
+  /* Делаем подложку иконки чуть более контрастной в светлой теме */
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+html[data-mode="light"] .footer-nav__button--active.ui-button,
+html[data-mode="light"] .footer-nav__button--active.ui-button--ghost {
+  /* Мягкая тень под активной кнопкой навигации в светлой теме */
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+html[data-mode="light"] .home-calendar__cell--today {
+  /* Более мягкое свечение сегодняшнего дня для светлого фона */
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 40%, transparent);
+}
