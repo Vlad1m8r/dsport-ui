@@ -49,13 +49,20 @@ html[data-mode="light"] {
     radial-gradient(circle at 50% 90%, rgba(244, 114, 182, 0.2), transparent 50%),
     #f8fafc;
 
+  /* Полупрозрачные белые поверхности для матового стекла */
   --surface: rgba(255, 255, 255, 0.65);
   --surface-2: rgba(255, 255, 255, 0.4);
+
   --text: #0f172a;
   --text-muted: #64748b;
+
+  /* Плотная белая рамка для эффекта блика на кромке стекла */
   --border: rgba(255, 255, 255, 0.8);
+
   --accent: #4f46e5;
   --accent-contrast: #ffffff;
+
+  /* Мягкие прозрачные тени */
   --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.04);
   --shadow-md: 0 8px 32px rgba(15, 23, 42, 0.08);
 }
