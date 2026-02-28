@@ -131,8 +131,13 @@
 .home-slider__track {
   display: grid;
   grid-template-columns: repeat(3, 100%);
-  transform: translateX(calc(var(--index) * -100%));
+  transform: translateX(calc(var(--index) * -100% + var(--drag-x, 0px)));
   transition: transform var(--motion-normal) var(--ease-standard);
+  will-change: transform;
+}
+
+.home-slider__track--dragging {
+  transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
