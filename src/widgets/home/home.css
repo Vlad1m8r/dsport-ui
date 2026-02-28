@@ -293,6 +293,10 @@ html[data-mode="light"] .footer-nav__inner {
   box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
+html[data-mode="dark"] .footer-nav__inner {
+  border: none;
+}
+
 .footer-nav__button.ui-button,
 .footer-nav__button.ui-button--ghost {
   min-height: 48px;
