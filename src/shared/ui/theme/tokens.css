@@ -41,8 +41,7 @@
   --content-bottom: var(--tg-content-safe-area-inset-bottom, 0px);
 }
 
-html[data-mode="light"],
-:root {
+html[data-mode="light"] {
   /* Базовый цвет + 3 мягких цветных пятна (фиолетовый, голубой, персиковый) */
   --bg:
     radial-gradient(circle at 15% 40%, rgba(167, 139, 250, 0.35), transparent 50%),
@@ -62,20 +61,22 @@ html[data-mode="light"],
 }
 
 html[data-mode="dark"] {
-  /* Базовый темный цвет + 3 глубоких неоновых пятна (пурпурный, синий, индиго) */
-  --bg:
-    radial-gradient(circle at 20% 30%, rgba(168, 85, 247, 0.18), transparent 55%),
-    radial-gradient(circle at 80% 60%, rgba(59, 130, 246, 0.15), transparent 55%),
-    radial-gradient(circle at 40% 100%, rgba(99, 102, 241, 0.15), transparent 55%),
-    #0f172a;
+  /* Делаем фон неоднородным, чтобы стекло красиво его размывало */
+  --bg: radial-gradient(circle at top left, #23153c 0%, #0d0914 50%, #09060d 100%);
 
+  /* Полупрозрачные поверхности для эффекта стекла */
   --surface: rgba(255, 255, 255, 0.05);
   --surface-2: rgba(255, 255, 255, 0.08);
+
   --text: #f8fafc;
   --text-muted: rgba(255, 255, 255, 0.5);
+
+  /* Тонкая граница для имитации блика на стекле */
   --border: rgba(255, 255, 255, 0.1);
+
   --accent: #a855f7;
   --accent-contrast: #ffffff;
+
   --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
