@@ -25,6 +25,24 @@
   background: transparent;
 }
 
+
+.home-user-header__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.home-user-header__theme-toggle {
+  width: 40px;
+  height: 40px;
+  color: var(--text-muted);
+  border-radius: var(--radius-pill);
+}
+
+.home-user-header__theme-toggle:hover {
+  color: var(--text);
+}
+
 .home-user-header__name {
   margin: 0;
   font-size: 28px;
