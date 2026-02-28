@@ -1,7 +1,5 @@
 import type { ReactElement } from "react";
 
-import { ThemeToggle } from "../../shared/ui/theme/ThemeToggle";
-
 type UserHeaderProps = {
   displayName: string;
   photoUrl?: string;
@@ -13,6 +11,7 @@ export const UserHeader = ({ displayName, photoUrl, initials }: UserHeaderProps)
 
   return (
     <header className="home-user-header" aria-label="Профиль пользователя">
+      <h1 className="home-user-header__name">{displayName}</h1>
       {hasPhoto ? (
         <img src={photoUrl} alt="" className="home-user-header__avatar-image" />
       ) : (
@@ -20,12 +19,6 @@ export const UserHeader = ({ displayName, photoUrl, initials }: UserHeaderProps)
           {initials}
         </div>
       )}
-      <div className="home-user-header__content">
-        <p className="home-user-header__name" title={displayName}>
-          {displayName}
-        </p>
-      </div>
-      <ThemeToggle />
     </header>
   );
 };
