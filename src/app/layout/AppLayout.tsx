@@ -1,13 +1,12 @@
 import type { ReactElement } from "react";
 import { Outlet } from "react-router-dom";
 
-import { AppHeader } from "../../components/AppHeader";
+import { SharedAppLayout } from "../../shared/ui/layout/AppLayout";
 
 export const AppLayout = (): ReactElement => {
   return (
-    <div className="app-layout">
+    <SharedAppLayout>
       <Outlet />
-      <AppHeader />
-    </div>
+    </SharedAppLayout>
   );
 };

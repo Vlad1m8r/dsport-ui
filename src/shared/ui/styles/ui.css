@@ -1,7 +1,7 @@
 .ui-app-layout {
   min-height: 100dvh;
   padding-top: var(--content-top);
-  padding-bottom: calc(var(--content-bottom) + var(--safe-bottom));
+  padding-bottom: calc(var(--content-bottom) + var(--safe-bottom) + 80px);
 }
 
 .ui-card {
