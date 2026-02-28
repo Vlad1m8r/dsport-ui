@@ -36,7 +36,7 @@
   - press-feedback через CSS и `prefers-reduced-motion`
 - HomeSlider (`src/widgets/home/HomeSlider.tsx`)
   - 3 слайда, свайп pointer/touch без внешних библиотек
-  - контент: `Календарь (заглушка)` и `В разработке`
+  - первый слайд: календарь текущего месяца (дни + подсветка today), остальные: `В разработке`
 - FooterNav (`src/widgets/nav/FooterNav.tsx`)
   - фиксированная нижняя навигация (Назад/Главная/AI disabled)
   - учитывает `--safe-bottom`
