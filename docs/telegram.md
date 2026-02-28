@@ -10,7 +10,7 @@ Bot API/Telegram API/MTProto решают другие задачи: работ�
 
 ## 2) Key concepts (Mini Apps)
 - **`initData` vs `initDataUnsafe`**: `initData` (raw string) отправляется на backend и проверяется там; `initDataUnsafe` можно использовать только для UI/отладки, не для security-решений.
-- **`themeParams` / `colorScheme`**: источник цветов Telegram-темы; UI должен подстраиваться без хардкода фиксированной палитры.
+- **`themeParams` / `colorScheme`**: в текущей архитектуре не используются для палитры; цвета определяются только локальными токенами light/dark.
 - **`safeAreaInset` vs `contentSafeAreaInset`**: первое — системные вырезы/индикаторы устройства, второе — дополнительные отступы под UI Telegram.
 - **Viewport events**: изменения высоты WebView и клавиатуры отслеживаются через события Telegram WebApp (`viewportChanged`) и отражаются в layout.
 
@@ -37,10 +37,11 @@ Bot API/Telegram API/MTProto решают другие задачи: работ�
 - Использовать `min-height: 100dvh` и обновление layout на `viewportChanged`.
 
 ## 5) Theme & palette (Frontend SHOULD)
-- Базовые цвета брать из `themeParams`; не хардкодить палитру компонентов.
-- На `themeChanged` обязательно переобновлять CSS-переменные/токены в рантайме.
+- Палитра приложения определяется только локальными CSS tokens (`light`/`dark`).
+- `themeParams` и `colorScheme` Telegram не участвуют в выборе цветов.
+- Telegram WebApp используется в теме только для safe-area геометрии (`safeAreaInset` / `contentSafeAreaInset`).
 - Архитектура токенов: **base palette → semantic tokens → component tokens**.
-- Для кастомизации пользователем закладывать точку расширения через override ограниченного набора токенов (в первую очередь `primary`/`accent`), не ломая контраст и доступность.
+- Акцентный цвет фиксированно фиолетовый (`--accent`) в обоих режимах.
 
 ## 6) Telegram APIs and what we do NOT use
 - `core.telegram.org/api`, `schema`, `mtproto` описывают Telegram API/MTProto-уровень (клиент-серверный протокол Telegram и типы).
@@ -53,7 +54,7 @@ Bot API/Telegram API/MTProto решают другие задачи: работ�
 ### Frontend checklist
 - [ ] `initData` отправляется на backend во всех реальных API-запросах.
 - [ ] Учтены `safe area` и `content safe area` в базовом layout.
-- [ ] `themeParams`/`colorScheme` применяются для темы.
+- [ ] Цвета UI берутся только из локальных tokens (без `themeParams`).
 - [ ] Нет `100vh` в корневых контейнерах.
 
 ### Backend checklist

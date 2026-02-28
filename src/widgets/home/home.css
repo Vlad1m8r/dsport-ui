@@ -25,6 +25,11 @@
   background: color-mix(in srgb, var(--surface-2) 68%, var(--surface));
 }
 
+.home-user-header__content {
+  flex: 1;
+  min-width: 0;
+}
+
 .home-user-header__avatar,
 .home-user-header__avatar-image {
   width: 48px;
@@ -49,6 +54,9 @@
   line-height: 1.1;
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .home-main {

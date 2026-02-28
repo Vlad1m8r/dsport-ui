@@ -1,10 +1,8 @@
-import { getTelegramWebApp } from "../telegram";
+import { readTheme, writeTheme } from "./storage";
 
-export type ThemeMode = "telegram" | "light" | "dark" | "auto";
+export type ThemeMode = "light" | "dark";
 
-type ResolvedMode = "light" | "dark";
-
-const resolveAutoMode = (): ResolvedMode => {
+const resolveSystemMode = (): ThemeMode => {
   if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
     return "light";
   }
@@ -12,19 +10,17 @@ const resolveAutoMode = (): ResolvedMode => {
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 };
 
-const resolveMode = (mode: ThemeMode): ResolvedMode => {
-  if (mode === "light" || mode === "dark") {
-    return mode;
+const isThemeMode = (value: string): value is ThemeMode => {
+  return value === "light" || value === "dark";
+};
+
+export const getThemeMode = (): ThemeMode => {
+  if (typeof document === "undefined") {
+    return "light";
   }
 
-  if (mode === "telegram") {
-    const telegramMode = getTelegramWebApp()?.colorScheme;
-    if (telegramMode === "light" || telegramMode === "dark") {
-      return telegramMode;
-    }
-  }
-
-  return resolveAutoMode();
+  const mode = document.documentElement.dataset.mode;
+  return mode && isThemeMode(mode) ? mode : "light";
 };
 
 export const setThemeMode = (mode: ThemeMode): void => {
@@ -32,16 +28,17 @@ export const setThemeMode = (mode: ThemeMode): void => {
     return;
   }
 
-  const html = document.documentElement;
-  html.dataset.theme = mode;
-  html.dataset.mode = resolveMode(mode);
+  document.documentElement.dataset.mode = mode;
+  writeTheme(mode);
 };
 
 export const initThemeMode = (): void => {
-  if (getTelegramWebApp()) {
-    setThemeMode("telegram");
+  const storedMode = readTheme();
+
+  if (storedMode) {
+    setThemeMode(storedMode);
     return;
   }
 
-  setThemeMode("auto");
+  setThemeMode(resolveSystemMode());
 };
