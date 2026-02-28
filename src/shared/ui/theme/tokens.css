@@ -42,14 +42,25 @@
 }
 
 html[data-mode="light"] {
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --surface-2: #f4f6ff;
+  /* Мягкий светлый mesh-градиент (светло-голубой и нежный персиковый/пурпурный) */
+  --bg: radial-gradient(circle at top right, #e0e7ff 0%, #f8fafc 40%, #fae8ff 100%);
+
+  /* Полупрозрачные белые поверхности для матового стекла */
+  --surface: rgba(255, 255, 255, 0.65);
+  --surface-2: rgba(255, 255, 255, 0.4);
+
   --text: #0f172a;
   --text-muted: #64748b;
-  --border: #d9dfeb;
-  --accent: #7c3aed;
+
+  /* Плотная белая рамка для эффекта блика на кромке стекла */
+  --border: rgba(255, 255, 255, 0.8);
+
+  --accent: #4f46e5;
   --accent-contrast: #ffffff;
+
+  /* Мягкие прозрачные тени */
+  --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 32px rgba(15, 23, 42, 0.08);
 }
 
 html[data-mode="dark"] {
