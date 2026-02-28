@@ -247,9 +247,9 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-2);
-  padding: 0;
+  padding: var(--space-2);
   border-radius: var(--radius-pill);
-  background: transparent;
+  background: color-mix(in srgb, var(--surface-2) 76%, var(--surface));
 }
 
 .footer-nav__button {

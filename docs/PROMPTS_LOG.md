@@ -1,3 +1,16 @@
+## D4.6 — Footer: капсула для нижней навигации
+Сделано:
+- В `FooterNav` визуально возвращена капсула-контейнер для группы нижних кнопок.
+- `footer-nav__inner` получил:
+  - внутренний `padding`,
+  - pill-radius,
+  - мягкий фон на токенах (`surface/surface-2`) без хардкода цветов.
+- Кнопки остались внутри общей капсулы и сохраняют accent-цвет.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## D4.5 — Home: header строго в content-safe-area + центрирование middle-блока
 Сделано:
 - Для Home добавлена явная опора на `--tg-content-safe-area-inset-top/bottom`:
