@@ -53,14 +53,22 @@ html[data-mode="light"] {
 }
 
 html[data-mode="dark"] {
-  --bg: #0f172a;
-  --surface: #111827;
-  --surface-2: #1f2937;
-  --text: #e2e8f0;
-  --text-muted: #94a3b8;
-  --border: #334155;
-  --accent: #7c3aed;
+  /* Делаем фон неоднородным, чтобы стекло красиво его размывало */
+  --bg: radial-gradient(circle at top left, #23153c 0%, #0d0914 50%, #09060d 100%);
+
+  /* Полупрозрачные поверхности для эффекта стекла */
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.08);
+
+  --text: #f8fafc;
+  --text-muted: rgba(255, 255, 255, 0.5);
+
+  /* Тонкая граница для имитации блика на стекле */
+  --border: rgba(255, 255, 255, 0.1);
+
+  --accent: #a855f7;
   --accent-contrast: #ffffff;
-  --shadow-sm: 0 1px 2px rgba(2, 6, 23, 0.4);
-  --shadow-md: 0 8px 24px rgba(2, 6, 23, 0.5);
+
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
