@@ -26,6 +26,25 @@
 - SharedAppLayout (`src/shared/ui/layout/AppLayout.tsx`)
 - UI styles (`src/shared/ui/styles/ui.css`)
 
+
+### Home widgets (D4)
+- UserHeader (`src/widgets/home/UserHeader.tsx`)
+  - капсула с аватаром и display name Telegram
+  - fallback: инициалы и `Пользователь`
+- ActionTile (`src/widgets/home/ActionTile.tsx`)
+  - квадратный tile 84x84 + подпись снизу
+  - press-feedback через CSS и `prefers-reduced-motion`
+- HomeSlider (`src/widgets/home/HomeSlider.tsx`)
+  - 3 слайда, свайп pointer/touch без внешних библиотек
+  - контент: `Календарь (заглушка)` и `В разработке`
+- FooterNav (`src/widgets/nav/FooterNav.tsx`)
+  - фиксированная нижняя навигация (Назад/Главная/AI disabled)
+  - учитывает `--safe-bottom`
+- SharedAppLayout (`src/shared/ui/layout/AppLayout.tsx`)
+  - общий layout для всех страниц + persistent FooterNav
+- Home styles (`src/widgets/home/home.css`)
+  - iOS minimal dark spacing/радиусы через токены и CSS vars
+
 ### Layout
 - AppLayout
   - учитывает content safe area

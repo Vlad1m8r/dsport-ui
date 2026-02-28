@@ -1,0 +1,201 @@
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: calc(var(--content-top) + var(--space-3));
+  padding-bottom: calc(72px + var(--safe-bottom) + var(--space-3));
+}
+
+.home-user-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.home-user-header__avatar,
+.home-user-header__avatar-image {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-pill);
+}
+
+.home-user-header__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  overflow: hidden;
+}
+
+.home-user-header__name {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.home-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.home-action-tile {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+}
+
+.home-action-tile__box {
+  width: 84px;
+  aspect-ratio: 1;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-action-tile__label {
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.home-action-tile__icon {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+
+.home-action-tile:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.home-action-tile:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-lg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-action-tile {
+    transition: transform var(--motion-fast) var(--ease-standard),
+      opacity var(--motion-fast) var(--ease-standard);
+  }
+}
+
+.home-slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.home-slider__viewport {
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+}
+
+.home-slider__track {
+  display: grid;
+  grid-template-columns: repeat(3, 100%);
+  transform: translateX(calc(var(--index) * -100%));
+  transition: transform var(--motion-normal) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-slider__track {
+    transition: none;
+  }
+}
+
+.home-slider__slide {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text);
+  padding: var(--space-6);
+}
+
+.home-slider__slide-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.home-slider__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.home-slider__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--border);
+}
+
+.home-slider__dot--active {
+  background: var(--accent);
+}
+
+.footer-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: var(--space-2) var(--space-4) calc(var(--safe-bottom) + var(--space-2));
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.footer-nav__inner {
+  max-width: 540px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.footer-nav__button {
+  min-height: 44px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.footer-nav__button--active {
+  color: var(--accent);
+}
+
+.footer-nav__button:disabled {
+  opacity: 0.5;
+}

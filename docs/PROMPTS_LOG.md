@@ -1,3 +1,16 @@
+## D4 — Home screen (iOS minimal dark) + persistent footer
+Сделано:
+- Пересобран `HomePage` под новую структуру виджетов: `UserHeader`, `ActionTile`, `HomeSlider`; добавлена навигация на `/templates`, `/start`, `/workouts`.
+- Добавлены helper-функции Telegram user view: `getTgUserView`, `getDisplayName`, `getInitials` с fallback-правилами (`@username` → `First Last` → `Пользователь`; инициалы или `U`).
+- Добавлены action-иконки в `src/shared/assets/icons/` (`templates.svg`, `start.svg`, `history.svg`) с `currentColor`.
+- Добавлен `FooterNav` и подключён в `SharedAppLayout`: фиксированный footer виден на всех страницах, учитывает `--safe-bottom`, `AI` выключен.
+- Home slider реализован без библиотек через pointer/touch обработчики: свайп > 40px переключает индекс (0..2), слайды `Календарь (заглушка)` и `В разработке`.
+- Обновлены layout-отступы для контента (`ui-app-layout`) под persistent footer без перекрытия контента.
+- Обновлены docs: `docs/component-map.md` и текущий лог.
+
+Проверка:
+- `npm run build` — ok
+
 ## D3 — Base UI kit + wiring
 Сделано:
 - Добавлен базовый UI-kit в shared-слое: `Button`, `IconButton`, `Card`, `Input`, `SearchInput`, `EmptyState`, `SkeletonLine/SkeletonCard`, `ModalSheet`, `AutosaveIndicator`, `SharedAppLayout`.
