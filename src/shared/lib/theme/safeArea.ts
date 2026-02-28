@@ -17,10 +17,19 @@ const setInsetVars = (safeInset?: TelegramInsets, contentInset?: TelegramInsets)
 
   const rootStyle = document.documentElement.style;
 
-  rootStyle.setProperty("--safe-top", toInsetPx(safeInset?.top));
-  rootStyle.setProperty("--safe-bottom", toInsetPx(safeInset?.bottom));
-  rootStyle.setProperty("--content-top", toInsetPx(contentInset?.top));
-  rootStyle.setProperty("--content-bottom", toInsetPx(contentInset?.bottom));
+  const safeTop = toInsetPx(safeInset?.top);
+  const safeBottom = toInsetPx(safeInset?.bottom);
+  const contentTop = toInsetPx(contentInset?.top);
+  const contentBottom = toInsetPx(contentInset?.bottom);
+
+  rootStyle.setProperty("--safe-top", safeTop);
+  rootStyle.setProperty("--safe-bottom", safeBottom);
+  rootStyle.setProperty("--content-top", contentTop);
+  rootStyle.setProperty("--content-bottom", contentBottom);
+  rootStyle.setProperty("--tg-safe-area-inset-top", safeTop);
+  rootStyle.setProperty("--tg-safe-area-inset-bottom", safeBottom);
+  rootStyle.setProperty("--tg-content-safe-area-inset-top", contentTop);
+  rootStyle.setProperty("--tg-content-safe-area-inset-bottom", contentBottom);
 };
 
 export const applySafeAreaInsets = (): void => {

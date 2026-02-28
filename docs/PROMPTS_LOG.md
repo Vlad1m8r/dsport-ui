@@ -1,3 +1,16 @@
+## D4.5 — Home: header строго в content-safe-area + центрирование middle-блока
+Сделано:
+- Для Home добавлена явная опора на `--tg-content-safe-area-inset-top/bottom`:
+  - header теперь гарантированно стартует внутри content safe area и не заходит под Telegram UI.
+- Пересчитана доступная высота Home с учётом content/safe insets, внешних app-padding и fixed footer.
+- Middle-зона (`home-main`) центрируется между header и footer (`justify-content: center`), поэтому action-кнопки и календарь визуально находятся по центру доступного пространства.
+- В `tokens.css` safe/content переменные теперь по умолчанию берутся из Telegram CSS vars.
+- В `safeArea.ts` дополнительно синхронизируются Telegram CSS vars (`--tg-safe-area-inset-*`, `--tg-content-safe-area-inset-*`) из SDK inset-данных.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## D4.4 — Home: header в safe-area и полностью без вертикального скролла
 Сделано:
 - Перестроен layout Home: добавлен контейнер `home-main`, чтобы action-кнопки и календарь стабильно находились между верхним header и fixed footer.
