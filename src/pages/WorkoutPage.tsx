@@ -26,6 +26,10 @@ import { useWorkout, workoutQueryKey } from "../features/workouts/view/queries";
 import { useExerciseLastMax } from "../features/exercises/stats/queries";
 import { useFinishWorkout } from "../features/workouts/finish/queries";
 import type { ApiError } from "../shared/api/http";
+import { Button } from "../shared/ui/button/Button";
+import { IconButton } from "../shared/ui/button/IconButton";
+import { Card } from "../shared/ui/card/Card";
+import { AutosaveIndicator } from "../shared/ui/status/AutosaveIndicator";
 
 import "./WorkoutPage.css";
 
@@ -52,6 +56,7 @@ type ExerciseType = "REPS_WEIGHT" | "TIME";
 
 type ExerciseCardProps = {
   workoutExercise: WorkoutExerciseResponse;
+  isCollapsed: boolean;
   isReadOnly: boolean;
   isFinished: boolean;
   highlightEmptyFields: boolean;
@@ -68,6 +73,7 @@ type ExerciseCardProps = {
   onAddSet: (workoutExerciseId: number, nextOrderIndex: number, exerciseType: ExerciseType) => void;
   onDeleteSet: (workoutExerciseId: number, setEntryId: number) => void;
   onDeleteExercise: (workoutExerciseId: number) => void;
+  onToggleCollapse: () => void;
 };
 
 const formatDateTime = (value?: string): string => {
@@ -232,6 +238,7 @@ const getNextOrderIndex = (items: Array<{ orderIndex?: number }> | undefined): n
 
 const ExerciseCard = ({
   workoutExercise,
+  isCollapsed,
   isReadOnly,
   isFinished,
   highlightEmptyFields,
@@ -242,6 +249,7 @@ const ExerciseCard = ({
   onAddSet,
   onDeleteSet,
   onDeleteExercise,
+  onToggleCollapse,
 }: ExerciseCardProps): ReactElement => {
   const exerciseId = workoutExercise.exerciseId ?? null;
   const lastMaxQuery = useExerciseLastMax(
@@ -281,7 +289,7 @@ const ExerciseCard = ({
   const exerciseTitle = getWorkoutExerciseName(workoutExercise);
 
   return (
-    <article className="workout-card">
+    <Card as="article" className="workout-card">
       <header className="workout-card__header">
         <div>
           <h2 className="workout-card__title">{exerciseTitle}</h2>
@@ -293,25 +301,35 @@ const ExerciseCard = ({
             <p className="workout-card__hint">Не удалось загрузить last-max.</p>
           ) : null}
         </div>
-        {!isFinished ? (
-          <button
-            type="button"
-            className="workout-card__ghost-button"
-            onClick={() => {
-              if (typeof workoutExerciseId === "number") {
-                onDeleteExercise(workoutExerciseId);
-              }
-            }}
-            disabled={isReadOnly || typeof workoutExerciseId !== "number"}
-          >
-            Удалить упражнение
-          </button>
-        ) : null}
+        <div className="workout-card__header-actions">
+          <IconButton
+            icon={isCollapsed ? "⌄" : "⌃"}
+            label={isCollapsed ? "Развернуть упражнение" : "Свернуть упражнение"}
+            variant="secondary"
+            onClick={onToggleCollapse}
+          />
+          {!isFinished ? (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (typeof workoutExerciseId === "number") {
+                  onDeleteExercise(workoutExerciseId);
+                }
+              }}
+              disabled={isReadOnly || typeof workoutExerciseId !== "number"}
+            >
+              Удалить упражнение
+            </Button>
+          ) : null}
+        </div>
       </header>
 
-      {sortedSets.length === 0 ? <p>Подходов пока нет.</p> : null}
+      {!isCollapsed && sortedSets.length === 0 ? <p>Подходов пока нет.</p> : null}
 
-      {sortedSets.map((setEntry, index) => {
+      {isCollapsed ? <p className="workout-card__hint">Подходы скрыты</p> : null}
+
+      {!isCollapsed
+        ? sortedSets.map((setEntry, index) => {
         const setKey = getSetKey(workoutExerciseId, setEntry, index);
         const draft = setDrafts[setKey];
         const status = draft?.status ?? "idle";
@@ -322,46 +340,37 @@ const ExerciseCard = ({
         const weightValue = formatNumber(values.weight);
         const durationValue = formatNumber(values.durationSeconds);
 
-        return (
+            const isCompleted = validation.isValid;
+
+            return (
           <div
             key={setKey}
-            className={`workout-card__set${isInvalid ? " workout-card__set--invalid" : ""}`}
+            className={`workout-card__set setRow${isInvalid ? " setRow--invalid" : ""}${isCompleted ? " setRow--completed" : ""}`}
           >
             <div className="workout-card__set-header">
               <span className="workout-card__set-title">
                 Подход {setEntry.orderIndex ?? index + 1}
               </span>
               <div className="workout-card__set-actions">
-                {status === "saving" ? (
-                  <span className="workout-card__set-status">сохранение…</span>
-                ) : null}
-                {status === "saved" ? (
-                  <span className="workout-card__set-status">сохранено</span>
-                ) : null}
-                {status === "error" ? (
-                  <span className="workout-card__set-status workout-card__set-status--error">
-                    ошибка
-                  </span>
-                ) : null}
                 {isInvalid ? (
                   <span className="workout-card__set-status workout-card__set-status--error">
                     нужно заполнить
                   </span>
                 ) : null}
                 {status === "error" ? (
-                  <button
-                    type="button"
+                  <Button
+                    variant="ghost"
+                    size="md"
                     className="workout-card__retry-button"
                     onClick={() => onRetrySetSave(setKey, setEntry, exerciseType)}
                     disabled={isReadOnly}
                   >
                     Повторить
-                  </button>
+                  </Button>
                 ) : null}
                 {!isFinished ? (
-                  <button
-                    type="button"
-                    className="workout-card__ghost-button"
+                  <Button
+                    variant="ghost"
                     onClick={() => {
                       if (
                         typeof workoutExerciseId === "number" &&
@@ -377,8 +386,11 @@ const ExerciseCard = ({
                     }
                   >
                     Удалить подход
-                  </button>
+                  </Button>
                 ) : null}
+                <div className="ui-autosave-slot">
+                  <AutosaveIndicator state={status} />
+                </div>
               </div>
             </div>
             <div className="workout-card__set-grid">
@@ -452,12 +464,12 @@ const ExerciseCard = ({
               ) : null}
             </div>
           </div>
-        );
-      })}
+            );
+          })
+        : null}
 
-      {!isFinished ? (
-        <button
-          type="button"
+      {!isFinished && !isCollapsed ? (
+        <Button
           className="workout-card__primary-button"
           onClick={() => {
             if (typeof workoutExerciseId === "number") {
@@ -467,9 +479,9 @@ const ExerciseCard = ({
           disabled={isReadOnly || typeof workoutExerciseId !== "number"}
         >
           Добавить подход
-        </button>
+        </Button>
       ) : null}
-    </article>
+    </Card>
   );
 };
 
@@ -490,6 +502,7 @@ export const WorkoutPage = (): ReactElement => {
   const [finishErrorCode, setFinishErrorCode] = useState<string | null>(null);
   const [forceReadOnly, setForceReadOnly] = useState<boolean>(false);
   const [finishAttempted, setFinishAttempted] = useState<boolean>(false);
+  const [collapsedExerciseIds, setCollapsedExerciseIds] = useState<Record<number, boolean>>({});
 
   const setDraftsRef = useRef<SetDraftMap>({});
   const debounceTimersRef = useRef<Record<string, number>>({});
@@ -546,6 +559,20 @@ export const WorkoutPage = (): ReactElement => {
     });
     return items;
   }, [workout?.exercises]);
+
+  useEffect(() => {
+    setCollapsedExerciseIds((current) => {
+      const next: Record<number, boolean> = {};
+      exercises.forEach((exercise, index) => {
+        if (typeof exercise.id !== "number") {
+          return;
+        }
+
+        next[exercise.id] = current[exercise.id] ?? index !== 0;
+      });
+      return next;
+    });
+  }, [exercises]);
 
   useEffect(() => {
     const pickedExerciseId = searchParams.get("pickedExerciseId");
@@ -1203,6 +1230,7 @@ export const WorkoutPage = (): ReactElement => {
             <ExerciseCard
               key={exerciseKey}
               workoutExercise={exercise}
+              isCollapsed={typeof exercise.id === "number" ? Boolean(collapsedExerciseIds[exercise.id]) : false}
               isReadOnly={isReadOnly}
               isFinished={isFinished}
               highlightEmptyFields={shouldHighlightEmptyFields}
@@ -1213,6 +1241,18 @@ export const WorkoutPage = (): ReactElement => {
               onAddSet={handleAddSet}
               onDeleteSet={handleDeleteSet}
               onDeleteExercise={handleDeleteExercise}
+              onToggleCollapse={() => {
+                const exerciseId = exercise.id;
+
+                if (typeof exerciseId !== "number") {
+                  return;
+                }
+
+                setCollapsedExerciseIds((current) => ({
+                  ...current,
+                  [exerciseId]: !current[exerciseId],
+                }));
+              }}
             />
           );
         })}

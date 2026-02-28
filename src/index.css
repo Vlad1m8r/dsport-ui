@@ -38,3 +38,15 @@ p {
 img {
   display: block;
 }
+
+
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+html,
+body {
+  touch-action: manipulation;
+}

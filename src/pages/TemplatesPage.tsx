@@ -7,6 +7,12 @@ import {
   useTemplatesQuery,
 } from "../features/templates/queries";
 import { useActiveWorkout } from "../features/workouts/history/queries";
+import { Button } from "../shared/ui/button/Button";
+import { Card } from "../shared/ui/card/Card";
+import { EmptyState } from "../shared/ui/empty/EmptyState";
+import { SkeletonCard, SkeletonLine } from "../shared/ui/skeleton/Skeleton";
+
+import "./TemplatesPage.css";
 
 export const TemplatesPage = (): ReactElement => {
   const navigate = useNavigate();
@@ -52,57 +58,86 @@ export const TemplatesPage = (): ReactElement => {
   };
 
   return (
-    <section>
-      <header>
+    <section className="templates-page">
+      <header className="templates-page__header">
         <h1>Шаблоны тренировок</h1>
-        <div>
-          <button
-            type="button"
+        <div className="templates-page__actions">
+          <Button
             onClick={handleCreateTemplate}
             disabled={createTemplateMutation.isPending || deleteMutation.isPending}
           >
             Создать шаблон
-          </button>
-          <Link to={workoutCtaLink} aria-busy={isActiveWorkoutLoading}>
+          </Button>
+          <Link
+            to={workoutCtaLink}
+            aria-busy={isActiveWorkoutLoading}
+            className="ui-button ui-button--secondary ui-button--md"
+          >
             {workoutCtaLabel}
           </Link>
-          <Link to="/workouts">История</Link>
+          <Link to="/workouts" className="ui-button ui-button--ghost ui-button--md">
+            История
+          </Link>
         </div>
       </header>
 
-      {isLoading ? <p>Загрузка...</p> : null}
-      {isError ? <p>Ошибка: {error?.message ?? "Не удалось загрузить шаблоны"}</p> : null}
+      {isLoading ? (
+        <SkeletonCard>
+          <SkeletonLine width="45%" height="18px" />
+          <SkeletonLine />
+          <SkeletonLine width="60%" />
+        </SkeletonCard>
+      ) : null}
+      {isError ? <p className="templates-page__error">Ошибка: {error?.message ?? "Не удалось загрузить шаблоны"}</p> : null}
       {deleteMutation.isError ? (
-        <p>Ошибка: {deleteMutation.error?.message ?? "Не удалось удалить шаблон"}</p>
+        <p className="templates-page__error">Ошибка: {deleteMutation.error?.message ?? "Не удалось удалить шаблон"}</p>
       ) : null}
       {createTemplateMutation.isError ? (
-        <p>Ошибка: {createTemplateMutation.error?.message ?? "Не удалось создать шаблон"}</p>
+        <p className="templates-page__error">Ошибка: {createTemplateMutation.error?.message ?? "Не удалось создать шаблон"}</p>
       ) : null}
 
-      {data && data.length === 0 ? <p>Шаблоны пока не созданы.</p> : null}
+      {data && data.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon="🧩"
+            title="Шаблоны пока не созданы"
+            description="Создай первый шаблон, чтобы быстро запускать тренировки."
+            actionLabel="Создать шаблон"
+            onAction={handleCreateTemplate}
+          />
+        </Card>
+      ) : null}
 
-      <ul>
+      <ul className="templates-page__list">
         {data?.map((template) => (
-          <li key={template.id ?? template.name ?? "template-without-id"}>
-            <div>
-              <strong>{template.name ?? "Без названия"}</strong>
-              <span>Упражнений: {template.exercises?.length ?? 0}</span>
+          <Card as="li" key={template.id ?? template.name ?? "template-without-id"}>
+            <div className="templates-page__item-header">
+              <div>
+                <h2 className="templates-page__item-title">{template.name ?? "Без названия"}</h2>
+                <span className="templates-page__item-meta">
+                  Упражнений: {template.exercises?.length ?? 0}
+                </span>
+              </div>
+              <div className="templates-page__item-actions">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => handleEdit(template.id)}
+                  disabled={deleteMutation.isPending}
+                >
+                  Изменить
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => handleDelete(template.id)}
+                  disabled={deleteMutation.isPending}
+                >
+                  Удалить
+                </Button>
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={() => handleEdit(template.id)}
-              disabled={deleteMutation.isPending}
-            >
-              Изменить
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDelete(template.id)}
-              disabled={deleteMutation.isPending}
-            >
-              Удалить
-            </button>
-          </li>
+          </Card>
         ))}
       </ul>
     </section>

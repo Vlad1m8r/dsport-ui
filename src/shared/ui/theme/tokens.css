@@ -35,10 +35,10 @@
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08);
   --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.12);
 
-  --safe-top: 0px;
-  --safe-bottom: 0px;
-  --content-top: 0px;
-  --content-bottom: 0px;
+  --safe-top: var(--tg-safe-area-inset-top, 0px);
+  --safe-bottom: var(--tg-safe-area-inset-bottom, 0px);
+  --content-top: var(--tg-content-safe-area-inset-top, 0px);
+  --content-bottom: var(--tg-content-safe-area-inset-bottom, 0px);
 
   --tg-theme-bg-color: var(--bg);
   --tg-theme-secondary-bg-color: var(--surface-2);

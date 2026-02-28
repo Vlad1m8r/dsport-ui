@@ -1,3 +1,123 @@
+## D4.7 — Fix рендера иконок: отказ от CSS mask в Home actions
+Сделано:
+- Исправлен рендер иконок action-тайлов на Home для Telegram WebView:
+  - убран подход с `mask-image` (из-за которого в части WebView показывались серые квадраты),
+  - иконки переведены на inline SVG-компоненты с `currentColor`.
+- Добавлен модуль `src/shared/ui/icons/HomeActionIcons.tsx` с иконками `TemplatesIcon`, `StartIcon`, `HistoryIcon`.
+- `HomePage` обновлён на использование новых SVG-компонентов вместо масок.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
+## D4.6 — Footer: капсула для нижней навигации
+Сделано:
+- В `FooterNav` визуально возвращена капсула-контейнер для группы нижних кнопок.
+- `footer-nav__inner` получил:
+  - внутренний `padding`,
+  - pill-radius,
+  - мягкий фон на токенах (`surface/surface-2`) без хардкода цветов.
+- Кнопки остались внутри общей капсулы и сохраняют accent-цвет.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
+## D4.5 — Home: header строго в content-safe-area + центрирование middle-блока
+Сделано:
+- Для Home добавлена явная опора на `--tg-content-safe-area-inset-top/bottom`:
+  - header теперь гарантированно стартует внутри content safe area и не заходит под Telegram UI.
+- Пересчитана доступная высота Home с учётом content/safe insets, внешних app-padding и fixed footer.
+- Middle-зона (`home-main`) центрируется между header и footer (`justify-content: center`), поэтому action-кнопки и календарь визуально находятся по центру доступного пространства.
+- В `tokens.css` safe/content переменные теперь по умолчанию берутся из Telegram CSS vars.
+- В `safeArea.ts` дополнительно синхронизируются Telegram CSS vars (`--tg-safe-area-inset-*`, `--tg-content-safe-area-inset-*`) из SDK inset-данных.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
+## D4.4 — Home: header в safe-area и полностью без вертикального скролла
+Сделано:
+- Перестроен layout Home: добавлен контейнер `home-main`, чтобы action-кнопки и календарь стабильно находились между верхним header и fixed footer.
+- `home-page` привязан к доступной высоте viewport с учётом `content/safe` insets и высоты footer, добавлены `overflow: hidden` + `overscroll-behavior: none`.
+- Header выровнен в верхней части экрана (внутри safe-area), без налезания Telegram UI.
+- Доработаны вертикальные отступы, чтобы блоки не «уезжали» и не провоцировали общий скролл экрана.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
+## D4.3 — Home: логика «Продолжить» для активной тренировки + смещение ниже
+Сделано:
+- На Home возвращена логика active workout для центральной action-кнопки:
+  - если есть `IN_PROGRESS` тренировка (`useActiveWorkout`), кнопка показывает `Продолжить` и ведёт на `/workouts/:id`;
+  - если активной нет — показывает `Начать тренировку` и ведёт на `/start`.
+- Визуально блок action-кнопок и календарь опущены немного ниже:
+  - увеличен верхний отступ страницы,
+  - добавлены дополнительные `margin-top` у секций actions и slider.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
+## D4.2 — Home без скролла + отключение zoom + footer accent
+Сделано:
+- Главный экран переведён в не-скроллящийся режим: `home-page` теперь фиксируется по высоте viewport и работает без вертикального скролла.
+- Глобально отключён zoom/пинч в viewport (`index.html`: `maximum-scale=1.0`, `user-scalable=no`, `viewport-fit=cover`).
+- Устранён iOS auto-zoom при фокусе на input: для `input/textarea/select` установлен `font-size: 16px`.
+- Footer упрощён по визуалу:
+  - убрана задняя подложка у footer и внутреннего контейнера,
+  - убраны обводки кнопок внутри footer,
+  - цвет кнопок footer переведён на `accent`.
+- Дополнительно увеличена высота слайдов (`320px`) для более плотной композиции на Home.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
+## D4.1 — Home: мягкая тёмная стилистика + реальный календарь
+Сделано:
+- На Home обновлены визуальные стили в сторону мягкой тёмной палитры на токенах (`color-mix` + `--surface/--surface-2/--text`), убраны заметные обводки у header/action tiles/календаря.
+- В `HomeSlider` вместо текста-заглушки реализован реальный календарь текущего месяца:
+  - заголовок с месяцем и годом,
+  - сетка дней недели,
+  - 6x7 календарная матрица с датами текущего месяца и соседних месяцев,
+  - подсветка текущей даты.
+- Увеличена высота блока календаря (`min-height: 280px`) для более читаемого контента.
+- Сохранён порядок секций: action-кнопки над календарём, календарь над fixed footer.
+- Усилен нижний отступ контента `home-page`, чтобы календарь не перекрывался footer и safe-area.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
+## D4 — Home screen (iOS minimal dark) + persistent footer
+Сделано:
+- Пересобран `HomePage` под новую структуру виджетов: `UserHeader`, `ActionTile`, `HomeSlider`; добавлена навигация на `/templates`, `/start`, `/workouts`.
+- Добавлены helper-функции Telegram user view: `getTgUserView`, `getDisplayName`, `getInitials` с fallback-правилами (`@username` → `First Last` → `Пользователь`; инициалы или `U`).
+- Добавлены action-иконки в `src/shared/assets/icons/` (`templates.svg`, `start.svg`, `history.svg`) с `currentColor`.
+- Добавлен `FooterNav` и подключён в `SharedAppLayout`: фиксированный footer виден на всех страницах, учитывает `--safe-bottom`, `AI` выключен.
+- Home slider реализован без библиотек через pointer/touch обработчики: свайп > 40px переключает индекс (0..2), слайды `Календарь (заглушка)` и `В разработке`.
+- Обновлены layout-отступы для контента (`ui-app-layout`) под persistent footer без перекрытия контента.
+- Обновлены docs: `docs/component-map.md` и текущий лог.
+
+Проверка:
+- `npm run build` — ok
+
+## D3 — Base UI kit + wiring
+Сделано:
+- Добавлен базовый UI-kit в shared-слое: `Button`, `IconButton`, `Card`, `Input`, `SearchInput`, `EmptyState`, `SkeletonLine/SkeletonCard`, `ModalSheet`, `AutosaveIndicator`, `SharedAppLayout`.
+- Добавлены общие стили `src/shared/ui/styles/ui.css` и подключение в `src/main.tsx`.
+- На `TemplatesPage` внедрены новые UI-компоненты: карточки шаблонов, кнопки, `EmptyState`, `Skeleton` для loading.
+- На `WorkoutPage` внедрены `Card` и `Button`, добавлен `AutosaveIndicator` в правый фиксированный слот строки подхода.
+- Добавлены стили `setRow` для completion/invalid подсветки; invalid-инпуты подсвечиваются через semantic vars.
+- Добавлен базовый collapse для упражнений на WorkoutPage: по умолчанию открыт первый блок, остальные свернуты; добавлен toggle в header.
+- Обновлены docs: `docs/component-map.md` и `docs/PROMPTS_LOG.md`.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## D2 — Theme/Tokens infra (iOS minimal, accent purple)
 Сделано:
 - Добавлена базовая система semantic-токенов в `src/shared/ui/theme/tokens.css` с дефолтами для `light/dark`, fallback accent = purple и системными переменными для радиусов, отступов, motion, shadows.
