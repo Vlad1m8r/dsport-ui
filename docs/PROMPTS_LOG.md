@@ -1,3 +1,15 @@
+## D4.7 — Fix рендера иконок: отказ от CSS mask в Home actions
+Сделано:
+- Исправлен рендер иконок action-тайлов на Home для Telegram WebView:
+  - убран подход с `mask-image` (из-за которого в части WebView показывались серые квадраты),
+  - иконки переведены на inline SVG-компоненты с `currentColor`.
+- Добавлен модуль `src/shared/ui/icons/HomeActionIcons.tsx` с иконками `TemplatesIcon`, `StartIcon`, `HistoryIcon`.
+- `HomePage` обновлён на использование новых SVG-компонентов вместо масок.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## D4.6 — Footer: капсула для нижней навигации
 Сделано:
 - В `FooterNav` визуально возвращена капсула-контейнер для группы нижних кнопок.
