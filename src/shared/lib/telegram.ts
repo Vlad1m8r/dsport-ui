@@ -4,11 +4,38 @@ export type TelegramUser = {
   photo_url?: string;
 };
 
+export type TelegramThemeParams = {
+  bg_color?: string;
+  secondary_bg_color?: string;
+  text_color?: string;
+  hint_color?: string;
+  button_color?: string;
+  button_text_color?: string;
+};
+
+export type TelegramInsets = {
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+type TelegramEventName = "themeChanged" | "viewportChanged";
+type TelegramEventHandler = () => void;
+
 export type TelegramWebApp = {
   initData?: string;
   initDataUnsafe?: {
     user?: TelegramUser;
   };
+  colorScheme?: "light" | "dark";
+  themeParams?: TelegramThemeParams;
+  safeAreaInset?: TelegramInsets;
+  contentSafeAreaInset?: TelegramInsets;
+  ready?: () => void;
+  expand?: () => void;
+  onEvent?: (event: TelegramEventName, handler: TelegramEventHandler) => void;
+  offEvent?: (event: TelegramEventName, handler: TelegramEventHandler) => void;
 };
 
 type TelegramNamespace = {
@@ -19,12 +46,18 @@ type TelegramWindow = Window & {
   Telegram?: TelegramNamespace;
 };
 
-const getTelegramWebApp = (): TelegramWebApp | undefined => {
+export const getTelegramWebApp = (): TelegramWebApp | undefined => {
   if (typeof window === "undefined") {
     return undefined;
   }
 
   return (window as TelegramWindow).Telegram?.WebApp;
+};
+
+export const prepareTelegramWebApp = (): void => {
+  const telegramWebApp = getTelegramWebApp();
+  telegramWebApp?.ready?.();
+  telegramWebApp?.expand?.();
 };
 
 export const getInitData = (): string => {

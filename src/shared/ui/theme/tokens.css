@@ -1,0 +1,71 @@
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-2: #eef2ff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #cbd5e1;
+  --accent: #7c3aed;
+  --accent-contrast: #ffffff;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+
+  --motion-fast: 120ms;
+  --motion-normal: 220ms;
+  --motion-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.12);
+
+  --safe-top: 0px;
+  --safe-bottom: 0px;
+  --content-top: 0px;
+  --content-bottom: 0px;
+
+  --tg-theme-bg-color: var(--bg);
+  --tg-theme-secondary-bg-color: var(--surface-2);
+  --tg-theme-text-color: var(--text);
+  --tg-theme-hint-color: var(--text-muted);
+  --tg-theme-link-color: var(--accent);
+  --tg-theme-button-color: var(--accent);
+  --tg-theme-button-text-color: var(--accent-contrast);
+  --tg-theme-destructive-text-color: var(--danger);
+}
+
+html[data-mode="light"] {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-2: #eef2ff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #cbd5e1;
+}
+
+html[data-mode="dark"] {
+  --bg: #0f172a;
+  --surface: #111827;
+  --surface-2: #1f2937;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --shadow-sm: 0 1px 2px rgba(2, 6, 23, 0.4);
+  --shadow-md: 0 8px 24px rgba(2, 6, 23, 0.5);
+}

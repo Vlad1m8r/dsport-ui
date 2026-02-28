@@ -1,72 +1,35 @@
-import { useCallback, useEffect, type ReactElement } from "react";
-import WebApp, { applyThemeParams } from "@twa-dev/sdk";
+import { useEffect, type ReactElement } from "react";
 import { Outlet } from "react-router-dom";
 
+import {
+  getTelegramWebApp,
+  prepareTelegramWebApp,
+} from "./shared/lib/telegram";
+import { initThemeMode } from "./shared/lib/theme/mode";
+import { applySafeAreaInsets, bindViewportEvents } from "./shared/lib/theme/safeArea";
+import {
+  applyTelegramTheme,
+  bindTelegramThemeEvents,
+} from "./shared/lib/theme/telegram";
 import "./App.css";
 
-const DEFAULT_THEME: Record<string, string> = {
-  "--tg-theme-bg-color": "#ffffff",
-  "--tg-theme-text-color": "#0f172a",
-  "--tg-theme-hint-color": "#64748b",
-  "--tg-theme-button-color": "#2563eb",
-  "--tg-theme-button-text-color": "#ffffff",
-  "--tg-theme-secondary-bg-color": "#e2e8f0",
-  "--tg-theme-link-color": "#2563eb",
-};
-
-const extractThemeParams = (): Record<string, string> => {
-  const nextTheme = { ...DEFAULT_THEME };
-
-  if (WebApp.themeParams.bg_color) {
-    nextTheme["--tg-theme-bg-color"] = WebApp.themeParams.bg_color;
-  }
-  if (WebApp.themeParams.text_color) {
-    nextTheme["--tg-theme-text-color"] = WebApp.themeParams.text_color;
-  }
-  if (WebApp.themeParams.hint_color) {
-    nextTheme["--tg-theme-hint-color"] = WebApp.themeParams.hint_color;
-  }
-  if (WebApp.themeParams.button_color) {
-    nextTheme["--tg-theme-button-color"] = WebApp.themeParams.button_color;
-  }
-  if (WebApp.themeParams.button_text_color) {
-    nextTheme["--tg-theme-button-text-color"] = WebApp.themeParams.button_text_color;
-  }
-  if (WebApp.themeParams.secondary_bg_color) {
-    nextTheme["--tg-theme-secondary-bg-color"] = WebApp.themeParams.secondary_bg_color;
-  }
-  if (WebApp.themeParams.link_color) {
-    nextTheme["--tg-theme-link-color"] = WebApp.themeParams.link_color;
-  }
-
-  return nextTheme;
-};
-
 function App(): ReactElement {
-  const applyCssVariables = useCallback((variables: Record<string, string>): void => {
-    const root = document.documentElement;
-    Object.entries(variables).forEach(([key, value]) => {
-      root.style.setProperty(key, value);
-    });
-  }, []);
-
   useEffect(() => {
-    WebApp.ready();
-    WebApp.expand();
-    applyThemeParams(WebApp.themeParams);
-    applyCssVariables(extractThemeParams());
+    prepareTelegramWebApp();
+    initThemeMode();
+    applySafeAreaInsets();
 
-    const handleThemeChange = (): void => {
-      applyThemeParams(WebApp.themeParams);
-      applyCssVariables(extractThemeParams());
-    };
+    const cleanups: Array<() => void> = [bindViewportEvents()];
 
-    WebApp.onEvent("themeChanged", handleThemeChange);
+    if (getTelegramWebApp()) {
+      applyTelegramTheme();
+      cleanups.push(bindTelegramThemeEvents());
+    }
 
     return () => {
-      WebApp.offEvent("themeChanged", handleThemeChange);
+      cleanups.forEach((cleanup) => cleanup());
     };
-  }, [applyCssVariables]);
+  }, []);
 
   return (
     <main className="app">

@@ -1,3 +1,32 @@
+## D2 — Theme/Tokens infra (iOS minimal, accent purple)
+Сделано:
+- Добавлена базовая система semantic-токенов в `src/shared/ui/theme/tokens.css` с дефолтами для `light/dark`, fallback accent = purple и системными переменными для радиусов, отступов, motion, shadows.
+- Добавлен менеджер режима темы `src/shared/lib/theme/mode.ts`:
+  - `ThemeMode = telegram | light | dark | auto`
+  - синхронизация `html[data-theme]` и `html[data-mode]`
+  - выбор режима из `Telegram.WebApp.colorScheme` или `prefers-color-scheme`.
+- Добавлен bridge Telegram-темы `src/shared/lib/theme/telegram.ts`:
+  - чтение `themeParams`
+  - маппинг в semantic vars (`--bg`, `--surface`, `--surface-2`, `--text`, `--text-muted`, `--accent`, `--accent-contrast`)
+  - подписка на `themeChanged` с cleanup.
+- Добавлены safe area helpers `src/shared/lib/theme/safeArea.ts`:
+  - применение `safeAreaInset/contentSafeAreaInset` в `--safe-top/--safe-bottom/--content-top/--content-bottom`
+  - подписки на `resize`, `visualViewport.resize` и `viewportChanged` с debounce.
+- Обновлён entry и корневая инициализация:
+  - `src/main.tsx` импортирует `tokens.css`
+  - `src/App.tsx` инициализирует theme mode/safe area/telegram bridge и cleanup событий.
+- Обновлены базовые стили (`src/index.css`, `src/App.css`):
+  - переход на semantic vars
+  - `100vh` заменён на `100dvh`
+  - добавлены padding с учётом content safe area и safe-bottom.
+
+DEV notes:
+- Вне Telegram используются fallback токены и `ThemeMode=auto`.
+- Если Telegram WebApp недоступен, safe area vars выставляются в `0px`.
+- Fallback accent (purple) сохраняется, если `themeParams.button_color` отсутствует.
+
+Проверка:
+- `npm run build` — ok
 ## F14 — WorkoutPage: чистый read-only для завершённой тренировки
 Сделано:
 - На `/workouts/:id` рендер read-only теперь явно завязан на `workout.finishedAt`.
