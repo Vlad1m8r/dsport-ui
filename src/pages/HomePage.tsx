@@ -49,25 +49,27 @@ export const HomePage = (): ReactElement => {
         photoUrl={user.photoUrl}
       />
 
-      <section className="home-actions" aria-label="Основные действия">
-        <ActionTile
-          icon={<span className="home-action-tile__icon" style={createMaskStyle(templatesIcon)} />}
-          label="Шаблоны"
-          onClick={() => navigate("/templates")}
-        />
-        <ActionTile
-          icon={<span className="home-action-tile__icon" style={createMaskStyle(startIcon)} />}
-          label={startLabel}
-          onClick={handleStart}
-        />
-        <ActionTile
-          icon={<span className="home-action-tile__icon" style={createMaskStyle(historyIcon)} />}
-          label="История"
-          onClick={() => navigate("/workouts")}
-        />
-      </section>
+      <div className="home-main">
+        <section className="home-actions" aria-label="Основные действия">
+          <ActionTile
+            icon={<span className="home-action-tile__icon" style={createMaskStyle(templatesIcon)} />}
+            label="Шаблоны"
+            onClick={() => navigate("/templates")}
+          />
+          <ActionTile
+            icon={<span className="home-action-tile__icon" style={createMaskStyle(startIcon)} />}
+            label={startLabel}
+            onClick={handleStart}
+          />
+          <ActionTile
+            icon={<span className="home-action-tile__icon" style={createMaskStyle(historyIcon)} />}
+            label="История"
+            onClick={() => navigate("/workouts")}
+          />
+        </section>
 
-      <HomeSlider />
+        <HomeSlider />
+      </div>
     </section>
   );
 };

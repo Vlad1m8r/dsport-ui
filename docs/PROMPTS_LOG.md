@@ -1,3 +1,14 @@
+## D4.4 — Home: header в safe-area и полностью без вертикального скролла
+Сделано:
+- Перестроен layout Home: добавлен контейнер `home-main`, чтобы action-кнопки и календарь стабильно находились между верхним header и fixed footer.
+- `home-page` привязан к доступной высоте viewport с учётом `content/safe` insets и высоты footer, добавлены `overflow: hidden` + `overscroll-behavior: none`.
+- Header выровнен в верхней части экрана (внутри safe-area), без налезания Telegram UI.
+- Доработаны вертикальные отступы, чтобы блоки не «уезжали» и не провоцировали общий скролл экрана.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## D4.3 — Home: логика «Продолжить» для активной тренировки + смещение ниже
 Сделано:
 - На Home возвращена логика active workout для центральной action-кнопки:
