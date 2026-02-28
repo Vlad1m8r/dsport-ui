@@ -63,7 +63,16 @@ Bot API/Telegram API/MTProto решают другие задачи: работ�
 - [ ] Сравнение `hash` выполняется constant-time методом.
 - [ ] `initData` целиком не логируется.
 
-## 8) Links (official)
+
+## 8) Vertical swipes & Closing confirmation
+- Глобально при старте Mini App включаем защитные настройки WebApp API:
+  - `disableVerticalSwipes()` через `setVerticalSwipesEnabled(false)`
+  - `enableClosingConfirmation()` через `setClosingConfirmationEnabled(true)`
+- Зачем: снизить риск случайного закрытия/сворачивания во время ввода данных и ведения тренировки.
+- Ограничение: пользователь всё равно может закрыть Mini App через системные элементы Telegram (например, хедер/кнопку закрытия), подтверждение только добавляет дополнительный шаг.
+- Совместимость: вне Telegram и в клиентах без поддержки этих методов вызовы остаются безопасным no-op (без ошибок).
+
+## 9) Links (official)
 - Web Apps: https://core.telegram.org/bots/webapps
 - Content safe area inset: https://core.telegram.org/bots/webapps#contentsafeareainset
 - Telegram API: https://core.telegram.org/api
