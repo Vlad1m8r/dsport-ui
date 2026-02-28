@@ -1,10 +1,10 @@
 :root {
   --bg: #f8fafc;
   --surface: #ffffff;
-  --surface-2: #eef2ff;
+  --surface-2: #f4f6ff;
   --text: #0f172a;
   --text-muted: #64748b;
-  --border: #cbd5e1;
+  --border: #d9dfeb;
   --accent: #7c3aed;
   --accent-contrast: #ffffff;
   --success: #16a34a;
@@ -39,33 +39,47 @@
   --safe-bottom: var(--tg-safe-area-inset-bottom, 0px);
   --content-top: var(--tg-content-safe-area-inset-top, 0px);
   --content-bottom: var(--tg-content-safe-area-inset-bottom, 0px);
-
-  --tg-theme-bg-color: var(--bg);
-  --tg-theme-secondary-bg-color: var(--surface-2);
-  --tg-theme-text-color: var(--text);
-  --tg-theme-hint-color: var(--text-muted);
-  --tg-theme-link-color: var(--accent);
-  --tg-theme-button-color: var(--accent);
-  --tg-theme-button-text-color: var(--accent-contrast);
-  --tg-theme-destructive-text-color: var(--danger);
 }
 
 html[data-mode="light"] {
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --surface-2: #eef2ff;
+  /* Мягкий светлый mesh-градиент (светло-голубой и нежный персиковый/пурпурный) */
+  --bg: radial-gradient(circle at top right, #e0e7ff 0%, #f8fafc 40%, #fae8ff 100%);
+
+  /* Полупрозрачные белые поверхности для матового стекла */
+  --surface: rgba(255, 255, 255, 0.65);
+  --surface-2: rgba(255, 255, 255, 0.4);
+
   --text: #0f172a;
   --text-muted: #64748b;
-  --border: #cbd5e1;
+
+  /* Плотная белая рамка для эффекта блика на кромке стекла */
+  --border: rgba(255, 255, 255, 0.8);
+
+  --accent: #4f46e5;
+  --accent-contrast: #ffffff;
+
+  /* Мягкие прозрачные тени */
+  --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 32px rgba(15, 23, 42, 0.08);
 }
 
 html[data-mode="dark"] {
-  --bg: #0f172a;
-  --surface: #111827;
-  --surface-2: #1f2937;
-  --text: #e2e8f0;
-  --text-muted: #94a3b8;
-  --border: #334155;
-  --shadow-sm: 0 1px 2px rgba(2, 6, 23, 0.4);
-  --shadow-md: 0 8px 24px rgba(2, 6, 23, 0.5);
+  /* Делаем фон неоднородным, чтобы стекло красиво его размывало */
+  --bg: radial-gradient(circle at top left, #23153c 0%, #0d0914 50%, #09060d 100%);
+
+  /* Полупрозрачные поверхности для эффекта стекла */
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.08);
+
+  --text: #f8fafc;
+  --text-muted: rgba(255, 255, 255, 0.5);
+
+  /* Тонкая граница для имитации блика на стекле */
+  --border: rgba(255, 255, 255, 0.1);
+
+  --accent: #a855f7;
+  --accent-contrast: #ffffff;
+
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
 }

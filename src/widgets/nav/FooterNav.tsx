@@ -14,7 +14,6 @@ export const FooterNav = (): ReactElement => {
       navigate(-1);
       return;
     }
-
     navigate("/");
   };
 

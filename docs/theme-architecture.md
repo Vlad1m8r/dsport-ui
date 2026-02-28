@@ -1,64 +1,35 @@
-# Theme Architecture (Telegram themeParams + user palette)
+# Theme Architecture (local light/dark only)
 
 ## Goals
-- Поддержка Telegram themeParams + динамическое обновление на `themeChanged`.
-- Готовность к light/dark.
-- Подготовка к пользовательской палитре (override limited set).
-- Никаких хардкодов “ключевых” цветов в компонентах.
+- Используем только собственные темы `light` и `dark`.
+- Полностью отключаем Telegram `themeParams` и `colorScheme` как источник цветов.
+- Сохраняем safe-area интеграцию Telegram (только геометрия).
+- Все компоненты продолжают работать через CSS tokens из `tokens.css`.
 
 ## Sources of truth
-1) Telegram themeParams / colorScheme (runtime)
-2) App base tokens (fallback)
-3) User overrides (future)
+1) `src/shared/ui/theme/tokens.css` — базовые и режимные CSS переменные.
+2) `html[data-mode="light" | "dark"]` — активный режим темы.
+3) `localStorage["theme_mode"]` — сохранённый пользовательский выбор.
 
-Важно: Telegram — верхний приоритет для интеграции, но мы сохраняем читабельность.
+## Runtime flow
+1) На старте вызывается `initThemeMode()`.
+2) Если в `localStorage` есть `theme_mode`, применяется сохранённое значение.
+3) Если значения нет, дефолт определяется через `prefers-color-scheme`.
+4) `setThemeMode(mode)` обновляет `document.documentElement.dataset.mode` и сохраняет режим в `localStorage`.
 
-## Token layers
-### 1) Base palette
-Нейтральные шкалы (gray) + accent шкала.
-Храним как CSS vars:
-- --c-gray-0 ... --c-gray-1000
-- --c-accent-...
+## Theme toggle UI
+- Переключатель расположен на Home рядом с именем пользователя.
+- Кнопка меняет режим между `light` и `dark`.
+- Accent остаётся фиолетовым (`--accent`) в обоих режимах.
 
-### 2) Semantic tokens
-Компоненты используют только семантику:
-- --bg
-- --bg-elevated
-- --surface
-- --surface-muted
-- --text-primary
-- --text-secondary
-- --border
-- --accent
-- --accent-contrast
-- --success / --danger / --warning
+## Telegram integration boundaries
+- Цвета Telegram не используются.
+- `applyTelegramTheme` / подписка на `themeChanged` для цветов отключены (no-op).
+- Из Telegram используются только safe-area insets:
+  - `--tg-content-safe-area-inset-top`
+  - `--tg-content-safe-area-inset-bottom`
+  - `--tg-safe-area-inset-bottom`
+- Layout продолжает учитывать эти переменные через `--content-top`, `--content-bottom`, `--safe-bottom`.
 
-### 3) Component tokens
-Например:
-- --button-primary-bg: var(--accent)
-- --card-bg: var(--surface)
-- --input-bg: var(--surface-muted)
-
-## Telegram mapping
-На старте приложения:
-- читаем `Telegram.WebApp.themeParams` и `Telegram.WebApp.colorScheme`
-- мапим их в semantic tokens
-- подписываемся на `themeChanged` и обновляем tokens
-
-Правило: подписки на Telegram events только в shared/provider слое.
-
-## Safe area / layout (must)
-- Layout padding = content safe area
-- Sticky bottom = safe area
-
-## User palette (future)
-Поддерживаем ограниченный override:
-- accent (primary)
-- maybe: success/danger (если надо)
-Нельзя давать пользователю ломать:
-- text colors
-- background contrast
-План: whitelist overrides + contrast guard.
-
-## DEV-only notes
-- Любые временные решения (например fallback initData) документируем в docs и помечаем DEV ONLY.
+## DEV note
+- Если Mini App запущен вне Telegram, safe-area значения остаются `0px`, тема при этом работает из локальных токенов.

@@ -1,5 +1,8 @@
 .ui-app-layout {
   min-height: 100dvh;
+  background: var(--bg);
+  background-attachment: fixed;
+  background-size: cover;
   padding-top: var(--content-top);
   padding-bottom: calc(var(--content-bottom) + var(--safe-bottom) + 80px);
 }

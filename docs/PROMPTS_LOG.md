@@ -1,3 +1,13 @@
+## D4.8 — Home: зафиксированы правила нового редизайна в docs
+Сделано:
+- Обновлён `docs/SCREENS.md`: формализованы актуальные UX-правила Home для нового редизайна.
+- Зафиксированы требования к `UserHeader` (display-заголовок, блок controls, theme toggle через `html[data-mode]`).
+- Зафиксированы правила для action-tiles (карточный стиль), drag-follow поведения `HomeSlider` (`--drag-x`, отключение transition в drag, edge resistance) и плавающего `FooterNav` (dock + glassmorphism).
+- Обновлён `docs/design-system.md`: добавлен раздел Home со специальными визуальными и micro-UX правилами.
+
+Проверка:
+- Изменения носят документационный характер (runtime/logic не затронуты).
+
 ## D4.7 — Fix рендера иконок: отказ от CSS mask в Home actions
 Сделано:
 - Исправлен рендер иконок action-тайлов на Home для Telegram WebView:
@@ -376,3 +386,26 @@ DEV notes:
 Проверка:
 - Открыть `/workouts/:id` и нажать «Добавить подход».
 - Убедиться, что запрос проходит без ошибки и новый подход появляется в списке.
+# F15 — Локальная тема light/dark без Telegram colors
+Сделано:
+- Отключён bridge Telegram themeParams: цвета больше не маппятся из Telegram и не обновляются через `themeChanged`.
+- Режим темы переведён на локальную модель `light | dark` с сохранением выбора в `localStorage` (`theme_mode`).
+- Добавлен `ThemeToggle` на Home рядом с именем пользователя (иконки sun/moon, `aria-label="Переключить тему"`).
+- Safe area интеграция сохранена: используются Telegram insets для layout/footer/sticky.
+- Обновлена документация по архитектуре тем и правилам Telegram.
+
+Затронутые файлы:
+- `src/App.tsx`
+- `src/shared/lib/theme/mode.ts`
+- `src/shared/lib/theme/storage.ts`
+- `src/shared/lib/theme/telegram.ts`
+- `src/shared/ui/theme/tokens.css`
+- `src/shared/ui/theme/ThemeToggle.tsx`
+- `src/widgets/home/UserHeader.tsx`
+- `src/widgets/home/home.css`
+- `docs/theme-architecture.md`
+- `docs/telegram.md`
+- `docs/PROMPTS_LOG.md`
+
+Проверка:
+- `npm run build` — ok

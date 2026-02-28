@@ -3,9 +3,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type PointerEvent,
   type ReactElement,
-  type TouchEvent,
 } from "react";
 
 type CalendarDay = {
@@ -78,71 +76,70 @@ const buildCalendarGrid = (currentDate: Date): CalendarDay[] => {
 
 export const HomeSlider = (): ReactElement => {
   const [index, setIndex] = useState<number>(0);
+  const [dragX, setDragX] = useState<number>(0);
   const startXRef = useRef<number | null>(null);
 
   const now = useMemo<Date>(() => new Date(), []);
   const monthLabel = `${MONTHS_RU[now.getMonth()]} ${now.getFullYear()}`;
   const calendarDays = useMemo<CalendarDay[]>(() => buildCalendarGrid(now), [now]);
 
-  const handleSwipe = (deltaX: number): void => {
-    if (Math.abs(deltaX) <= 40) {
-      return;
-    }
+  const isDragging = startXRef.current !== null;
 
-    if (deltaX < 0) {
-      setIndex((prev) => Math.min(prev + 1, LAST_SLIDE_INDEX));
-      return;
-    }
-
-    setIndex((prev) => Math.max(prev - 1, 0));
+  const handlePointerDown = (clientX: number): void => {
+    startXRef.current = clientX;
   };
 
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>): void => {
-    startXRef.current = event.clientX;
-  };
-
-  const onPointerUp = (event: PointerEvent<HTMLDivElement>): void => {
+  const handlePointerMove = (clientX: number): void => {
     if (startXRef.current === null) {
       return;
     }
 
-    handleSwipe(event.clientX - startXRef.current);
-    startXRef.current = null;
-  };
+    const deltaX = clientX - startXRef.current;
 
-  const onTouchStart = (event: TouchEvent<HTMLDivElement>): void => {
-    const point = event.changedTouches[0];
-
-    if (!point) {
+    if ((index === 0 && deltaX > 0) || (index === LAST_SLIDE_INDEX && deltaX < 0)) {
+      setDragX(deltaX * 0.3);
       return;
     }
 
-    startXRef.current = point.clientX;
+    setDragX(deltaX);
   };
 
-  const onTouchEnd = (event: TouchEvent<HTMLDivElement>): void => {
-    const point = event.changedTouches[0];
-
-    if (!point || startXRef.current === null) {
+  const handlePointerUp = (): void => {
+    if (startXRef.current === null) {
       return;
     }
 
-    handleSwipe(point.clientX - startXRef.current);
+    if (Math.abs(dragX) > 50) {
+      if (dragX < 0) {
+        setIndex((prev) => Math.min(prev + 1, LAST_SLIDE_INDEX));
+      } else {
+        setIndex((prev) => Math.max(prev - 1, 0));
+      }
+    }
+
     startXRef.current = null;
+    setDragX(0);
   };
 
-  const trackStyle = { "--index": index } as CSSProperties;
+  const trackStyle = {
+    "--index": index,
+    "--drag-x": `${dragX}px`,
+  } as CSSProperties;
 
   return (
     <section className="home-slider" aria-label="Слайдер главной страницы">
       <div
         className="home-slider__viewport"
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
+        onPointerDown={(event) => handlePointerDown(event.clientX)}
+        onPointerMove={(event) => handlePointerMove(event.clientX)}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+        onTouchStart={(event) => handlePointerDown(event.touches[0].clientX)}
+        onTouchMove={(event) => handlePointerMove(event.touches[0].clientX)}
+        onTouchEnd={handlePointerUp}
+        style={{ touchAction: "pan-y" }}
       >
-        <div className="home-slider__track" style={trackStyle}>
+        <div className={`home-slider__track ${isDragging ? "home-slider__track--dragging" : ""}`} style={trackStyle}>
           <article className="home-slider__slide home-slider__slide--calendar">
             <header className="home-calendar__header">
               <h2 className="home-calendar__title">{monthLabel}</h2>
