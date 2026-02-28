@@ -4,6 +4,8 @@ import { Outlet } from "react-router-dom";
 import {
   getTelegramWebApp,
   prepareTelegramWebApp,
+  setClosingConfirmationEnabled,
+  setVerticalSwipesEnabled,
 } from "./shared/lib/telegram";
 import { initThemeMode } from "./shared/lib/theme/mode";
 import { applySafeAreaInsets, bindViewportEvents } from "./shared/lib/theme/safeArea";
@@ -16,6 +18,8 @@ import "./App.css";
 function App(): ReactElement {
   useEffect(() => {
     prepareTelegramWebApp();
+    setVerticalSwipesEnabled(false);
+    setClosingConfirmationEnabled(true);
     initThemeMode();
     applySafeAreaInsets();
 

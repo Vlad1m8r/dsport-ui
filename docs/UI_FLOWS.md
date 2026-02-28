@@ -1,6 +1,7 @@
 # UI FLOWS (MVP)
 
 ## Каркас приложения (routing/providers/http client/initData)
+- TG поведение приложения: глобально отключены вертикальные свайпы (`disableVerticalSwipes`) и включено подтверждение закрытия (`enableClosingConfirmation`).
 - Routing: React Router, маршруты объявлены в `src/app/router.tsx`.
 - Providers: React Query (QueryClientProvider), Telegram WebApp SDK и тема Telegram подключаются в app-layer.
 - HTTP client: только `src/shared/api/http.ts`, базовый URL из `import.meta.env.VITE_API_BASE_URL`.

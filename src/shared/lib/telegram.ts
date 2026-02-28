@@ -38,6 +38,10 @@ export type TelegramWebApp = {
   expand?: () => void;
   onEvent?: (event: TelegramEventName, handler: TelegramEventHandler) => void;
   offEvent?: (event: TelegramEventName, handler: TelegramEventHandler) => void;
+  enableVerticalSwipes?: () => void;
+  disableVerticalSwipes?: () => void;
+  enableClosingConfirmation?: () => void;
+  disableClosingConfirmation?: () => void;
 };
 
 type TelegramNamespace = {
@@ -86,4 +90,42 @@ export const getTelegramUser = (): TelegramUser | null => {
   }
 
   return user;
+};
+
+export const setVerticalSwipesEnabled = (enabled: boolean): void => {
+  const telegramWebApp = getTelegramWebApp();
+
+  if (!telegramWebApp) {
+    return;
+  }
+
+  try {
+    if (enabled) {
+      telegramWebApp.enableVerticalSwipes?.();
+      return;
+    }
+
+    telegramWebApp.disableVerticalSwipes?.();
+  } catch {
+    // no-op: старые версии Telegram WebApp могут не поддерживать API.
+  }
+};
+
+export const setClosingConfirmationEnabled = (enabled: boolean): void => {
+  const telegramWebApp = getTelegramWebApp();
+
+  if (!telegramWebApp) {
+    return;
+  }
+
+  try {
+    if (enabled) {
+      telegramWebApp.enableClosingConfirmation?.();
+      return;
+    }
+
+    telegramWebApp.disableClosingConfirmation?.();
+  } catch {
+    // no-op: старые версии Telegram WebApp могут не поддерживать API.
+  }
 };
