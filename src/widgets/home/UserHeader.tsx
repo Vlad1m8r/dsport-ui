@@ -2,6 +2,12 @@ import { useEffect, useState, type ReactElement } from "react";
 
 import { IconButton } from "../../shared/ui/button/IconButton";
 import { MoonIcon, SunIcon } from "../../shared/ui/icons/ThemeIcons";
+import {
+  getThemeMode,
+  subscribeThemeMode,
+  toggleThemeMode,
+  type ThemeMode,
+} from "../../shared/lib/theme/mode";
 
 type UserHeaderProps = {
   displayName: string;
@@ -11,17 +17,19 @@ type UserHeaderProps = {
 
 export const UserHeader = ({ displayName, photoUrl, initials }: UserHeaderProps): ReactElement => {
   const hasPhoto = typeof photoUrl === "string" && photoUrl.trim() !== "";
-  const [isDark, setIsDark] = useState<boolean>(false);
+  const [isDark, setIsDark] = useState<boolean>(getThemeMode() === "dark");
 
   useEffect(() => {
-    const currentMode = document.documentElement.getAttribute("data-mode");
-    setIsDark(currentMode === "dark");
+    const unsubscribe = subscribeThemeMode((mode: ThemeMode) => {
+      setIsDark(mode === "dark");
+    });
+
+    return unsubscribe;
   }, []);
 
   const toggleTheme = (): void => {
-    const newTheme = isDark ? "light" : "dark";
-    setIsDark(!isDark);
-    document.documentElement.setAttribute("data-mode", newTheme);
+    const nextMode = toggleThemeMode();
+    setIsDark(nextMode === "dark");
   };
 
   return (
