@@ -5,6 +5,6 @@
 .app {
   min-height: 100dvh;
   padding: var(--space-4);
-  background-color: var(--bg);
+  background: var(--bg);
   color: var(--text);
 }
