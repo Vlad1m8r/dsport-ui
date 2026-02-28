@@ -10,6 +10,22 @@
 - Workouts history (/workouts) + Workout view (/workouts/:id?mode=view) (если разделяем)
 
 ## Shared UI components
+
+### Base UI kit (D3)
+- Button (`src/shared/ui/button/Button.tsx`)
+  - variants: `primary | secondary | ghost | destructive`
+  - size: `md | lg`
+- IconButton (`src/shared/ui/button/IconButton.tsx`)
+  - 44x44, variants `ghost | secondary`, обязательный `aria-label`
+- Card (`src/shared/ui/card/Card.tsx`)
+- Input / SearchInput (`src/shared/ui/input/*`)
+- EmptyState (`src/shared/ui/empty/EmptyState.tsx`)
+- SkeletonLine / SkeletonCard (`src/shared/ui/skeleton/Skeleton.tsx`)
+- ModalSheet (`src/shared/ui/sheet/ModalSheet.tsx`)
+- AutosaveIndicator (`src/shared/ui/status/AutosaveIndicator.tsx`)
+- SharedAppLayout (`src/shared/ui/layout/AppLayout.tsx`)
+- UI styles (`src/shared/ui/styles/ui.css`)
+
 ### Layout
 - AppLayout
   - учитывает content safe area

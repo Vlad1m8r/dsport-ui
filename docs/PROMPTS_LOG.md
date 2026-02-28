@@ -1,3 +1,17 @@
+## D3 — Base UI kit + wiring
+Сделано:
+- Добавлен базовый UI-kit в shared-слое: `Button`, `IconButton`, `Card`, `Input`, `SearchInput`, `EmptyState`, `SkeletonLine/SkeletonCard`, `ModalSheet`, `AutosaveIndicator`, `SharedAppLayout`.
+- Добавлены общие стили `src/shared/ui/styles/ui.css` и подключение в `src/main.tsx`.
+- На `TemplatesPage` внедрены новые UI-компоненты: карточки шаблонов, кнопки, `EmptyState`, `Skeleton` для loading.
+- На `WorkoutPage` внедрены `Card` и `Button`, добавлен `AutosaveIndicator` в правый фиксированный слот строки подхода.
+- Добавлены стили `setRow` для completion/invalid подсветки; invalid-инпуты подсвечиваются через semantic vars.
+- Добавлен базовый collapse для упражнений на WorkoutPage: по умолчанию открыт первый блок, остальные свернуты; добавлен toggle в header.
+- Обновлены docs: `docs/component-map.md` и `docs/PROMPTS_LOG.md`.
+
+Проверка:
+- `npm run lint` — ok
+- `npm run build` — ok
+
 ## D2 — Theme/Tokens infra (iOS minimal, accent purple)
 Сделано:
 - Добавлена базовая система semantic-токенов в `src/shared/ui/theme/tokens.css` с дефолтами для `light/dark`, fallback accent = purple и системными переменными для радиусов, отступов, motion, shadows.
