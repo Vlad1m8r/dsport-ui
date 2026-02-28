@@ -1,10 +1,14 @@
 .ui-app-layout {
   min-height: 100dvh;
+
+  /* Применяем сложный фон и фиксируем его */
   background: var(--bg);
   background-attachment: fixed;
   background-size: cover;
+  background-repeat: no-repeat;
+
   padding-top: var(--content-top);
-  padding-bottom: calc(var(--content-bottom) + var(--safe-bottom) + 80px);
+  padding-bottom: calc(var(--content-bottom) + var(--safe-bottom) + 100px);
 }
 
 .ui-card {
