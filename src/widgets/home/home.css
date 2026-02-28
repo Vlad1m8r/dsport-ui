@@ -279,12 +279,18 @@
   gap: var(--space-1);
   padding: var(--space-1);
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.65);
+  background: color-mix(in srgb, var(--surface) 60%, rgba(20, 15, 30, 0.4));
   backdrop-filter: blur(24px) saturate(200%);
   -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+}
+
+html[data-mode="light"] .footer-nav__inner {
+  background: rgba(255, 255, 255, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 1);
-  pointer-events: auto;
 }
 
 .footer-nav__button.ui-button,
