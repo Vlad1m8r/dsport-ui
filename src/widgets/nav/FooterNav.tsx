@@ -19,7 +19,7 @@ export const FooterNav = (): ReactElement => {
 
   return (
     <nav className="footer-nav" aria-label="Нижняя навигация">
-      <div className="footer-nav__inner">
+      <div className="footer-nav__inner glass">
         <Button variant="ghost" className="footer-nav__button" onClick={handleBack}>
           Назад
         </Button>

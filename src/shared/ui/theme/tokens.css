@@ -59,8 +59,11 @@ html[data-mode="light"] {
   /* Плотная белая рамка для эффекта блика на кромке стекла */
   --border: rgba(255, 255, 255, 0.8);
 
-  --accent: #4f46e5;
+  --accent: #9333ea;
   --accent-contrast: #ffffff;
+
+  /* Solid fallback для glass */
+  --surface-solid: rgba(255, 255, 255, 0.92);
 
   /* Мягкие прозрачные тени */
   --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.04);
@@ -83,6 +86,9 @@ html[data-mode="dark"] {
 
   --accent: #a855f7;
   --accent-contrast: #ffffff;
+
+  /* Нейтральный тёмный solid fallback (не фиолетовый!) */
+  --surface-solid: #14101e;
 
   --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);

@@ -1,10 +1,32 @@
 .ui-app-layout {
+  position: relative;
   min-height: 100dvh;
-  background: var(--bg);
-  background-attachment: fixed;
-  background-size: cover;
   padding-top: var(--content-top);
-  padding-bottom: calc(var(--content-bottom) + var(--safe-bottom) + 80px);
+  padding-bottom: calc(var(--content-bottom) + var(--safe-bottom) + 100px);
+}
+
+.ui-app-layout::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--bg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.ui-app-layout > * {
+  position: relative;
+  z-index: 1;
+}
+
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border);
 }
 
 .ui-card {
@@ -326,4 +348,11 @@
 .setRow .ui-input--invalid,
 .setRow .workout-card__input--invalid {
   border-color: var(--danger);
+}
+
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--surface-solid);
+  }
 }

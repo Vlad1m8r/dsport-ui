@@ -9,7 +9,7 @@ type ActionTileProps = {
 
 export const ActionTile = ({ icon, label, onClick, disabled = false }: ActionTileProps): ReactElement => {
   return (
-    <button type="button" className="home-action-tile" onClick={onClick} disabled={disabled}>
+    <button type="button" className="home-action-tile glass" onClick={onClick} disabled={disabled}>
       <span className="home-action-tile__icon-wrapper" aria-hidden>
         {icon}
       </span>
