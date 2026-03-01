@@ -17,7 +17,7 @@
   pointer-events: none;
 }
 
-.ui-app-layout > * {
+.ui-app-layout > *:not(.footer-nav) {
   position: relative;
   z-index: 1;
 }
