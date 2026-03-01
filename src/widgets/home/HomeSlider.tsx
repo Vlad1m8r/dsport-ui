@@ -140,7 +140,7 @@ export const HomeSlider = (): ReactElement => {
         style={{ touchAction: "pan-y" }}
       >
         <div className={`home-slider__track ${isDragging ? "home-slider__track--dragging" : ""}`} style={trackStyle}>
-          <article className="home-slider__slide home-slider__slide--calendar">
+          <article className="home-slider__slide glass home-slider__slide--calendar">
             <header className="home-calendar__header">
               <h2 className="home-calendar__title">{monthLabel}</h2>
             </header>
@@ -166,8 +166,8 @@ export const HomeSlider = (): ReactElement => {
               ))}
             </div>
           </article>
-          <article className="home-slider__slide home-slider__slide--stub">В разработке</article>
-          <article className="home-slider__slide home-slider__slide--stub">В разработке</article>
+          <article className="home-slider__slide glass home-slider__slide--stub">В разработке</article>
+          <article className="home-slider__slide glass home-slider__slide--stub">В разработке</article>
         </div>
       </div>
       <div className="home-slider__dots" aria-hidden>
