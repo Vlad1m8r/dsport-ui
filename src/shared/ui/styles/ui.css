@@ -2,7 +2,7 @@
   position: relative;
   min-height: 100dvh;
   padding-top: var(--content-top);
-  padding-bottom: calc(var(--content-bottom) + var(--safe-bottom) + 100px);
+  padding-bottom: calc(var(--content-bottom) + var(--safe-bottom) + 80px);
 }
 
 .ui-app-layout::before {
