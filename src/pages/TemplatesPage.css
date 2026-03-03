@@ -9,6 +9,9 @@
   height: calc(100dvh - var(--templates-content-top) - var(--space-4));
   padding-top: calc(var(--templates-content-top) + var(--space-2));
   overflow: hidden;
+
+  /* НОВОЕ: Блокируем эффект резинки для всей страницы */
+  overscroll-behavior: none;
 }
 
 .templates-page__header {
@@ -52,6 +55,9 @@
   /* 2. Плавное растворение списка сверху */
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black var(--space-4), black 100%);
   mask-image: linear-gradient(to bottom, transparent 0%, black var(--space-4), black 100%);
+
+  /* НОВОЕ: Изолируем скролл строго внутри этого контейнера */
+  overscroll-behavior: none;
 }
 
 /* 3. Прячем скроллбар (Chrome, Safari, iOS) */
