@@ -3,9 +3,9 @@
 
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  /* Убираем gap, так как мы перенесем отступ внутрь контента для работы маски */
+  gap: 0;
 
-  /* Жестко ограничиваем высоту окна и отключаем скролл на корне */
   height: calc(100dvh - var(--templates-content-top) - var(--space-4));
   padding-top: calc(var(--templates-content-top) + var(--space-2));
   overflow: hidden;
@@ -16,6 +16,11 @@
   flex-direction: column;
   gap: var(--space-4);
   flex-shrink: 0;
+  /* Добавляем небольшой отступ снизу, чтобы шапка "дышала" */
+  margin-bottom: var(--space-2);
+  /* Убеждаемся, что шапка всегда поверх контента */
+  position: relative;
+  z-index: 10;
 }
 
 .templates-page__title {
@@ -30,13 +35,28 @@
 .templates-page__content {
   flex: 1;
   min-height: 0;
-  overflow-y: auto; /* Скроллится только эта часть */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 
-  /* Перенесли отступ для футера сюда, чтобы контент можно было доскроллить до конца */
+  /* Переносим отступ внутрь, чтобы маска скрывала только этот пустой отступ,
+     а первый элемент начинался ниже (уже полностью видимым) */
+  padding-top: var(--space-4);
   padding-bottom: calc(100px + var(--safe-bottom) + var(--space-4));
+
+  /* 1. Прячем скроллбар (Firefox, IE/Edge) */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  /* 2. Плавное растворение списка сверху */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black var(--space-4), black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black var(--space-4), black 100%);
+}
+
+/* 3. Прячем скроллбар (Chrome, Safari, iOS) */
+.templates-page__content::-webkit-scrollbar {
+  display: none;
 }
 
 .templates-page__content--locked {
