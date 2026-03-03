@@ -57,7 +57,7 @@
   mask-image: linear-gradient(to bottom, transparent 0%, black var(--space-4), black 100%);
 
   /* НОВОЕ: Изолируем скролл строго внутри этого контейнера */
-  overscroll-behavior: none;
+  overscroll-behavior: contain;
 }
 
 /* 3. Прячем скроллбар (Chrome, Safari, iOS) */
