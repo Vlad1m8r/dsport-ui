@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -9,7 +9,6 @@ import {
 import { Button } from "../shared/ui/button/Button";
 import { Card } from "../shared/ui/card/Card";
 import { EmptyState } from "../shared/ui/empty/EmptyState";
-import { ModalSheet } from "../shared/ui/sheet/ModalSheet";
 import { SkeletonCard, SkeletonLine } from "../shared/ui/skeleton/Skeleton";
 import "./TemplatesPage.css";
 
@@ -24,6 +23,24 @@ export const TemplatesPage = (): ReactElement => {
   const createTemplateMutation = useCreateTemplateMutation();
   const deleteMutation = useDeleteTemplateMutation();
   const [deleteModalState, setDeleteModalState] = useState<DeleteModalState | null>(null);
+
+  useEffect((): (() => void) | void => {
+    if (deleteModalState === null) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent): void => {
+      if (event.key === "Escape") {
+        setDeleteModalState(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return (): void => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [deleteModalState]);
 
   const handleEdit = (id: number | undefined): void => {
     if (typeof id !== "number") {
@@ -167,26 +184,35 @@ export const TemplatesPage = (): ReactElement => {
         </ul>
       ) : null}
 
-      <ModalSheet isOpen={deleteModalState !== null} onClose={handleCloseDeleteConfirm} title="Удалить шаблон?">
-        <div className="templates-page__modal-content">
-          <p className="templates-page__modal-text">
-            Шаблон будет удалён без возможности восстановления.
-          </p>
-          <div className="templates-page__modal-actions">
-            <Button type="button" variant="secondary" onClick={handleCloseDeleteConfirm}>
-              Отмена
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleConfirmDelete}
-              disabled={deleteMutation.isPending}
-            >
-              Удалить
-            </Button>
-          </div>
+      {deleteModalState ? (
+        <div className="templates-page__modal" role="dialog" aria-modal="true" aria-labelledby="delete-template-title">
+          <button
+            type="button"
+            className="templates-page__modal-backdrop"
+            aria-label="Закрыть модальное окно"
+            onClick={handleCloseDeleteConfirm}
+          />
+          <section className="templates-page__modal-panel glass">
+            <h2 id="delete-template-title" className="templates-page__modal-title">
+              Удалить шаблон?
+            </h2>
+            <p className="templates-page__modal-text">Шаблон будет удалён без возможности восстановления.</p>
+            <div className="templates-page__modal-actions">
+              <Button type="button" variant="secondary" onClick={handleCloseDeleteConfirm}>
+                Отмена
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isPending}
+              >
+                Удалить
+              </Button>
+            </div>
+          </section>
         </div>
-      </ModalSheet>
+      ) : null}
     </section>
   );
 };

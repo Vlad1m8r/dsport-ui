@@ -1,5 +1,6 @@
 .templates-page {
   --templates-content-top: var(--tg-content-safe-area-inset-top, var(--content-top));
+
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
@@ -49,7 +50,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-
 .templates-page__item-content {
   display: flex;
   flex-direction: column;
@@ -81,8 +81,14 @@
 }
 
 .templates-page__delete-button {
-  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+  border-color: color-mix(in srgb, var(--danger) 70%, var(--border));
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
   color: var(--danger);
+}
+
+.templates-page__delete-button:hover {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 24%, transparent);
 }
 
 .templates-page__error-card {
@@ -104,10 +110,38 @@
   border-radius: var(--radius-xl);
 }
 
-.templates-page__modal-content {
+.templates-page__modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.templates-page__modal-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: color-mix(in srgb, var(--bg) 30%, var(--text));
+}
+
+.templates-page__modal-panel {
+  position: relative;
+  width: min(100%, 360px);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+.templates-page__modal-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 20px;
 }
 
 .templates-page__modal-text {
@@ -132,5 +166,10 @@
 
   .templates-page__item-actions .ui-button {
     width: 100%;
+  }
+
+  .templates-page__modal-panel {
+    width: min(100%, 420px);
+    padding: var(--space-4);
   }
 }
