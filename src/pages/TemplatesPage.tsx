@@ -29,15 +29,19 @@ export const TemplatesPage = (): ReactElement => {
       return;
     }
 
+    const previousOverflow = document.body.style.overflow;
+
     const handleEscape = (event: KeyboardEvent): void => {
       if (event.key === "Escape") {
         setDeleteModalState(null);
       }
     };
 
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleEscape);
 
     return (): void => {
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
   }, [deleteModalState]);
@@ -106,83 +110,85 @@ export const TemplatesPage = (): ReactElement => {
         </Button>
       </header>
 
-      {isLoading ? (
-        <ul className="templates-page__list" aria-label="Загрузка шаблонов">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <li key={`template-skeleton-${index}`} className="templates-page__skeleton-item">
-              <SkeletonCard>
-                <SkeletonLine width="40%" height="20px" />
-                <SkeletonLine width="28%" height="13px" />
-              </SkeletonCard>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <div className={`templates-page__content ${deleteModalState ? "templates-page__content--locked" : ""}`}>
+        {isLoading ? (
+          <ul className="templates-page__list" aria-label="Загрузка шаблонов">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <li key={`template-skeleton-${index}`} className="templates-page__skeleton-item">
+                <SkeletonCard>
+                  <SkeletonLine width="40%" height="20px" />
+                  <SkeletonLine width="28%" height="13px" />
+                </SkeletonCard>
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
-      {isError ? (
-        <div className="templates-page__error-card glass" role="alert">
-          <p className="templates-page__error">Ошибка: {error?.message ?? "Не удалось загрузить шаблоны"}</p>
-          <Button type="button" variant="secondary" onClick={() => void refetch()}>
-            Повторить
-          </Button>
-        </div>
-      ) : null}
+        {isError ? (
+          <div className="templates-page__error-card glass" role="alert">
+            <p className="templates-page__error">Ошибка: {error?.message ?? "Не удалось загрузить шаблоны"}</p>
+            <Button type="button" variant="secondary" onClick={() => void refetch()}>
+              Повторить
+            </Button>
+          </div>
+        ) : null}
 
-      {deleteMutation.isError ? (
-        <p className="templates-page__error">Ошибка: {deleteMutation.error?.message ?? "Не удалось удалить шаблон"}</p>
-      ) : null}
-      {createTemplateMutation.isError ? (
-        <p className="templates-page__error">Ошибка: {createTemplateMutation.error?.message ?? "Не удалось создать шаблон"}</p>
-      ) : null}
+        {deleteMutation.isError ? (
+          <p className="templates-page__error">Ошибка: {deleteMutation.error?.message ?? "Не удалось удалить шаблон"}</p>
+        ) : null}
+        {createTemplateMutation.isError ? (
+          <p className="templates-page__error">Ошибка: {createTemplateMutation.error?.message ?? "Не удалось создать шаблон"}</p>
+        ) : null}
 
-      {!isLoading && data && data.length === 0 ? (
-        <Card className="templates-page__empty glass">
-          <EmptyState
-            icon="🧩"
-            title="Нет шаблонов"
-            description="Создай первый шаблон тренировки"
-            actionLabel="Создать шаблон"
-            onAction={handleCreateTemplate}
-          />
-        </Card>
-      ) : null}
+        {!isLoading && data && data.length === 0 ? (
+          <Card className="templates-page__empty glass">
+            <EmptyState
+              icon="🧩"
+              title="Нет шаблонов"
+              description="Создай первый шаблон тренировки"
+              actionLabel="Создать шаблон"
+              onAction={handleCreateTemplate}
+            />
+          </Card>
+        ) : null}
 
-      {!isLoading && data && data.length > 0 ? (
-        <ul className="templates-page__list">
-          {data.map((template) => (
-            <Card
-              as="li"
-              className="templates-page__row glass"
-              key={template.id ?? template.name ?? "template-without-id"}
-            >
-              <div className="templates-page__item-content">
-                <h2 className="templates-page__item-title">{template.name ?? "Без названия"}</h2>
-                <span className="templates-page__item-meta">{template.exercises?.length ?? 0} упражнений</span>
-              </div>
+        {!isLoading && data && data.length > 0 ? (
+          <ul className="templates-page__list">
+            {data.map((template) => (
+              <Card
+                as="li"
+                className="templates-page__row glass"
+                key={template.id ?? template.name ?? "template-without-id"}
+              >
+                <div className="templates-page__item-content">
+                  <h2 className="templates-page__item-title">{template.name ?? "Без названия"}</h2>
+                  <span className="templates-page__item-meta">{template.exercises?.length ?? 0} упражнений</span>
+                </div>
 
-              <div className="templates-page__item-actions">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => handleEdit(template.id)}
-                  disabled={deleteMutation.isPending}
-                >
-                  Изменить
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="templates-page__delete-button"
-                  onClick={() => handleOpenDeleteConfirm(template.id, template.name)}
-                  disabled={deleteMutation.isPending}
-                >
-                  Удалить
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </ul>
-      ) : null}
+                <div className="templates-page__item-actions">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => handleEdit(template.id)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    Изменить
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    className="templates-page__delete-button"
+                    onClick={() => handleOpenDeleteConfirm(template.id, template.name)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    Удалить
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </ul>
+        ) : null}
+      </div>
 
       {deleteModalState ? (
         <div className="templates-page__modal" role="dialog" aria-modal="true" aria-labelledby="delete-template-title">
@@ -192,7 +198,7 @@ export const TemplatesPage = (): ReactElement => {
             aria-label="Закрыть модальное окно"
             onClick={handleCloseDeleteConfirm}
           />
-          <section className="templates-page__modal-panel glass">
+          <section className="templates-page__modal-panel">
             <h2 id="delete-template-title" className="templates-page__modal-title">
               Удалить шаблон?
             </h2>
