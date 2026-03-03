@@ -4,9 +4,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  min-height: calc(100dvh - var(--templates-content-top) - var(--safe-bottom) - 100px - var(--space-4));
+
+  /* Жестко ограничиваем высоту окна и отключаем скролл на корне */
+  height: calc(100dvh - var(--templates-content-top) - var(--space-4));
   padding-top: calc(var(--templates-content-top) + var(--space-2));
-  padding-bottom: calc(100px + var(--safe-bottom) + var(--space-4));
+  overflow: hidden;
 }
 
 .templates-page__header {
@@ -28,11 +30,13 @@
 .templates-page__content {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: auto; /* Скроллится только эта часть */
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding-bottom: var(--space-2);
+
+  /* Перенесли отступ для футера сюда, чтобы контент можно было доскроллить до конца */
+  padding-bottom: calc(100px + var(--safe-bottom) + var(--space-4));
 }
 
 .templates-page__content--locked {
@@ -141,7 +145,17 @@
   position: absolute;
   inset: 0;
   border: none;
-  background: color-mix(in srgb, var(--text) 70%, transparent);
+
+  /* Светлая тема: затемняем фон и блюрим */
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background var(--motion-normal) var(--ease-standard);
+}
+
+/* Темная тема: фон почти не затемняем, оставляем только блюр */
+html[data-mode="dark"] .templates-page__modal-backdrop {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .templates-page__modal-panel {
@@ -150,7 +164,12 @@
   border-radius: var(--radius-xl);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-lg);
-  background: var(--surface);
+
+  /* Стандартная солидная модалка без стекла */
+  background: var(--surface-solid, var(--surface));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
   padding: var(--space-5);
   display: flex;
   flex-direction: column;
