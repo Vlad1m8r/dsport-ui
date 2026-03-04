@@ -1,10 +1,10 @@
 .ui-app-layout {
-  position: relative;
+  position: fixed;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  height: 100dvh;
-  width: 100%;
   overflow: hidden;
+  box-sizing: border-box;
   padding-bottom: 0;
 }
 
@@ -26,6 +26,7 @@
   overflow: hidden;
   position: relative;
   z-index: 1;
+  box-sizing: border-box;
 }
 
 .glass {
@@ -286,12 +287,14 @@
   --page-content-bottom: var(--tg-content-safe-area-inset-bottom, var(--content-bottom));
 
   display: flex;
+  flex: 1;
   flex-direction: column;
-  height: 100%;
+  min-height: 0;
   padding-top: calc(var(--page-content-top) + var(--space-2));
 
   overflow: hidden;
   overscroll-behavior: none;
+  box-sizing: border-box;
 
   /* Разрешаем “обычные” тапы/клики, но не отдаём pan-жесты корню */
   touch-action: manipulation;
@@ -311,6 +314,7 @@
 
   overscroll-behavior: contain;
   touch-action: pan-y;
+  box-sizing: border-box;
 
   scrollbar-width: none;
   -ms-overflow-style: none;
