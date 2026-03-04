@@ -5,7 +5,6 @@
   height: 100dvh;
   width: 100%;
   overflow: hidden;
-  padding-top: var(--content-top);
   padding-bottom: 0;
 }
 
