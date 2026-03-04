@@ -258,6 +258,8 @@
   left: 0;
   right: 0;
   bottom: 0;
+
+
   max-height: 85dvh;
   display: flex;
   flex-direction: column;
@@ -265,6 +267,59 @@
   border-top-right-radius: var(--radius-xl);
   background: var(--surface);
   padding: var(--space-2) var(--space-4) calc(var(--space-4) + var(--safe-bottom));
+}
+
+/* --- Telegram Mini App: Page layout стандарты --- */
+
+/**
+ * Корневой контейнер страницы: НЕ скроллится, не тянется, фиксирует safe-area top.
+ * Важно: НЕ ставим touch-action:none (ломает часть интеракций в WebView).
+ */
+.ui-page-root {
+  --page-content-top: var(--tg-content-safe-area-inset-top, var(--content-top));
+  --page-content-bottom: var(--tg-content-safe-area-inset-bottom, var(--content-bottom));
+
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--page-content-top) - var(--space-4));
+  padding-top: calc(var(--page-content-top) + var(--space-2));
+
+  overflow: hidden;
+  overscroll-behavior: none;
+
+  /* Разрешаем “обычные” тапы/клики, но не отдаём pan-жесты корню */
+  touch-action: manipulation;
+}
+
+/**
+ * Скролл-область страницы (списки, формы, контент):
+ * - только она скроллится
+ * - внутри возможен “баунс”, но без scroll chaining наверх
+ * - скрытый скроллбар
+ */
+.ui-page-scroll-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ui-page-scroll-area::-webkit-scrollbar {
+  display: none;
+}
+
+/**
+ * Вспомогательный класс для fade/растворения верхней части списка.
+ * Используется точечно на страницах, где нужно.
+ */
+.ui-scroll-fade-top {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black var(--space-4), black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black var(--space-4), black 100%);
 }
 
 .ui-sheet__drag-indicator {
