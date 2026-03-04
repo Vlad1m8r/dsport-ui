@@ -31,7 +31,6 @@
   /* Переносим отступ внутрь, чтобы маска скрывала только этот пустой отступ,
      а первый элемент начинался ниже (уже полностью видимым) */
   padding-top: var(--space-4);
-  padding-bottom: calc(100px + var(--safe-bottom) + var(--space-4));
 }
 
 .templates-page__content--locked {
