@@ -1,3 +1,8 @@
+:root {
+  /* Дополнительный отступ для Telegram UI */
+  --tg-ui-offset-top: 12px;
+}
+
 .ui-app-layout {
   position: relative;
   display: flex;
@@ -5,7 +10,7 @@
   height: 100dvh;
   width: 100%;
   overflow: hidden;
-  padding-top: var(--content-top);
+  padding-top: 0;
   padding-bottom: 0;
 }
 
@@ -21,9 +26,10 @@
   pointer-events: none;
 }
 
-.ui-app-layout > *:not(.footer-nav) {
+.ui-app-layout__content {
   flex: 1;
   min-height: 0;
+  overflow: hidden;
   position: relative;
   z-index: 1;
 }
@@ -283,11 +289,16 @@
  */
 .ui-page-root {
   --page-content-top: var(--tg-content-safe-area-inset-top, var(--content-top));
+  --page-content-bottom: var(--tg-content-safe-area-inset-bottom, var(--content-bottom));
 
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding-top: calc(var(--page-content-top) + var(--space-2));
+  padding-top: calc(
+    var(--page-content-top)
+    + var(--tg-ui-offset-top)
+    + var(--space-2)
+  );
 
   overflow: hidden;
   overscroll-behavior: none;
@@ -317,6 +328,10 @@
 
 .ui-page-scroll-area::-webkit-scrollbar {
   display: none;
+}
+
+.ui-page-scroll-area--no-footer-pad {
+  padding-bottom: 0;
 }
 
 /**
