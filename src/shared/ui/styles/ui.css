@@ -1,11 +1,8 @@
 .ui-app-layout {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-sizing: border-box;
-  padding-bottom: 0;
+  position: relative;
+  min-height: 100dvh;
+  padding-top: var(--content-top);
+  padding-bottom: calc(var(--content-bottom) + var(--safe-bottom) + 80px);
 }
 
 .ui-app-layout::before {
@@ -20,13 +17,9 @@
   pointer-events: none;
 }
 
-.ui-app-layout__content {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
+.ui-app-layout > *:not(.footer-nav) {
   position: relative;
   z-index: 1;
-  box-sizing: border-box;
 }
 
 .glass {
@@ -265,8 +258,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-
-
   max-height: 85dvh;
   display: flex;
   flex-direction: column;
@@ -274,67 +265,6 @@
   border-top-right-radius: var(--radius-xl);
   background: var(--surface);
   padding: var(--space-2) var(--space-4) calc(var(--space-4) + var(--safe-bottom));
-}
-
-/* --- Telegram Mini App: Page layout стандарты --- */
-
-/**
- * Корневой контейнер страницы: НЕ скроллится, не тянется, фиксирует safe-area top.
- * Важно: НЕ ставим touch-action:none (ломает часть интеракций в WebView).
- */
-.ui-page-root {
-  --page-content-top: var(--tg-content-safe-area-inset-top, var(--content-top));
-  --page-content-bottom: var(--tg-content-safe-area-inset-bottom, var(--content-bottom));
-
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-height: 0;
-  padding-top: calc(var(--page-content-top) + var(--space-2));
-
-  overflow: hidden;
-  overscroll-behavior: none;
-  box-sizing: border-box;
-
-  /* Разрешаем “обычные” тапы/клики, но не отдаём pan-жесты корню */
-  touch-action: manipulation;
-}
-
-/**
- * Скролл-область страницы (списки, формы, контент):
- * - только она скроллится
- * - внутри возможен “баунс”, но без scroll chaining наверх
- * - скрытый скроллбар
- */
-.ui-page-scroll-area {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-bottom: calc(100px + var(--safe-bottom) + var(--space-4));
-
-  overscroll-behavior: contain;
-  touch-action: pan-y;
-  box-sizing: border-box;
-
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.ui-page-scroll-area::-webkit-scrollbar {
-  display: none;
-}
-
-.ui-page-scroll-area--no-footer-pad {
-  padding-bottom: 0;
-}
-
-/**
- * Вспомогательный класс для fade/растворения верхней части списка.
- * Используется точечно на страницах, где нужно.
- */
-.ui-scroll-fade-top {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black var(--space-4), black 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black var(--space-4), black 100%);
 }
 
 .ui-sheet__drag-indicator {

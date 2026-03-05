@@ -98,7 +98,7 @@ export const TemplatesPage = (): ReactElement => {
   };
 
   return (
-    <section className="templates-page ui-page-root">
+    <section className="templates-page">
       <header className="templates-page__header">
         <h1 className="templates-page__title">Шаблоны тренировок</h1>
         <Button
@@ -110,11 +110,7 @@ export const TemplatesPage = (): ReactElement => {
         </Button>
       </header>
 
-      <div
-        className={`templates-page__content ui-page-scroll-area ui-scroll-fade-top ${
-          deleteModalState ? "templates-page__content--locked" : ""
-        }`}
-      >
+      <div className={`templates-page__content ${deleteModalState ? "templates-page__content--locked" : ""}`}>
         {isLoading ? (
           <ul className="templates-page__list" aria-label="Загрузка шаблонов">
             {Array.from({ length: 4 }).map((_, index) => (

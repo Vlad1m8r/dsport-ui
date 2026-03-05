@@ -28,14 +28,14 @@ export const HomePage = (): ReactElement => {
   };
 
   return (
-    <section className="home-page ui-page-root">
+    <section className="home-page">
       <UserHeader
         displayName={getDisplayName(user)}
         initials={getInitials(user)}
         photoUrl={user.photoUrl}
       />
 
-      <div className="home-main ui-page-scroll-area">
+      <div className="home-main">
         <section className="home-actions" aria-label="Основные действия">
           <ActionTile
             icon={<TemplatesIcon className="home-action-tile__icon" />}
