@@ -1,14 +1,7 @@
 .home-page {
-  --home-content-top: var(--tg-content-safe-area-inset-top, var(--content-top));
-
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: pan-x;
-  padding-top: calc(var(--home-content-top) + var(--space-2));
 }
 
 .home-user-header {
@@ -70,14 +63,9 @@
 .home-main {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
   gap: var(--space-4);
   margin-top: var(--space-2);
   padding: 0 var(--space-4);
-  padding-bottom: calc(100px + var(--safe-bottom) + var(--space-4));
 }
 
 .home-actions {

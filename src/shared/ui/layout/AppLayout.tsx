@@ -9,7 +9,7 @@ type SharedAppLayoutProps = {
 export const SharedAppLayout = ({ children }: SharedAppLayoutProps): ReactElement => {
   return (
     <div className="ui-app-layout">
-      {children}
+      <div className="ui-app-layout__content">{children}</div>
       <FooterNav />
     </div>
   );
