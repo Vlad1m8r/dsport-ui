@@ -1,0 +1,97 @@
+.history-page {
+  height: 100%;
+  gap: 0;
+}
+
+.history-header {
+  flex-shrink: 0;
+  padding-bottom: var(--space-2);
+}
+
+.history-header__top {
+  align-items: flex-start;
+}
+
+.history-header__heading {
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.history-header__description {
+  margin: 0;
+  max-width: 34rem;
+  font-size: 14px;
+}
+
+.history-scroll {
+  flex: 1;
+}
+
+.history-list {
+  padding-top: var(--space-4);
+  gap: var(--space-3);
+}
+
+.workout-card {
+  width: 100%;
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+  color: var(--text);
+  border-color: var(--border);
+  cursor: pointer;
+}
+
+.workout-card:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.workout-card__content {
+  gap: var(--space-3);
+}
+
+.workout-card__date {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.workout-card__duration {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.workout-card__title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.workout-card__meta {
+  font-size: 13px;
+}
+
+.history-empty {
+  min-height: 100%;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+}
+
+.history-empty__title,
+.history-state-card__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.history-state-card {
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  align-items: flex-start;
+}
+
+.history-state-card .ui-button {
+  align-self: flex-start;
+}
