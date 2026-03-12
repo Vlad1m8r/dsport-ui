@@ -432,3 +432,197 @@
     background: var(--surface-solid);
   }
 }
+
+/* =========================================================
+   UI UTILITIES v1
+   Минимальный набор переиспользуемых layout и typography
+   примитивов для Telegram Mini App
+========================================================= */
+
+/* ---------------------------------------------------------
+   Container
+--------------------------------------------------------- */
+
+.ui-container {
+  padding-inline: var(--space-4);
+}
+
+/* ---------------------------------------------------------
+   Stack (vertical layout)
+--------------------------------------------------------- */
+
+.ui-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ui-stack-sm {
+  gap: var(--space-2);
+}
+
+.ui-stack-md {
+  gap: var(--space-4);
+}
+
+.ui-stack-lg {
+  gap: var(--space-5);
+}
+
+/* ---------------------------------------------------------
+   Row layouts
+--------------------------------------------------------- */
+
+.ui-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ui-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.ui-row-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+/* ---------------------------------------------------------
+   Grid helpers
+--------------------------------------------------------- */
+
+.ui-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.ui-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+/* ---------------------------------------------------------
+   Typography
+--------------------------------------------------------- */
+
+.ui-page-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.ui-section-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.ui-text-muted {
+  color: var(--text-muted);
+}
+
+.ui-text-caption {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.ui-text-accent {
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------
+   Surfaces
+--------------------------------------------------------- */
+
+.ui-glass {
+  background: var(--surface);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border);
+}
+
+.ui-surface {
+  background: var(--surface);
+}
+
+.ui-surface-2 {
+  background: var(--surface-2);
+}
+
+/* ---------------------------------------------------------
+   Divider
+--------------------------------------------------------- */
+
+.ui-divider {
+  height: 1px;
+  width: 100%;
+  background: var(--border);
+}
+
+/* ---------------------------------------------------------
+   Interaction helpers
+--------------------------------------------------------- */
+
+.ui-pressable {
+  transition:
+    transform var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard);
+}
+
+.ui-pressable:active {
+  transform: scale(0.97);
+}
+
+.ui-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------
+   Text helpers
+--------------------------------------------------------- */
+
+.ui-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------
+   Utility helpers
+--------------------------------------------------------- */
+
+.ui-fill {
+  width: 100%;
+  height: 100%;
+}
+
+.ui-hidden-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ui-hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
