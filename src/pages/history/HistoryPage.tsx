@@ -134,7 +134,7 @@ export const HistoryPage = (): ReactElement => {
         </div>
       </header>
 
-      <div className="history-scroll ui-page-scroll-area">
+      <div className="history-scroll ui-page-scroll-area ui-scroll-fade-top">
         {isLoading ? (
           <div className="history-list ui-container ui-stack" aria-label="Загрузка истории тренировок">
             {Array.from({ length: 4 }).map((_, index: number) => (
