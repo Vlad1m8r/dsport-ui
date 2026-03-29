@@ -10,6 +10,7 @@ import { ExercisePickerPage } from "../pages/ExercisePickerPage";
 import { TemplatesPage } from "../pages/TemplatesPage";
 import { WorkoutsHistoryPage } from "../pages/WorkoutsHistoryPage";
 import { WorkoutPage } from "../pages/WorkoutPage";
+import { FigmaHomePreviewPage } from "../pages/FigmaHomePreviewPage";
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
           {
             path: "workouts",
             element: <WorkoutsHistoryPage />,
+          },
+          {
+            path: "figma/home-preview",
+            element: <FigmaHomePreviewPage />,
           },
         ],
       },

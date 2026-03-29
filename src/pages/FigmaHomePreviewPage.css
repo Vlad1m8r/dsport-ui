@@ -1,0 +1,355 @@
+.figma-home-preview {
+  min-height: 100%;
+  overflow: auto;
+  padding: 48px 24px 120px;
+}
+
+.figma-home-preview__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin: 0 auto 32px;
+  max-width: 1560px;
+}
+
+.figma-home-preview__kicker {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.figma-home-preview__title {
+  margin: 0;
+  max-width: 760px;
+  font-size: 44px;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.figma-home-preview__description {
+  max-width: 420px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.figma-home-preview__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+  max-width: 1560px;
+  margin: 0 auto;
+}
+
+.figma-home-preview__device-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 32px;
+}
+
+.figma-home-preview__device-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.figma-home-preview__device-name {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.figma-home-preview__device-subtitle,
+.figma-home-preview__device-size {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.figma-home-preview__phone-shell {
+  width: var(--device-width);
+  height: var(--device-height);
+  margin: 0 auto;
+  padding: 14px;
+  border-radius: 44px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.18)),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.82));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 24px 64px rgba(15, 23, 42, 0.18);
+}
+
+.figma-home-preview__phone-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+  padding: 16px 16px 28px;
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--device-accent) 26%, transparent), transparent 28%),
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.22), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.86));
+  overflow: hidden;
+}
+
+.figma-home-preview__phone-screen::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 34%;
+  height: 28px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+}
+
+.figma-home-preview__statusbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 2px 0;
+  color: #0f172a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.figma-home-preview__hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 18px;
+  border-radius: 24px;
+}
+
+.figma-home-preview__hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.figma-home-preview__eyebrow,
+.figma-home-preview__focus-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--device-accent);
+}
+
+.figma-home-preview__hero-title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  color: #0f172a;
+}
+
+.figma-home-preview__hero-text,
+.figma-home-preview__focus-text {
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.figma-home-preview__hero-avatar {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--device-accent), #38bdf8);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--device-accent) 30%, transparent);
+}
+
+.figma-home-preview__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.figma-home-preview__metric,
+.figma-home-preview__stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-radius: 20px;
+}
+
+.figma-home-preview__metric-label,
+.figma-home-preview__stat-label {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.figma-home-preview__metric-value,
+.figma-home-preview__stat-value {
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.figma-home-preview__actions {
+  margin-top: 0;
+}
+
+.figma-home-preview__focus-card,
+.figma-home-preview__week {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 24px;
+}
+
+.figma-home-preview__focus-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.figma-home-preview__focus-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: #0f172a;
+}
+
+.figma-home-preview__progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.figma-home-preview__progress-track {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.2);
+  overflow: hidden;
+}
+
+.figma-home-preview__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--device-accent), #38bdf8);
+}
+
+.figma-home-preview__progress-label,
+.figma-home-preview__stat-delta,
+.figma-home-preview__section-link {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.figma-home-preview__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.figma-home-preview__section-title {
+  margin: 0;
+  font-size: 17px;
+  color: #0f172a;
+}
+
+.figma-home-preview__week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.figma-home-preview__week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 4px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.figma-home-preview__week-day-name {
+  font-size: 11px;
+  color: #475569;
+}
+
+.figma-home-preview__week-day-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+}
+
+.figma-home-preview__week-day--done .figma-home-preview__week-day-dot {
+  background: linear-gradient(135deg, var(--device-accent), #38bdf8);
+}
+
+.figma-home-preview__week-day--planned .figma-home-preview__week-day-dot {
+  background: rgba(148, 163, 184, 0.28);
+  border: 2px solid color-mix(in srgb, var(--device-accent) 55%, white);
+}
+
+.figma-home-preview__week-day--rest .figma-home-preview__week-day-dot {
+  background: rgba(226, 232, 240, 0.85);
+}
+
+.figma-home-preview__stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.figma-home-preview__stat-delta {
+  font-weight: 500;
+}
+
+.figma-home-preview .footer-nav {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  padding: 0;
+}
+
+.figma-home-preview .footer-nav__inner {
+  max-width: none;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+}
+
+.figma-home-preview .footer-nav__button.ui-button,
+.figma-home-preview .footer-nav__button.ui-button--ghost {
+  min-height: 44px;
+}
+
+@media (max-width: 1440px) {
+  .figma-home-preview__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .figma-home-preview__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
